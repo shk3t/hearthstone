@@ -1,0 +1,16 @@
+# Private data
+.env
+env.*
+
+# Logs
+logs/
+*.log
+
+# Builds
+build/
+
+# Debug
+__debug*
+
+# Archives
+*.zip
