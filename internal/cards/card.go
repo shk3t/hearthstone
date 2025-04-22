@@ -1,5 +1,9 @@
 package cards
 
+type Playable interface {
+	Play()
+}
+
 type Card struct {
 	ManaCost    int
 	Name        string

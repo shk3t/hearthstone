@@ -1,24 +1,22 @@
 package main
 
 import (
-	"fmt"
+	"hearthstone/internal/cards"
 	"hearthstone/internal/game"
-	s "strings"
+	"hearthstone/internal/ui"
 )
 
-func DisplayGame() {
+func main() {
 	topPlayer := game.NewPlayer()
 	botPlayer := game.NewPlayer()
 
-	fmt.Println(topPlayer.Hero)
+	topPlayer.Hand[0] = &cards.AllCards.ChillwindYeti
+	topPlayer.Hand[3] = &cards.AllCards.RiverCrocolisk
 
-	fmt.Println(s.Repeat("=", 30))
-	fmt.Println(s.Repeat("-", 30))
-	fmt.Println(s.Repeat("=", 30))
+	botPlayer.Hand[3] = &cards.AllCards.Fireball
 
-	fmt.Println(botPlayer.Hero)
-}
+	table := &game.Table{}
+	table.Top[0] = &cards.AllCards.ChillwindYeti
 
-func main() {
-	DisplayGame()
+	ui.DisplayGame(topPlayer, botPlayer, table)
 }

@@ -1,6 +1,8 @@
 package game
 
-import "hearthstone/internal/cards"
+import (
+	"hearthstone/internal/cards"
+)
 
 type Player struct {
 	Hero Hero
@@ -8,13 +10,9 @@ type Player struct {
 	Deck Deck
 }
 
-type Deck struct {
-	Cards [30]*cards.Card
-}
+type Deck [30]cards.Playable
 
-type Hand struct {
-	Cards [10]*cards.Card
-}
+type Hand [10]cards.Playable
 
 func NewPlayer() *Player {
 	return &Player{
@@ -22,4 +20,21 @@ func NewPlayer() *Player {
 		Hand: Hand{},
 		Deck: Deck{},
 	}
+}
+
+func (h *Hand) String() string {
+	return OrderedPlayableString(h[:])
+}
+
+func (h *Hand) Play(num int) cards.Playable {
+	i := 1
+	for _, card := range h {
+		if i == num {
+			return card
+		}
+		if card != nil {
+			i++
+		}
+	}
+	return nil
 }

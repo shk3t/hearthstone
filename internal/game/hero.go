@@ -25,7 +25,7 @@ func NewHero() *Hero {
 	}
 }
 
-func (h Hero) String() string {
+func (h *Hero) String() string {
 	return fmt.Sprintf(
 		"%-15s | %d/%dm | %dh",
 		h.Class,

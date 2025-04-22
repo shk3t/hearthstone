@@ -19,8 +19,16 @@ var MinionTypes = struct {
 	Murloc MinionType
 }{"Нет", "Зверь", "Механизм", "Пират", "Мурлок"}
 
-func (m Minion) String() string {
+func (m *Minion) String() string {
 	return fmt.Sprintf(
-		"",
+		"<%d> %s %d/%d",
+		m.ManaCost,
+		m.Name,
+		m.Attack,
+		m.Health,
 	)
+}
+
+func (m *Minion) Play() {
+
 }
