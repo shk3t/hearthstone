@@ -2,6 +2,7 @@ package game
 
 import (
 	"hearthstone/internal/cards"
+	"hearthstone/pkg/conversions"
 )
 
 type Table struct {
@@ -12,9 +13,6 @@ type Table struct {
 type TableArea [7]*cards.Minion
 
 func (t *TableArea) String() string {
-	playables := make([]cards.Playable, len(*t))
-	for i, card := range t {
-		playables[i] = card
-	}
+	playables := conversions.TrueNilInterfaceSlice[cards.Minion, cards.Playable](t[:])
 	return OrderedPlayableString(playables)
 }
