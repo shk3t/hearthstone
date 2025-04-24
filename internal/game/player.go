@@ -1,40 +1,43 @@
 package game
 
 import (
+	"errors"
 	"hearthstone/internal/cards"
+	"hearthstone/pkg/collections"
 )
 
 type Player struct {
-	Hero Hero
-	Hand Hand
-	Deck Deck
+	Hero  Hero
+	Hand  Hand
+	Deck  Deck
+	table *Table
+	side  side
 }
 
-type Deck [30]cards.Playable
-
-type Hand [10]cards.Playable
-
-func NewPlayer() *Player {
+func NewPlayer(table *Table) *Player {
 	return &Player{
-		Hero: *NewHero(),
-		Hand: Hand{},
-		Deck: Deck{},
+		Hero:  *NewHero(),
+		Hand:  Hand(collections.NewShrice[cards.Playable](handSize)),
+		Deck:  Deck(collections.NewShrice[cards.Playable](deckSize)),
+		table: table,
+		side:  sides.top,
 	}
 }
 
-func (h *Hand) String() string {
-	return OrderedPlayableString(h[:])
+
+func (p *Player) getArea() TableArea {
+	return p.table.getArea(p.side)
 }
 
-func (h *Hand) Play(num int) cards.Playable {
-	i := 1
-	for _, card := range h {
-		if i == num {
-			return card
-		}
-		if card != nil {
-			i++
-		}
+func (p *Player) PlayCard(handIdx int, areaIdx int) error {
+	card, err := p.Hand.take(handIdx)
+
+	switch card := card.(type) {
+	case *cards.Minion:
+		err = p.getArea().put(areaIdx, card)
+	case *cards.Spell:
+		return errors.New("Spell play is not implemented")
 	}
-	return nil
+
+	return err
 }

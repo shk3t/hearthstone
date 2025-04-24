@@ -14,7 +14,3 @@ func (m *Spell) String() string {
 		m.Name,
 	)
 }
-
-func (m *Spell) Play() {
-
-}

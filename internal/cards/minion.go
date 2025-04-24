@@ -28,7 +28,3 @@ func (m *Minion) String() string {
 		m.Health,
 	)
 }
-
-func (m *Minion) Play() {
-
-}

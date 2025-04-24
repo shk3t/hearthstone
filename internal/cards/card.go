@@ -1,5 +1,10 @@
 package cards
 
+import (
+	"fmt"
+	"strings"
+)
+
 type Playable interface {
 	Play()
 }
@@ -33,3 +38,19 @@ var Rarities = struct {
 	Epic      Raritiy
 	Legendary Raritiy
 }{"Базовая", "Обычная", "Редкая", "Эпическая", "Легендарная"}
+
+func (m *Card) Play() {
+
+}
+
+func OrderedPlayableString(cards []Playable) string {
+	builder := strings.Builder{}
+	i := 1
+	for _, card := range cards {
+		if card != nil {
+			fmt.Fprintf(&builder, "%d. %s\n", i, card)
+			i++
+		}
+	}
+	return builder.String()
+}
