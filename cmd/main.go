@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	table := &game.Table{}
+	table := game.NewTable()
 
 	topPlayer := game.NewPlayer(table)
 	botPlayer := game.NewPlayer(table)

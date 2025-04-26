@@ -63,7 +63,7 @@ func (s Shrice[T]) Pop(idx int) (T, error) {
 
 func (s Shrice[T]) shrink() {
 	var null T
-	j := s.Len() - 1
+	j := s.Len()
 	for i := j + 1; i < s.Cap(); i++ {
 		if s[i] != null {
 			s[j] = s[i]
