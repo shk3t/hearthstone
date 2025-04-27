@@ -29,13 +29,6 @@ func (t *Table) String() string {
 	return builder.String()
 }
 
-type side string
-
-var sides = struct {
-	top side
-	bot side
-}{"Top", "Bot"}
-
 func (t *Table) getArea(playerSide side) TableArea {
 	switch playerSide {
 	case sides.top:

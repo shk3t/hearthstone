@@ -7,26 +7,25 @@ import (
 )
 
 type Player struct {
-	Hero  Hero
-	Hand  Hand
-	Deck  Deck
-	table *Table
-	side  side
+	Hero Hero
+	Hand Hand
+	Deck Deck
+	Side side
+	game *Game
 }
 
-func NewPlayer(table *Table) *Player {
+func NewPlayer(game *Game) *Player {
 	return &Player{
-		Hero:  *NewHero(),
-		Hand:  Hand(collections.NewShrice[cards.Playable](handSize)),
-		Deck:  Deck(collections.NewShrice[cards.Playable](deckSize)),
-		table: table,
-		side:  sides.top,
+		Hero: *NewHero(),
+		Hand: Hand(collections.NewShrice[cards.Playable](handSize)),
+		Deck: Deck(collections.NewShrice[cards.Playable](deckSize)),
+		Side: sides.top,
+		game: game,
 	}
 }
 
-
 func (p *Player) getArea() TableArea {
-	return p.table.getArea(p.side)
+	return p.game.Table.getArea(p.Side)
 }
 
 func (p *Player) PlayCard(handIdx int, areaIdx int) error {
