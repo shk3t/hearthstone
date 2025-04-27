@@ -21,13 +21,11 @@ func NewTable() *Table {
 
 func (t *Table) String() string {
 	builder := strings.Builder{}
-	builder.WriteRune('\n')
-	fmt.Fprintln(&builder, strings.Repeat("=", 30))
+	fmt.Fprintln(&builder, strings.Repeat("=", 50))
 	fmt.Fprint(&builder, &t.top)
-	fmt.Fprintln(&builder, strings.Repeat("-", 30))
+	fmt.Fprintln(&builder, strings.Repeat("-", 50))
 	fmt.Fprint(&builder, &t.bot)
-	fmt.Fprintln(&builder, strings.Repeat("=", 30))
-	builder.WriteRune('\n')
+	fmt.Fprintln(&builder, strings.Repeat("=", 50))
 	return builder.String()
 }
 

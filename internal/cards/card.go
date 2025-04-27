@@ -2,6 +2,7 @@ package cards
 
 import (
 	"fmt"
+	"hearthstone/internal/config"
 	"strings"
 )
 
@@ -46,6 +47,10 @@ func (m *Card) Play() {
 func OrderedPlayableString(cards []Playable) string {
 	builder := strings.Builder{}
 	i := 1
+	if config.Config.Debug {
+		i--
+	}
+
 	for _, card := range cards {
 		if card != nil {
 			fmt.Fprintf(&builder, "%d. %s\n", i, card)
