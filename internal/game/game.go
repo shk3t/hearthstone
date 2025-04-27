@@ -10,7 +10,6 @@ type Game struct {
 	BotPlayer Player
 	Table     Table
 	Turn      side
-	InputHelp string // TODO extract this somehow
 }
 
 func NewGame() *Game {
@@ -27,14 +26,7 @@ func (g *Game) String() string {
 	builder := strings.Builder{}
 	fmt.Fprint(&builder, &g.TopPlayer)
 	fmt.Fprint(&builder, &g.Table)
-	fmt.Fprintln(&builder, &g.BotPlayer)
-
-	if g.InputHelp != "" {
-		fmt.Fprintln(&builder, g.InputHelp)
-	}
-
-	fmt.Fprint(&builder, prompt)
-
+	fmt.Fprint(&builder, &g.BotPlayer)
 	return builder.String()
 }
 
@@ -55,5 +47,3 @@ var sides = struct {
 	top side
 	bot side
 }{"Top", "Bot"}
-
-const prompt = "> "

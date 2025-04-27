@@ -1,10 +1,11 @@
 package core
 
 import (
-	"hearthstone/internal/game"
+	gamepkg "hearthstone/internal/game"
 )
 
-func StartGame(game *game.Game) {
+func StartGame(gameState *gamepkg.Game) {
+	game := NewActiveGame(gameState)
 	for {
 		DisplayFrame(game.String())
 		HandleInput(game)

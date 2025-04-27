@@ -4,12 +4,12 @@ import (
 	"hearthstone/internal/cards"
 	"hearthstone/internal/config"
 	"hearthstone/internal/core"
-	"hearthstone/internal/game"
+	gamepkg "hearthstone/internal/game"
 )
 
 func main() {
 	config.InitConfig()
-	game := game.NewGame()
+	game := gamepkg.NewGame()
 
 	game.TopPlayer.Hand[0] = &cards.AllCards.RiverCrocolisk
 	game.TopPlayer.Hand[1] = &cards.AllCards.RiverCrocolisk
