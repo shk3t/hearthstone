@@ -9,13 +9,12 @@ type Game struct {
 	TopPlayer Player
 	BotPlayer Player
 	Table     Table
-	Turn      side
+	turn      side
 }
 
 func NewGame() *Game {
 	game := &Game{
 		Table: *NewTable(),
-		Turn:  sides.top,
 	}
 	game.TopPlayer = *NewPlayer(game)
 	game.BotPlayer = *NewPlayer(game)
@@ -31,7 +30,7 @@ func (g *Game) String() string {
 }
 
 func (g *Game) GetActivePlayer() *Player {
-	switch g.Turn {
+	switch g.turn {
 	case sides.top:
 		return &g.TopPlayer
 	case sides.bot:
@@ -39,6 +38,20 @@ func (g *Game) GetActivePlayer() *Player {
 	default:
 		panic("Invalid side")
 	}
+}
+
+func (g *Game) StartTurn() {
+	switch g.turn {
+	case sides.top:
+		g.turn = sides.bot
+	default:
+		g.turn = sides.top
+	}
+
+	activePlayer := g.GetActivePlayer()
+	activePlayer.IncreaseMana()
+	activePlayer.RestoreMana()
+	activePlayer.DrawCard()
 }
 
 type side string

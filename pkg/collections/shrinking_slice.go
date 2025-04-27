@@ -1,6 +1,8 @@
 package collections
 
-import "errors"
+import (
+	errorpkg "hearthstone/pkg/errors"
+)
 
 // Shrinking slice
 // Works with pointers and interfaces
@@ -28,11 +30,11 @@ func (s Shrice[T]) Cap() int {
 func (s Shrice[T]) Insert(idx int, value T) error {
 	var null T
 	if idx < 0 || s.Cap() <= idx {
-		return errors.New("Invalid index")
+		return errorpkg.NewIndexError(&idx)
 	}
 	length := s.Len()
 	if s.Cap() == length {
-		return errors.New("Shrice is full")
+		return errorpkg.NewFullError()
 	}
 
 	if s[idx] != null {
@@ -49,15 +51,33 @@ func (s Shrice[T]) Insert(idx int, value T) error {
 	return nil
 }
 
+// func (s Shrice[T]) PushBack(value T) error {
+// 	// TODO: add last
+// }
+
 func (s Shrice[T]) Pop(idx int) (T, error) {
 	var null T
+	// TODO: empty
 	if idx < 0 || s.Cap() <= idx || s[idx] == null {
-		return null, errors.New("Invalid index")
+		return null, errorpkg.NewIndexError(&idx)
 	}
 
 	value := s[idx]
 	s[idx] = null
 	s.shrink()
+	return value, nil
+}
+
+func (s Shrice[T]) PopBack() (T, error) {
+	var null T
+	idx := s.Len() - 1
+
+	if idx < 0 {
+		return null, errorpkg.NewEmptyError()
+	}
+
+	value := s[idx]
+	s[idx] = null
 	return value, nil
 }
 

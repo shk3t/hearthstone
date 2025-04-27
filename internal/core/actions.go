@@ -1,29 +1,34 @@
 package core
 
-import "strconv"
+import (
+	"errors"
+	"strconv"
+)
 
-func DoPlay(game *ActiveGame, args []string) {
-	if len(args) != 3 {
-		game.InputHelp = `Invalid arguments, use the following form:
+var playDefaultHelp = `
+Use the following form:
 play <hand position> <table position>`
-		return
+
+func DoPlay(args []string, game *ActiveGame) error {
+	if len(args) != 3 {
+		return errors.New("Invalid arguments." + playDefaultHelp)
 	}
 
 	handPos, err := strconv.Atoi(args[1])
 	if err != nil {
-		game.InputHelp = `Invalid 1 argument, use the following form:
-play <hand position> <table position>`
-		return
+		return errors.New("Invalid 1 argument." + playDefaultHelp)
 	}
 
 	tablePos, err := strconv.Atoi(args[2])
 	if err != nil {
-		game.InputHelp = `Invalid 2 argument, use the following form:
-play <hand position> <table position>`
-		return
+		return errors.New("Invalid 2 argument." + playDefaultHelp)
 	}
 
-	player := game.GetActivePlayer()
-	player.PlayCard(handPos-1, tablePos-1)
+	activePlayer := game.GetActivePlayer()
+	err = activePlayer.PlayCard(handPos-1, tablePos-1)
+	if err != nil {
+		return err
+	}
 
+	return nil
 }

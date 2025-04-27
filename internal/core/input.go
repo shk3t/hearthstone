@@ -2,7 +2,6 @@ package core
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"strings"
 )
@@ -15,12 +14,14 @@ func HandleInput(game *ActiveGame) {
 
 	input = strings.ToLower(input)
 	args := strings.Split(input, " ")
-	fmt.Println(args)
 
 	game.InputHelp = ""
 	switch {
 	case strings.HasPrefix(args[0], "p"):
-		DoPlay(game, args)
+		err := DoPlay(args, game)
+		if err != nil {
+			game.InputHelp = err.Error()
+		}
 	default:
 		game.InputHelp = `Invalid action, actions available:
 play (p) - play a card
