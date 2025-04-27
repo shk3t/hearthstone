@@ -2,8 +2,10 @@ package game
 
 import (
 	"errors"
+	"fmt"
 	"hearthstone/internal/cards"
 	"hearthstone/pkg/collections"
+	"strings"
 )
 
 type Player struct {
@@ -22,6 +24,23 @@ func NewPlayer(game *Game) *Player {
 		Side: sides.top,
 		game: game,
 	}
+}
+
+func (p *Player) String() string {
+	builder := strings.Builder{}
+
+	switch p.Side {
+	case sides.top:
+		fmt.Fprint(&builder, &p.Hand)
+		fmt.Fprintln(&builder, &p.Hero)
+	case sides.bot:
+		fmt.Fprintln(&builder, &p.Hero)
+		fmt.Fprint(&builder, &p.Hand)
+	default:
+		panic("Invalid side")
+	}
+
+	return builder.String()
 }
 
 func (p *Player) getArea() TableArea {

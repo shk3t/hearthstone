@@ -6,16 +6,18 @@ import (
 )
 
 type Game struct {
-	TopPlayer  Player
-	BotPlayer  Player
-	Table      Table
-	Turn       side
-	InputError error
+	TopPlayer Player
+	BotPlayer Player
+	Table     Table
+	Turn      side
+	InputHelp string // TODO extract this somehow
 }
 
 func NewGame() *Game {
-	game := new(Game)
-	game.Table = *NewTable()
+	game := &Game{
+		Table: *NewTable(),
+		Turn:  sides.top,
+	}
 	game.TopPlayer = *NewPlayer(game)
 	game.BotPlayer = *NewPlayer(game)
 	return game
@@ -23,19 +25,28 @@ func NewGame() *Game {
 
 func (g *Game) String() string {
 	builder := strings.Builder{}
-	fmt.Fprint(&builder, &g.TopPlayer.Hand)
-	fmt.Fprintln(&builder, &g.TopPlayer.Hero)
+	fmt.Fprint(&builder, &g.TopPlayer)
 	fmt.Fprint(&builder, &g.Table)
-	fmt.Fprintln(&builder, &g.BotPlayer.Hero)
-	fmt.Fprintln(&builder, &g.BotPlayer.Hand)
+	fmt.Fprintln(&builder, &g.BotPlayer)
 
-	if g.InputError != nil {
-		fmt.Fprintln(&builder, g.InputError)
+	if g.InputHelp != "" {
+		fmt.Fprintln(&builder, g.InputHelp)
 	}
 
 	fmt.Fprint(&builder, prompt)
 
 	return builder.String()
+}
+
+func (g *Game) GetActivePlayer() *Player {
+	switch g.Turn {
+	case sides.top:
+		return &g.TopPlayer
+	case sides.bot:
+		return &g.BotPlayer
+	default:
+		panic("Invalid side")
+	}
 }
 
 type side string
