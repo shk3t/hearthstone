@@ -23,14 +23,13 @@ func main() {
 
 	botPlayer.Hand[3] = &cards.AllCards.Fireball
 
-	ui.DisplayFrame(topPlayer, botPlayer, table)
+	ui.DisplayGame(topPlayer, botPlayer, table)
 
 	topPlayer.PlayCard(0, 3)
 	topPlayer.PlayCard(1, 3)
 	topPlayer.PlayCard(2, 3)
-	ui.DisplayFrame(topPlayer, botPlayer, table)
+	ui.DisplayGame(topPlayer, botPlayer, table)
 
 	topPlayer.PlayCard(2, 2)
-	ui.DisplayFrame(topPlayer, botPlayer, table)
-	// TODO: handle input
+	ui.DisplayGame(topPlayer, botPlayer, table)
 }

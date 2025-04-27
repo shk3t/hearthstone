@@ -4,24 +4,33 @@ import (
 	"fmt"
 	"hearthstone/internal/config"
 	"hearthstone/internal/game"
+	"hearthstone/pkg/sugar"
+	"strings"
 )
 
-func DisplayFrame(topPlayer, botPlayer *game.Player, table *game.Table) {
-	if !config.Config.Debug {
-		clearDisplay()
-	}
+var DisplayFrame = sugar.If(config.Config.Debug, PrintFrame, UpdateFrame)
 
-	fmt.Print(&topPlayer.Hand)
-	fmt.Println(&topPlayer.Hero)
-	fmt.Print(table)
-	fmt.Println(&botPlayer.Hero)
-	fmt.Print(&botPlayer.Hand)
+const prompt = "\n> "
 
-	if config.Config.Debug {
-		displayFrameSeparator()
-	}
+func DisplayGame(topPlayer, botPlayer *game.Player, table *game.Table) {
+	builder := strings.Builder{}
+	fmt.Fprint(&builder, &topPlayer.Hand)
+	fmt.Fprintln(&builder, &topPlayer.Hero)
+	fmt.Fprint(&builder, table)
+	fmt.Fprintln(&builder, &botPlayer.Hero)
+	fmt.Fprint(&builder, &botPlayer.Hand)
+
+	builder.WriteString(prompt)
+
+	DisplayFrame(builder.String())
 }
 
-func clearDisplay() {
+func UpdateFrame(content string) {
 	fmt.Print("\033[2J\033[H")
+	fmt.Print(content)
+}
+
+func PrintFrame(content string) {
+	fmt.Print(content)
+	fmt.Print("\n\n\n")
 }

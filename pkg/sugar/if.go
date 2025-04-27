@@ -23,3 +23,11 @@ func Or[T comparable](a T, b T) T {
 	}
 	return a
 }
+
+func If[T any](condition bool, ifValue T, elseValue T) T {
+	if condition {
+		return ifValue
+	} else {
+		return elseValue
+	}
+}
