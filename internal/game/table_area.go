@@ -6,6 +6,7 @@ import (
 	"hearthstone/pkg/conversions"
 )
 
+// AVOID direct indexing!
 type TableArea collections.Shrice[*cards.Minion]
 
 func (a TableArea) String() string {

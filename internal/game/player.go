@@ -43,7 +43,9 @@ func (p *Player) String() string {
 	return builder.String()
 }
 
-func (p *Player) PlayCard(handIdx int, areaIdx int) error {
+func (p *Player) PlayCard(handPos int, areaPos int) error {
+	handIdx, areaIdx := handPos-1, areaPos-1
+
 	card, err := p.Hand.pick(handIdx)
 	if err != nil {
 		return err

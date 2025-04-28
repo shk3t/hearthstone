@@ -8,14 +8,21 @@ import (
 
 type ActiveGame struct {
 	*gamepkg.Game
-	InputHelp string
+	InputHelp    string
+	TurnFinished bool
 }
 
 func NewActiveGame(game *gamepkg.Game) *ActiveGame {
 	return &ActiveGame{
-		Game:      game,
-		InputHelp: "",
+		Game:         game,
+		InputHelp:    "",
+		TurnFinished: true,
 	}
+}
+
+func (g *ActiveGame) StartNextTurn() {
+	g.TurnFinished = false
+	g.Game.StartNextTurn()
 }
 
 func (g *ActiveGame) String() string {

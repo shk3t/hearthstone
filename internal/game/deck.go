@@ -5,6 +5,7 @@ import (
 	"hearthstone/pkg/collections"
 )
 
+// AVOID direct indexing!
 type Deck collections.Shrice[cards.Playable]
 
 const deckSize = 30

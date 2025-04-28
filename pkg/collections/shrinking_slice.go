@@ -1,11 +1,13 @@
 package collections
 
 import (
+	"fmt"
 	errorpkg "hearthstone/pkg/errors"
 )
 
-// Shrinking slice
-// Works with pointers and interfaces
+// Shrinking slice.
+// Works with pointers and interfaces.
+// AVOID direct indexing!
 type Shrice[T comparable] []T
 
 func NewShrice[T comparable](size int) Shrice[T] {
@@ -57,8 +59,10 @@ func (s Shrice[T]) Insert(idx int, value T) error {
 
 func (s Shrice[T]) Pop(idx int) (T, error) {
 	var null T
-	// TODO: empty
-	if idx < 0 || s.Cap() <= idx || s[idx] == null {
+	fmt.Println(null, s[0])  // TODO: TEST, use logging
+	if s[0] == null {
+		return null, errorpkg.NewEmptyError()
+	} else if idx < 0 || s.Cap() <= idx || s[idx] == null {
 		return null, errorpkg.NewIndexError(&idx)
 	}
 

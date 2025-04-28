@@ -9,22 +9,25 @@ import (
 var scanner = bufio.NewScanner(os.Stdin)
 
 func HandleInput(game *ActiveGame) {
+	var err error
+	game.InputHelp = ""
+
 	scanner.Scan()
 	input := scanner.Text()
 
 	input = strings.ToLower(input)
 	args := strings.Split(input, " ")
 
-	game.InputHelp = ""
 	switch {
 	case strings.HasPrefix(args[0], "p"):
-		err := DoPlay(args, game)
-		if err != nil {
-			game.InputHelp = err.Error()
-		}
+		err = DoPlay(args, game)
+	case strings.HasPrefix(args[0], "e"):
+		DoEnd(game)
 	default:
-		game.InputHelp = `Invalid action, actions available:
-play (p) - play a card
-`
+		game.InputHelp = actionsHelp
+	}
+
+	if err != nil {
+		game.InputHelp = err.Error()
 	}
 }

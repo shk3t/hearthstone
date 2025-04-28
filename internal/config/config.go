@@ -14,7 +14,7 @@ type config struct {
 	Debug bool
 }
 
-func InitConfig() {
+func Init() {
 	if err := godotenv.Load(".env"); err != nil {
 		fmt.Println("Error loading .env file")
 	}

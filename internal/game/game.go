@@ -40,7 +40,7 @@ func (g *Game) GetActivePlayer() *Player {
 	}
 }
 
-func (g *Game) StartTurn() {
+func (g *Game) StartNextTurn() {
 	switch g.turn {
 	case sides.top:
 		g.turn = sides.bot
