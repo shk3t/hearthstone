@@ -1,21 +1,22 @@
 package logging
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"os"
 )
 
 var DebugLogger *log.Logger
+var DLog func(...any)
 
 func Init() {
-	debugLogFile, err := os.OpenFile("debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	debugLogFile, err := os.OpenFile("logs/debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		panic("Can't open log file")
 	}
-	DebugLogger = log.New(debugLogFile, "DEBUG:", log.LstdFlags|log.Lshortfile)
 
+	DebugLogger = log.New(debugLogFile, "", log.LstdFlags|log.Lshortfile)
+	DLog = DebugLogger.Println
 }
 
 func Deinit() {
@@ -26,6 +27,5 @@ func Deinit() {
 		if err != nil {
 			panic("Can't close log file")
 		}
-		fmt.Println("CLOSED!")
 	}
 }

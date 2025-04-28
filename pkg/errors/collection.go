@@ -14,11 +14,11 @@ type FullError struct{}
 func NewIndexError(index *int) IndexError {
 	return IndexError{index: index}
 }
-func NewEmptyError() IndexError {
-	return IndexError{}
+func NewEmptyError() EmptyError {
+	return EmptyError{}
 }
-func NewFullError() IndexError {
-	return IndexError{}
+func NewFullError() FullError {
+	return FullError{}
 }
 
 func (err IndexError) Error() string {

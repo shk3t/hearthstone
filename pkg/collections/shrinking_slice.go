@@ -1,7 +1,6 @@
 package collections
 
 import (
-	"fmt"
 	errorpkg "hearthstone/pkg/errors"
 )
 
@@ -59,7 +58,6 @@ func (s Shrice[T]) Insert(idx int, value T) error {
 
 func (s Shrice[T]) Pop(idx int) (T, error) {
 	var null T
-	fmt.Println(null, s[0])  // TODO: TEST, use logging
 	if s[0] == null {
 		return null, errorpkg.NewEmptyError()
 	} else if idx < 0 || s.Cap() <= idx || s[idx] == null {
