@@ -3,26 +3,28 @@ package game
 import (
 	"fmt"
 	"hearthstone/internal/cards"
-	"hearthstone/pkg/collections"
+	"hearthstone/pkg/containers"
 	errorpkg "hearthstone/pkg/errors"
 	"strings"
 )
 
 type Player struct {
-	Hero Hero
-	Hand Hand
-	deck Deck
-	Side side
-	game *Game
+	Side    side
+	Hero    Hero
+	Hand    Hand
+	Deck    Deck
+	game    *Game
+	fatigue int
 }
 
 func NewPlayer(game *Game) *Player {
 	return &Player{
-		Hero: *NewHero(),
-		Hand: Hand(collections.NewShrice[cards.Playable](handSize)),
-		deck: Deck(collections.NewShrice[cards.Playable](deckSize)),
-		Side: sides.top,
-		game: game,
+		Side:    sides.top,
+		Hero:    *NewHero(),
+		Hand:    Hand(containers.NewShrice[cards.Playable](handSize)),
+		Deck:    Deck(containers.NewShrice[cards.Playable](deckSize)),
+		game:    game,
+		fatigue: 0,
 	}
 }
 
@@ -53,7 +55,7 @@ func (p *Player) PlayCard(handPos int, areaPos int) error {
 
 	switch card := card.(type) {
 	case *cards.Minion:
-		err = p.getArea().put(areaIdx, card)
+		err = p.getArea().place(areaIdx, card)
 	case *cards.Spell:
 		return errorpkg.NewNotImplementedError("Spells")
 	}
@@ -69,9 +71,28 @@ func (p *Player) RestoreMana() {
 	p.Hero.Mana = p.Hero.MaxMana
 }
 
-func (p *Player) DrawCard() {
-	// card, err := p.deck.takeTop()
-	// TODO: implement
+func (p *Player) DrawCard() []error {
+	errs := make([]error, 0, 4)
+
+	card, err := p.Deck.takeTop()
+	switch err := err.(type) {
+	case EmptyDeckError:
+		p.fatigue++
+		p.Hero.Health -= p.fatigue
+		err.Fatigue = p.fatigue
+		errs = append(errs, err)
+	case nil:
+		err = p.Hand.refill(card)
+		switch err := err.(type) {
+		case FullHandError:
+			err.BurnedCard = card
+			errs = append(errs, err)
+		}
+	default:
+		panic("Unexpected error")
+	}
+
+	return errs
 }
 
 func (p *Player) getArea() TableArea {

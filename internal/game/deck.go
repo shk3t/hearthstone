@@ -2,14 +2,22 @@ package game
 
 import (
 	"hearthstone/internal/cards"
-	"hearthstone/pkg/collections"
+	"hearthstone/pkg/containers"
+	errorpkg "hearthstone/pkg/errors"
 )
 
-// AVOID direct indexing!
-type Deck collections.Shrice[cards.Playable]
+type Deck containers.Shrice[cards.Playable]
 
 const deckSize = 30
 
 func (d Deck) takeTop() (cards.Playable, error) {
-	return collections.Shrice[cards.Playable](d).PopBack()
+	card, err := containers.Shrice[cards.Playable](d).PopBack()
+	switch err.(type) {
+	case errorpkg.EmptyError:
+		return nil, NewEmptyDeckError()
+	case nil:
+		return card, nil
+	default:
+		panic("Unexpected error")
+	}
 }

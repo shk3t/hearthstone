@@ -2,12 +2,11 @@ package game
 
 import (
 	"hearthstone/internal/cards"
-	"hearthstone/pkg/collections"
+	"hearthstone/pkg/containers"
 	errorpkg "hearthstone/pkg/errors"
 )
 
-// AVOID direct indexing!
-type Hand collections.Shrice[cards.Playable]
+type Hand containers.Shrice[cards.Playable]
 
 func (h Hand) String() string {
 	return cards.OrderedPlayableString(h)
@@ -16,7 +15,7 @@ func (h Hand) String() string {
 const handSize = 10
 
 func (h Hand) pick(idx int) (cards.Playable, error) {
-	card, err := collections.Shrice[cards.Playable](h).Pop(idx)
+	card, err := containers.Shrice[cards.Playable](h).Pop(idx)
 	switch err.(type) {
 	case errorpkg.IndexError:
 		return nil, NewCardPickError()
@@ -24,6 +23,18 @@ func (h Hand) pick(idx int) (cards.Playable, error) {
 		return nil, NewEmptyHandError()
 	case nil:
 		return card, nil
+	default:
+		panic("Unexpected error")
+	}
+}
+
+func (h Hand) refill(card cards.Playable) error {
+	err := containers.Shrice[cards.Playable](h).PushBack(card)
+	switch err.(type) {
+	case errorpkg.FullError:
+		return NewFullHandError()
+	case nil:
+		return nil
 	default:
 		panic("Unexpected error")
 	}

@@ -3,7 +3,7 @@ package game
 import (
 	"fmt"
 	"hearthstone/internal/cards"
-	"hearthstone/pkg/collections"
+	"hearthstone/pkg/containers"
 	"strings"
 )
 
@@ -14,8 +14,8 @@ type Table struct {
 
 func NewTable() *Table {
 	return &Table{
-		TableArea(collections.NewShrice[*cards.Minion](areaSize)),
-		TableArea(collections.NewShrice[*cards.Minion](areaSize)),
+		TableArea(containers.NewShrice[*cards.Minion](areaSize)),
+		TableArea(containers.NewShrice[*cards.Minion](areaSize)),
 	}
 }
 

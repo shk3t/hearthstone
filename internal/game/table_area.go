@@ -2,12 +2,11 @@ package game
 
 import (
 	"hearthstone/internal/cards"
-	"hearthstone/pkg/collections"
+	"hearthstone/pkg/containers"
 	"hearthstone/pkg/conversions"
 )
 
-// AVOID direct indexing!
-type TableArea collections.Shrice[*cards.Minion]
+type TableArea containers.Shrice[*cards.Minion]
 
 func (a TableArea) String() string {
 	playables := conversions.TrueNilInterfaceSlice[cards.Minion, cards.Playable](a)
@@ -16,6 +15,6 @@ func (a TableArea) String() string {
 
 const areaSize = 7
 
-func (a TableArea) put(idx int, minion *cards.Minion) error {
-	return collections.Shrice[*cards.Minion](a).Insert(idx, minion)
+func (a TableArea) place(idx int, minion *cards.Minion) error {
+	return containers.Shrice[*cards.Minion](a).Insert(idx, minion)
 }

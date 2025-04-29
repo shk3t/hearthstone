@@ -1,20 +1,18 @@
 package game
 
-type CardPickError struct {
-}
-type EmptyHandError struct {
-}
-type FullTableAreaError struct {
-}
+import (
+	"fmt"
+	"hearthstone/internal/cards"
+)
 
-func (err CardPickError) Error() string {
-	return "Invalid card pick"
+type CardPickError struct{}
+type EmptyHandError struct{}
+type FullHandError struct {
+	BurnedCard cards.Playable
 }
-func (err EmptyHandError) Error() string {
-	return "Hand is empty"
-}
-func (err FullTableAreaError) Error() string {
-	return "Table is full"
+type FullTableAreaError struct{}
+type EmptyDeckError struct {
+	Fatigue int
 }
 
 func NewCardPickError() CardPickError {
@@ -23,6 +21,37 @@ func NewCardPickError() CardPickError {
 func NewEmptyHandError() EmptyHandError {
 	return EmptyHandError{}
 }
+func NewFullHandError() FullHandError {
+	return FullHandError{}
+}
 func NewFullTableAreaError() FullTableAreaError {
 	return FullTableAreaError{}
+}
+func NewEmptyDeckError() EmptyDeckError {
+	return EmptyDeckError{}
+}
+
+func (err CardPickError) Error() string {
+	return "Invalid card pick"
+}
+func (err EmptyHandError) Error() string {
+	return "Hand is empty"
+}
+func (err FullHandError) Error() string {
+	if err.BurnedCard != nil {
+		return fmt.Sprintf(
+			"Hand is full. Recent card was burned: \"%s\"",
+			err.BurnedCard.(*cards.Card).Name,  // TODO: can't type assert to embedded struct
+		)
+	}
+	return "Hand is full"
+}
+func (err FullTableAreaError) Error() string {
+	return "Table is full"
+}
+func (err EmptyDeckError) Error() string {
+	if err.Fatigue != 0 {
+		return fmt.Sprintf("Deck is empty. Fatigue health loss: %d", err.Fatigue)
+	}
+	return "Deck is empty"
 }

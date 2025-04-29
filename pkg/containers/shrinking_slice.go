@@ -1,4 +1,4 @@
-package collections
+package containers
 
 import (
 	errorpkg "hearthstone/pkg/errors"
@@ -52,9 +52,15 @@ func (s Shrice[T]) Insert(idx int, value T) error {
 	return nil
 }
 
-// func (s Shrice[T]) PushBack(value T) error {
-// 	// TODO: add last
-// }
+func (s Shrice[T]) PushBack(value T) error {
+	length := s.Len()
+	if s.Cap() == length {
+		return errorpkg.NewFullError()
+	}
+
+	s[length] = value
+	return nil
+}
 
 func (s Shrice[T]) Pop(idx int) (T, error) {
 	var null T

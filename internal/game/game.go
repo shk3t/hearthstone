@@ -40,7 +40,7 @@ func (g *Game) GetActivePlayer() *Player {
 	}
 }
 
-func (g *Game) StartNextTurn() {
+func (g *Game) StartNextTurn() []error {
 	switch g.turn {
 	case sides.top:
 		g.turn = sides.bot
@@ -51,7 +51,9 @@ func (g *Game) StartNextTurn() {
 	activePlayer := g.GetActivePlayer()
 	activePlayer.IncreaseMana()
 	activePlayer.RestoreMana()
-	activePlayer.DrawCard()
+	errs := activePlayer.DrawCard()
+
+	return errs
 }
 
 type side string

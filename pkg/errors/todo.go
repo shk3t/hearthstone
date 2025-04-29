@@ -2,7 +2,7 @@ package errors
 
 import (
 	"fmt"
-	"strings"
+	"hearthstone/pkg/helpers"
 )
 
 type NotImplementedError struct {
@@ -10,7 +10,11 @@ type NotImplementedError struct {
 }
 
 func (err NotImplementedError) Error() string {
-	return fmt.Sprintf("%s is not implemented", strings.ToTitle(err.feature))
+	return fmt.Sprintf(
+		"%s %s not implemented",
+		helpers.Capitalize(err.feature),
+		helpers.BeForm(err.feature),
+	)
 }
 
 func NewNotImplementedError(feature string) NotImplementedError {
