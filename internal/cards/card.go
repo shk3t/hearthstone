@@ -69,7 +69,3 @@ func ToCard(p Playable) *Card {
 		panic("Invalid type")
 	}
 }
-
-type GoodCard interface {
-	Minion | Spell
-}

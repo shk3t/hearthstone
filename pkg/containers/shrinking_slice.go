@@ -31,7 +31,7 @@ func (s Shrice[T]) Cap() int {
 func (s Shrice[T]) Insert(idx int, value T) error {
 	var null T
 	if idx < 0 || s.Cap() <= idx {
-		return errorpkg.NewIndexError(&idx)
+		return errorpkg.NewIndexError(idx)
 	}
 	length := s.Len()
 	if s.Cap() == length {
@@ -67,7 +67,7 @@ func (s Shrice[T]) Pop(idx int) (T, error) {
 	if s[0] == null {
 		return null, errorpkg.NewEmptyError()
 	} else if idx < 0 || s.Cap() <= idx || s[idx] == null {
-		return null, errorpkg.NewIndexError(&idx)
+		return null, errorpkg.NewIndexError(idx)
 	}
 
 	value := s[idx]

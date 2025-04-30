@@ -5,6 +5,7 @@ import (
 	"hearthstone/internal/cards"
 	"hearthstone/pkg/containers"
 	errorpkg "hearthstone/pkg/errors"
+	"hearthstone/pkg/helpers"
 	"strings"
 )
 
@@ -45,9 +46,7 @@ func (p *Player) String() string {
 	return builder.String()
 }
 
-func (p *Player) PlayCard(handPos int, areaPos int) error {
-	handIdx, areaIdx := handPos-1, areaPos-1
-
+func (p *Player) PlayCard(handIdx int, areaIdx int) error {
 	card, err := p.Hand.pick(handIdx)
 	if err != nil {
 		return err
@@ -56,6 +55,9 @@ func (p *Player) PlayCard(handPos int, areaPos int) error {
 	switch card := card.(type) {
 	case *cards.Minion:
 		err = p.getArea().place(areaIdx, card)
+		if err != nil {
+			p.Hand.revert(handIdx, card)
+		}
 	case *cards.Spell:
 		return errorpkg.NewNotImplementedError("Spells")
 	}
@@ -89,7 +91,7 @@ func (p *Player) DrawCard() []error {
 			errs = append(errs, err)
 		}
 	default:
-		panic("Unexpected error")
+		panic(helpers.UnexpectedError(err))
 	}
 
 	return errs

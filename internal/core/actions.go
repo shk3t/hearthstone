@@ -1,27 +1,24 @@
 package core
 
-import (
-	"errors"
-	"strconv"
-)
+import "errors"
 
 func DoPlay(args []string, game *ActiveGame) error {
 	if len(args) != 3 {
 		return errors.New("Invalid arguments." + playDefaultHelp)
 	}
 
-	handPos, err := strconv.Atoi(args[1])
+	handIdx, err := parseIndexFromPosition(args[1])
 	if err != nil {
 		return errors.New("Invalid 1 argument." + playDefaultHelp)
 	}
 
-	areaPos, err := strconv.Atoi(args[2])
+	areaIdx, err := parseIndexFromPosition(args[1])
 	if err != nil {
 		return errors.New("Invalid 2 argument." + playDefaultHelp)
 	}
 
 	activePlayer := game.GetActivePlayer()
-	err = activePlayer.PlayCard(handPos, areaPos)
+	err = activePlayer.PlayCard(handIdx, areaIdx)
 	if err != nil {
 		return err
 	}

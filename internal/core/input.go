@@ -8,10 +8,12 @@ import (
 
 var scanner = bufio.NewScanner(os.Stdin)
 
-func HandleInput(game *ActiveGame) {
+func handleInput(game *ActiveGame) {
 	var err error
 
-	scanner.Scan()
+	if !scanner.Scan() {
+		scanner = bufio.NewScanner(os.Stdin)
+	}
 	input := scanner.Text()
 
 	input = strings.ToLower(input)

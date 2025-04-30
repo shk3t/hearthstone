@@ -4,6 +4,7 @@ import (
 	"hearthstone/internal/cards"
 	"hearthstone/pkg/containers"
 	errorpkg "hearthstone/pkg/errors"
+	"hearthstone/pkg/helpers"
 )
 
 type Deck containers.Shrice[cards.Playable]
@@ -18,6 +19,6 @@ func (d Deck) takeTop() (cards.Playable, error) {
 	case nil:
 		return card, nil
 	default:
-		panic("Unexpected error")
+		panic(helpers.UnexpectedError(err))
 	}
 }

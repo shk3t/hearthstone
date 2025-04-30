@@ -4,6 +4,7 @@ import (
 	"hearthstone/internal/cards"
 	"hearthstone/pkg/containers"
 	errorpkg "hearthstone/pkg/errors"
+	"hearthstone/pkg/helpers"
 )
 
 type Hand containers.Shrice[cards.Playable]
@@ -18,13 +19,13 @@ func (h Hand) pick(idx int) (cards.Playable, error) {
 	card, err := containers.Shrice[cards.Playable](h).Pop(idx)
 	switch err.(type) {
 	case errorpkg.IndexError:
-		return nil, NewCardPickError()
+		return nil, NewCardPickError(idx)
 	case errorpkg.EmptyError:
 		return nil, NewEmptyHandError()
 	case nil:
 		return card, nil
 	default:
-		panic("Unexpected error")
+		panic(helpers.UnexpectedError(err))
 	}
 }
 
@@ -36,6 +37,13 @@ func (h Hand) refill(card cards.Playable) error {
 	case nil:
 		return nil
 	default:
-		panic("Unexpected error")
+		panic(helpers.UnexpectedError(err))
+	}
+}
+
+func (h Hand) revert(idx int, card cards.Playable) {
+	err := containers.Shrice[cards.Playable](h).Insert(idx, card)
+	if err != nil {
+		panic("Can't return the card to hand")
 	}
 }

@@ -11,6 +11,6 @@ func StartGame(gameState *gamepkg.Game) {
 			game.StartNextTurn()
 		}
 		DisplayFrame(game.String())
-		HandleInput(game)
+		handleInput(game)
 	}
 }
