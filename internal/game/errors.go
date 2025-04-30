@@ -41,7 +41,7 @@ func (err FullHandError) Error() string {
 	if err.BurnedCard != nil {
 		return fmt.Sprintf(
 			"Hand is full. Recent card was burned: \"%s\"",
-			err.BurnedCard.(*cards.Card).Name,  // TODO: can't type assert to embedded struct
+			cards.ToCard(err.BurnedCard).Name,
 		)
 	}
 	return "Hand is full"

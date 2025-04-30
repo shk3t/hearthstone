@@ -2,11 +2,12 @@ package cards
 
 import (
 	"fmt"
+	errorpkg "hearthstone/pkg/errors"
 	"strings"
 )
 
 type Playable interface {
-	Play()
+	Play() error
 }
 
 type Card struct {
@@ -39,8 +40,8 @@ var Rarities = struct {
 	Legendary Raritiy
 }{"Базовая", "Обычная", "Редкая", "Эпическая", "Легендарная"}
 
-func (m *Card) Play() {
-
+func (m *Card) Play() error {
+	return errorpkg.NewUnusableFeatureError()
 }
 
 func OrderedPlayableString(cards []Playable) string {
@@ -54,4 +55,21 @@ func OrderedPlayableString(cards []Playable) string {
 		}
 	}
 	return builder.String()
+}
+
+func ToCard(p Playable) *Card {
+	switch card := p.(type) {
+	case *Card:
+		return card
+	case *Minion:
+		return &card.Card
+	case *Spell:
+		return &card.Card
+	default:
+		panic("Invalid type")
+	}
+}
+
+type GoodCard interface {
+	Minion | Spell
 }
