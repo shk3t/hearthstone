@@ -6,44 +6,71 @@ import (
 	"hearthstone/pkg/containers"
 	errorpkg "hearthstone/pkg/errors"
 	"hearthstone/pkg/helpers"
+	"slices"
 	"strings"
 )
 
 type Player struct {
-	Side    side
+	Side    Side
 	Hero    Hero
 	Hand    Hand
 	Deck    Deck
+	Mana    int
+	MaxMana int
 	game    *Game
 	fatigue int
 }
 
-func NewPlayer(game *Game) *Player {
+func NewPlayer(side Side, game *Game) *Player {
 	return &Player{
-		Side:    sides.top,
+		Side:    side,
 		Hero:    *NewHero(),
 		Hand:    Hand(containers.NewShrice[cards.Playable](handSize)),
 		Deck:    Deck(containers.NewShrice[cards.Playable](deckSize)),
+		Mana:    0,
+		MaxMana: 0,
 		game:    game,
 		fatigue: 0,
 	}
 }
 
 func (p *Player) String() string {
-	builder := strings.Builder{}
+	linesForTop := append(
+		make([]string, 0, 5),
+		string(p.Hero.Class),
+		p.healthString(),
+		p.manaString(),
+		p.Hand.String(),
+	)
 
 	switch p.Side {
-	case sides.top:
-		fmt.Fprint(&builder, &p.Hand)
-		fmt.Fprintln(&builder, &p.Hero)
-	case sides.bot:
-		fmt.Fprintln(&builder, &p.Hero)
-		fmt.Fprint(&builder, &p.Hand)
+	case Sides.top:
+	case Sides.bot:
+		slices.Reverse(linesForTop)
 	default:
 		panic("Invalid side")
 	}
 
-	return builder.String()
+	linesForTop = append(linesForTop, "")
+	return strings.Join(linesForTop, "\n")
+}
+
+func (p *Player) manaString() string {
+	return fmt.Sprintf(
+		"Мана:     %2d/%2d [%s%s]",
+		p.Mana, p.MaxMana,
+		strings.Repeat(" ", p.MaxMana-p.Mana),
+		strings.Repeat("*", p.Mana),
+	)
+}
+
+func (p *Player) healthString() string {
+	return fmt.Sprintf(
+		"Здоровье: %2d/%2d [%s%s]",
+		p.Hero.Health, p.Hero.MaxHealth,
+		strings.Repeat(" ", p.Hero.MaxHealth-p.Hero.Health),
+		strings.Repeat("#", p.Hero.Health),
+	)
 }
 
 func (p *Player) PlayCard(handIdx int, areaIdx int) error {
@@ -51,6 +78,8 @@ func (p *Player) PlayCard(handIdx int, areaIdx int) error {
 	if err != nil {
 		return err
 	}
+
+	p.Mana -= cards.ToCard(card).ManaCost
 
 	switch card := card.(type) {
 	case *cards.Minion:
@@ -63,14 +92,6 @@ func (p *Player) PlayCard(handIdx int, areaIdx int) error {
 	}
 
 	return err
-}
-
-func (p *Player) IncreaseMana() {
-	p.Hero.MaxMana++
-}
-
-func (p *Player) RestoreMana() {
-	p.Hero.Mana = p.Hero.MaxMana
 }
 
 func (p *Player) DrawCard() []error {
@@ -95,6 +116,22 @@ func (p *Player) DrawCard() []error {
 	}
 
 	return errs
+}
+
+func (p *Player) IncreaseMana() {
+	p.MaxMana++
+}
+
+func (p *Player) RestoreMana() {
+	p.Mana = p.MaxMana
+}
+
+func (p *Player) SpendMana(value int) error {
+	if p.Mana-value < 0 {
+		return NewNotEnoughManaError(p.Mana, value)
+	}
+	p.Mana -= value
+	return nil
 }
 
 func (p *Player) getArea() TableArea {

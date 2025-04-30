@@ -29,11 +29,11 @@ func (t *Table) String() string {
 	return builder.String()
 }
 
-func (t *Table) getArea(playerSide side) TableArea {
+func (t *Table) getArea(playerSide Side) TableArea {
 	switch playerSide {
-	case sides.top:
+	case Sides.top:
 		return t.top
-	case sides.bot:
+	case Sides.bot:
 		return t.bot
 	default:
 		panic("Invalid side")

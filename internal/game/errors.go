@@ -1,4 +1,5 @@
 package game
+// TODO: Локализовать все ошибки
 
 import (
 	"fmt"
@@ -7,6 +8,10 @@ import (
 
 type CardPickError struct {
 	position int
+}
+type NotEnoughManaError struct {
+	available int
+	required  int
 }
 type EmptyHandError struct{}
 type FullHandError struct {
@@ -22,6 +27,9 @@ type EmptyDeckError struct {
 
 func NewCardPickError(idx int) CardPickError {
 	return CardPickError{position: idx + 1}
+}
+func NewNotEnoughManaError(available, required int) NotEnoughManaError {
+	return NotEnoughManaError{available, required}
 }
 func NewEmptyHandError() EmptyHandError {
 	return EmptyHandError{}
@@ -41,6 +49,9 @@ func NewEmptyDeckError() EmptyDeckError {
 
 func (err CardPickError) Error() string {
 	return fmt.Sprintf("Invalid card pick: %d", err.position)
+}
+func (err NotEnoughManaError) Error() string {
+	return fmt.Sprintf("Not Enough mana. Available: %d, required: %d", err.available, err.required)
 }
 func (err EmptyHandError) Error() string {
 	return "Hand is empty"

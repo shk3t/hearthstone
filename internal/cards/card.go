@@ -54,7 +54,7 @@ func OrderedPlayableString(cards []Playable) string {
 			i++
 		}
 	}
-	return builder.String()
+	return strings.TrimSuffix(builder.String(), "\n")
 }
 
 func ToCard(p Playable) *Card {

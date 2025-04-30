@@ -9,20 +9,21 @@ type Game struct {
 	TopPlayer Player
 	BotPlayer Player
 	Table     Table
-	turn      side
+	Turn      Side
 }
 
 func NewGame() *Game {
 	game := &Game{
 		Table: *NewTable(),
 	}
-	game.TopPlayer = *NewPlayer(game)
-	game.BotPlayer = *NewPlayer(game)
+	game.TopPlayer = *NewPlayer(Sides.top, game)
+	game.BotPlayer = *NewPlayer(Sides.bot, game)
 	return game
 }
 
 func (g *Game) String() string {
 	builder := strings.Builder{}
+	fmt.Fprintf(&builder, "Ход: %s\n\n", g.Turn)
 	fmt.Fprint(&builder, &g.TopPlayer)
 	fmt.Fprint(&builder, &g.Table)
 	fmt.Fprint(&builder, &g.BotPlayer)
@@ -30,10 +31,10 @@ func (g *Game) String() string {
 }
 
 func (g *Game) GetActivePlayer() *Player {
-	switch g.turn {
-	case sides.top:
+	switch g.Turn {
+	case Sides.top:
 		return &g.TopPlayer
-	case sides.bot:
+	case Sides.bot:
 		return &g.BotPlayer
 	default:
 		panic("Invalid side")
@@ -41,11 +42,11 @@ func (g *Game) GetActivePlayer() *Player {
 }
 
 func (g *Game) StartNextTurn() []error {
-	switch g.turn {
-	case sides.top:
-		g.turn = sides.bot
+	switch g.Turn {
+	case Sides.top:
+		g.Turn = Sides.bot
 	default:
-		g.turn = sides.top
+		g.Turn = Sides.top
 	}
 
 	activePlayer := g.GetActivePlayer()
@@ -56,9 +57,9 @@ func (g *Game) StartNextTurn() []error {
 	return errs
 }
 
-type side string
+type Side string
 
-var sides = struct {
-	top side
-	bot side
-}{"Top", "Bot"}
+var Sides = struct {
+	top Side
+	bot Side
+}{"Верхний", "Нижний"}
