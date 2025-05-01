@@ -4,17 +4,17 @@ import "errors"
 
 func DoPlay(args []string, game *ActiveGame) error {
 	if len(args) != 3 {
-		return errors.New("Invalid arguments." + playDefaultHelp)
+		return errors.New("Некорректные аргументы\n" + playDefaultHelp)
 	}
 
 	handIdx, err := parseIndexFromPosition(args[1])
 	if err != nil {
-		return errors.New("Invalid 1 argument." + playDefaultHelp)
+		return errors.New("Некорретный 1 аргумент\n" + playDefaultHelp)
 	}
 
 	areaIdx, err := parseIndexFromPosition(args[1])
 	if err != nil {
-		return errors.New("Invalid 2 argument." + playDefaultHelp)
+		return errors.New("Некорретный 2 аргумент\n" + playDefaultHelp)
 	}
 
 	activePlayer := game.GetActivePlayer()

@@ -33,14 +33,14 @@ func (s Shrice[T]) Insert(idx int, value T) error {
 	if idx < 0 || s.Cap() <= idx {
 		return errorpkg.NewIndexError(idx)
 	}
-	length := s.Len()
-	if s.Cap() == length {
+	sLen := s.Len()
+	if s.Cap() == sLen {
 		return errorpkg.NewFullError()
 	}
 
 	if s[idx] != null {
 		// Push everything one element to the right
-		for i := length; i > idx; i-- {
+		for i := sLen; i > idx; i-- {
 			s[i] = s[i-1]
 		}
 		s[idx] = value
@@ -52,13 +52,18 @@ func (s Shrice[T]) Insert(idx int, value T) error {
 	return nil
 }
 
-func (s Shrice[T]) PushBack(value T) error {
-	length := s.Len()
-	if s.Cap() == length {
-		return errorpkg.NewFullError()
+func (s Shrice[T]) PushBack(values ...T) error {
+	sCap := s.Cap()
+	sLen := s.Len()
+	vLen := len(values)
+
+	if sCap-sLen < vLen {
+		return errorpkg.NewNotEnoughSpaceError(sCap-sLen, vLen)
 	}
 
-	s[length] = value
+	for i := 0; i < vLen; i++ {
+		s[sLen+i] = values[i]
+	}
 	return nil
 }
 

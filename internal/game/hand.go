@@ -9,6 +9,10 @@ import (
 
 type Hand containers.Shrice[cards.Playable]
 
+func NewHand() Hand {
+	return Hand(containers.NewShrice[cards.Playable](handSize))
+}
+
 func (h Hand) String() string {
 	return cards.OrderedPlayableString(h)
 }
@@ -32,7 +36,7 @@ func (h Hand) pick(idx int) (cards.Playable, error) {
 func (h Hand) refill(card cards.Playable) error {
 	err := containers.Shrice[cards.Playable](h).PushBack(card)
 	switch err.(type) {
-	case errorpkg.FullError:
+	case errorpkg.NotEnoughSpaceError:
 		return NewFullHandError()
 	case nil:
 		return nil

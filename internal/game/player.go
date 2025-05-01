@@ -3,7 +3,6 @@ package game
 import (
 	"fmt"
 	"hearthstone/internal/cards"
-	"hearthstone/pkg/containers"
 	errorpkg "hearthstone/pkg/errors"
 	"hearthstone/pkg/helpers"
 	"slices"
@@ -21,12 +20,12 @@ type Player struct {
 	fatigue int
 }
 
-func NewPlayer(side Side, game *Game) *Player {
+func NewPlayer(side Side, deck Deck, game *Game) *Player {
 	return &Player{
 		Side:    side,
 		Hero:    *NewHero(),
-		Hand:    Hand(containers.NewShrice[cards.Playable](handSize)),
-		Deck:    Deck(containers.NewShrice[cards.Playable](deckSize)),
+		Hand:    NewHand(),
+		Deck:    deck.Copy(),
 		Mana:    0,
 		MaxMana: 0,
 		game:    game,

@@ -12,12 +12,12 @@ type Game struct {
 	Turn      Side
 }
 
-func NewGame() *Game {
+func NewGame(topDeck, botDeck Deck) *Game {
 	game := &Game{
 		Table: *NewTable(),
 	}
-	game.TopPlayer = *NewPlayer(Sides.Top, game)
-	game.BotPlayer = *NewPlayer(Sides.Bot, game)
+	game.TopPlayer = *NewPlayer(Sides.Top, topDeck, game)
+	game.BotPlayer = *NewPlayer(Sides.Bot, botDeck, game)
 	return game
 }
 
