@@ -1,9 +1,7 @@
 package core
 
-const playDefaultHelp = `
-Use the following form:
-play <hand position> <table position>`
+const playDefaultHelp = "play <номер_карты> <позиция_на_столе>"
 
-const actionsHelp = `Invalid action, actions available:
-play (p) - play a card
-end (e) - end the turn`
+const actionsHelp = `Некорректное действие. Доступны:
+play (p) - сыграть карту
+end  (e) - закончить ход`
