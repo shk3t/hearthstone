@@ -31,9 +31,9 @@ func (t *Table) String() string {
 
 func (t *Table) getArea(playerSide Side) TableArea {
 	switch playerSide {
-	case Sides.top:
+	case Sides.Top:
 		return t.top
-	case Sides.bot:
+	case Sides.Bot:
 		return t.bot
 	default:
 		panic("Invalid player side")

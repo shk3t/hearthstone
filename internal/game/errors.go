@@ -1,5 +1,4 @@
 package game
-// TODO: Локализовать все ошибки
 
 import (
 	"fmt"

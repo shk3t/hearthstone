@@ -44,8 +44,8 @@ func (p *Player) String() string {
 	)
 
 	switch p.Side {
-	case Sides.top:
-	case Sides.bot:
+	case Sides.Top:
+	case Sides.Bot:
 		slices.Reverse(linesForTop)
 	default:
 		panic("Invalid player side")
@@ -68,8 +68,8 @@ func (p *Player) healthString() string {
 	return fmt.Sprintf(
 		"Здоровье: %2d/%2d [%s%s]",
 		p.Hero.Health, p.Hero.MaxHealth,
-		strings.Repeat(" ", p.Hero.MaxHealth-p.Hero.Health),
-		strings.Repeat("#", p.Hero.Health),
+		strings.Repeat(" ", min(p.Hero.MaxHealth-p.Hero.Health, p.Hero.MaxHealth)),
+		strings.Repeat("#", max(p.Hero.Health, 0)),
 	)
 }
 

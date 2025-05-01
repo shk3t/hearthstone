@@ -16,8 +16,8 @@ func NewGame() *Game {
 	game := &Game{
 		Table: *NewTable(),
 	}
-	game.TopPlayer = *NewPlayer(Sides.top, game)
-	game.BotPlayer = *NewPlayer(Sides.bot, game)
+	game.TopPlayer = *NewPlayer(Sides.Top, game)
+	game.BotPlayer = *NewPlayer(Sides.Bot, game)
 	return game
 }
 
@@ -32,9 +32,9 @@ func (g *Game) String() string {
 
 func (g *Game) GetActivePlayer() *Player {
 	switch g.Turn {
-	case Sides.top:
+	case Sides.Top:
 		return &g.TopPlayer
-	case Sides.bot:
+	case Sides.Bot:
 		return &g.BotPlayer
 	default:
 		panic("Invalid turn side")
@@ -43,10 +43,10 @@ func (g *Game) GetActivePlayer() *Player {
 
 func (g *Game) StartNextTurn() []error {
 	switch g.Turn {
-	case Sides.top:
-		g.Turn = Sides.bot
+	case Sides.Top:
+		g.Turn = Sides.Bot
 	default:
-		g.Turn = Sides.top
+		g.Turn = Sides.Top
 	}
 
 	activePlayer := g.GetActivePlayer()
@@ -60,6 +60,6 @@ func (g *Game) StartNextTurn() []error {
 type Side string
 
 var Sides = struct {
-	top Side
-	bot Side
+	Top Side
+	Bot Side
 }{"Верхний", "Нижний"}

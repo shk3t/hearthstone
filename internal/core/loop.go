@@ -7,10 +7,14 @@ import (
 func StartGame(gameState *gamepkg.Game) {
 	game := NewActiveGame(gameState)
 	for {
-		if game.TurnFinished {
+		game.CheckWinner()
+		if game.TurnFinished && game.Winner == "" {
 			game.StartNextTurn()
 		}
-		DisplayFrame(game.String())
+		game.Display()
+		if game.Winner != "" {
+			return
+		}
 		handleInput(game)
 	}
 }

@@ -11,6 +11,7 @@ type ActiveGame struct {
 	*gamepkg.Game
 	Help         string
 	TurnFinished bool
+	Winner       gamepkg.Side
 }
 
 func NewActiveGame(game *gamepkg.Game) *ActiveGame {
@@ -18,6 +19,7 @@ func NewActiveGame(game *gamepkg.Game) *ActiveGame {
 		Game:         game,
 		Help:         "",
 		TurnFinished: true,
+		Winner:       "",
 	}
 }
 
@@ -38,9 +40,26 @@ func (g *ActiveGame) String() string {
 		fmt.Fprintln(&builder, g.Help)
 	}
 
-	fmt.Fprint(&builder, prompt)
+	if g.Winner != "" {
+		fmt.Fprintf(&builder, "%s игрок одерживает ПОБЕДУ!\n", g.Winner)
+	} else {
+		fmt.Fprint(&builder, prompt)
+	}
 
 	return builder.String()
+}
+
+func (g *ActiveGame) Display() {
+	DisplayFrame(g.String())
+}
+
+func (g *ActiveGame) CheckWinner() {
+	switch {
+	case g.Game.TopPlayer.Hero.Health <= 0:
+		g.Winner = gamepkg.Sides.Bot
+	case g.Game.BotPlayer.Hero.Health <= 0:
+		g.Winner = gamepkg.Sides.Top
+	}
 }
 
 const prompt = "> "
