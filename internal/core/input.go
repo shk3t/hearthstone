@@ -23,6 +23,8 @@ func handleInput(game *ActiveGame) {
 	switch {
 	case strings.HasPrefix(args[0], "p"):
 		err = DoPlay(args, game)
+	case strings.HasPrefix(args[0], "a"):
+		err = DoAttack(args, game)
 	case strings.HasPrefix(args[0], "e"):
 		DoEnd(game)
 	default:

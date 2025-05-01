@@ -2,20 +2,18 @@ package game
 
 import (
 	"fmt"
-	"hearthstone/internal/cards"
-	"hearthstone/pkg/containers"
 	"strings"
 )
 
 type Table struct {
-	top TableArea
-	bot TableArea
+	top tableArea
+	bot tableArea
 }
 
 func NewTable() *Table {
 	return &Table{
-		TableArea(containers.NewShrice[*cards.Minion](areaSize)),
-		TableArea(containers.NewShrice[*cards.Minion](areaSize)),
+		newTableArea(Sides.Top),
+		newTableArea(Sides.Bot),
 	}
 }
 
@@ -29,7 +27,12 @@ func (t *Table) String() string {
 	return builder.String()
 }
 
-func (t *Table) getArea(playerSide Side) TableArea {
+func (t *Table) CleanupDeadMinions() {
+	t.top.cleanupDeadMinions()
+	t.bot.cleanupDeadMinions()
+}
+
+func (t *Table) getArea(playerSide Side) tableArea {
 	switch playerSide {
 	case Sides.Top:
 		return t.top

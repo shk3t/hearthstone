@@ -1,12 +1,15 @@
 package cards
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Minion struct {
 	Card
 	Character
 	MinionType
 	Attack int
+	IsDead bool
 }
 
 type MinionType string
@@ -27,4 +30,16 @@ func (m *Minion) String() string {
 		m.Attack,
 		m.Health,
 	)
+}
+
+func (m *Minion) ExecuteAttack(target *Minion) {
+	target.DealDamage(m.Attack)
+	m.DealDamage(target.Attack)
+}
+
+func (m *Minion) DealDamage(damage int) {
+	m.Health -= damage
+	if m.Health <= 0 {
+		m.IsDead = true
+	}
 }

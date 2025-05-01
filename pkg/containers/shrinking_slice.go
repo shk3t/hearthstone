@@ -28,6 +28,14 @@ func (s Shrice[T]) Cap() int {
 	return cap(s)
 }
 
+func (s Shrice[T]) Get(idx int) (T, error) {
+	var null T
+	if idx > s.Cap() || s[idx] == null {
+		return null, errorpkg.NewIndexError(idx)
+	}
+	return s[idx], nil 
+}
+
 func (s Shrice[T]) Insert(idx int, value T) error {
 	var null T
 	if idx < 0 || s.Cap() <= idx {
@@ -46,7 +54,7 @@ func (s Shrice[T]) Insert(idx int, value T) error {
 		s[idx] = value
 	} else {
 		s[idx] = value
-		s.shrink()
+		s.Shrink()
 	}
 
 	return nil
@@ -77,7 +85,7 @@ func (s Shrice[T]) Pop(idx int) (T, error) {
 
 	value := s[idx]
 	s[idx] = null
-	s.shrink()
+	s.Shrink()
 	return value, nil
 }
 
@@ -94,7 +102,7 @@ func (s Shrice[T]) PopBack() (T, error) {
 	return value, nil
 }
 
-func (s Shrice[T]) shrink() {
+func (s Shrice[T]) Shrink() {
 	var null T
 	j := s.Len()
 	for i := j + 1; i < s.Cap(); i++ {

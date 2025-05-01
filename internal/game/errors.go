@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"hearthstone/internal/cards"
+	"strings"
 )
 
 type CardPickError struct {
@@ -18,6 +19,7 @@ type FullHandError struct {
 }
 type InvalidTableAreaPositionError struct {
 	position int
+	side     Side
 }
 type FullTableAreaError struct{}
 type EmptyDeckError struct {
@@ -36,8 +38,11 @@ func NewEmptyHandError() EmptyHandError {
 func NewFullHandError() FullHandError {
 	return FullHandError{}
 }
-func NewInvalidTableAreaPositionError(idx int) InvalidTableAreaPositionError {
-	return InvalidTableAreaPositionError{position: idx + 1}
+func NewInvalidTableAreaPositionError(idx int, side Side) InvalidTableAreaPositionError {
+	return InvalidTableAreaPositionError{
+		position: idx + 1,
+		side:     side,
+	}
 }
 func NewFullTableAreaError() FullTableAreaError {
 	return FullTableAreaError{}
@@ -65,7 +70,17 @@ func (err FullHandError) Error() string {
 	return "Полная рука"
 }
 func (err InvalidTableAreaPositionError) Error() string {
-	return fmt.Sprintf("Некорректная позиция на столе: %d", err.position)
+	if err.side == "" {
+		return fmt.Sprintf("Некорректная позиция на столе: %d", err.position)
+	}
+
+	sideText := strings.ToLower(string(err.side))
+	sideText = strings.Replace(sideText, "ий", "ей", 1)
+	return fmt.Sprintf(
+		"Некорректная позиция на %s части стола: %d",
+		sideText,
+		err.position,
+	)
 }
 func (err FullTableAreaError) Error() string {
 	return "Полный стол"

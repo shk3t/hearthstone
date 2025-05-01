@@ -1,7 +1,10 @@
 package core
 
-const playDefaultHelp = "play <номер_карты> <позиция_на_столе>"
-
 const actionsHelp = `Некорректное действие. Доступны:
-play (p) - сыграть карту
-end  (e) - закончить ход`
+play   (p): сыграть карту
+attack (a): атаковать существом
+end    (e): закончить ход`
+
+const playUsageHelp = "play <номер_карты> <позиция_на_столе>"
+
+const attackUsageHelp = "attack <номер_союзного_персонажа> <номер_персонажа_противника>"

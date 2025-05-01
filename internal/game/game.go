@@ -56,10 +56,3 @@ func (g *Game) StartNextTurn() []error {
 
 	return errs
 }
-
-type Side string
-
-var Sides = struct {
-	Top Side
-	Bot Side
-}{"Верхний", "Нижний"}
