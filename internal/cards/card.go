@@ -66,6 +66,6 @@ func ToCard(p Playable) *Card {
 	case *Spell:
 		return &card.Card
 	default:
-		panic("Invalid type")
+		panic("Invalid card type")
 	}
 }

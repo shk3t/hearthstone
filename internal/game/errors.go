@@ -48,32 +48,32 @@ func NewEmptyDeckError() EmptyDeckError {
 }
 
 func (err CardPickError) Error() string {
-	return fmt.Sprintf("Invalid card pick: %d", err.position)
+	return fmt.Sprintf("Выбрана некорректная карта: %d", err.position)
 }
 func (err NotEnoughManaError) Error() string {
-	return fmt.Sprintf("Not Enough mana. Available: %d, required: %d", err.available, err.required)
+	return fmt.Sprintf("Недостаточно маны. Нужно: %d, имеется: %d", err.available, err.required)
 }
 func (err EmptyHandError) Error() string {
-	return "Hand is empty"
+	return "Пустая рука"
 }
 func (err FullHandError) Error() string {
 	if err.BurnedCard != nil {
 		return fmt.Sprintf(
-			"Hand is full. Recent card was burned: \"%s\"",
+			"Полная рука. Последняя сожженная карта: \"%s\"",
 			cards.ToCard(err.BurnedCard).Name,
 		)
 	}
-	return "Hand is full"
+	return "Полная рука"
 }
 func (err InvalidTableAreaPositionError) Error() string {
-	return fmt.Sprintf("Invalid table position: %d", err.position)
+	return fmt.Sprintf("Некорректная позиция на столе: %d", err.position)
 }
 func (err FullTableAreaError) Error() string {
-	return "Table is full"
+	return "Полный стол"
 }
 func (err EmptyDeckError) Error() string {
 	if err.Fatigue != 0 {
-		return fmt.Sprintf("Deck is empty. Fatigue health loss: %d", err.Fatigue)
+		return fmt.Sprintf("Пустая колода. Потеря здоровья из-за усталости: %d", err.Fatigue)
 	}
-	return "Deck is empty"
+	return "Пустая колода"
 }

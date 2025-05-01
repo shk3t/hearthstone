@@ -48,7 +48,7 @@ func (p *Player) String() string {
 	case Sides.bot:
 		slices.Reverse(linesForTop)
 	default:
-		panic("Invalid side")
+		panic("Invalid player side")
 	}
 
 	linesForTop = append(linesForTop, "")
@@ -79,7 +79,11 @@ func (p *Player) PlayCard(handIdx int, areaIdx int) error {
 		return err
 	}
 
-	p.Mana -= cards.ToCard(card).ManaCost
+	err = p.SpendMana(cards.ToCard(card).ManaCost)
+	if err != nil {
+		p.Hand.revert(handIdx, card)
+		return err
+	}
 
 	switch card := card.(type) {
 	case *cards.Minion:
@@ -87,11 +91,12 @@ func (p *Player) PlayCard(handIdx int, areaIdx int) error {
 		if err != nil {
 			p.Hand.revert(handIdx, card)
 		}
+		return err
 	case *cards.Spell:
 		return errorpkg.NewNotImplementedError("Spells")
+	default:
+		panic("Invalid card type")
 	}
-
-	return err
 }
 
 func (p *Player) DrawCard() []error {

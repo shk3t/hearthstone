@@ -37,7 +37,7 @@ func (g *Game) GetActivePlayer() *Player {
 	case Sides.bot:
 		return &g.BotPlayer
 	default:
-		panic("Invalid side")
+		panic("Invalid turn side")
 	}
 }
 

@@ -36,6 +36,6 @@ func (t *Table) getArea(playerSide Side) TableArea {
 	case Sides.bot:
 		return t.bot
 	default:
-		panic("Invalid side")
+		panic("Invalid player side")
 	}
 }
