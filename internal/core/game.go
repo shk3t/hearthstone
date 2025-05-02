@@ -40,11 +40,15 @@ func (g *ActiveGame) String() string {
 	fmt.Fprintln(&builder, g.Game)
 
 	if g.Help != "" {
-		fmt.Fprintln(&builder, g.Help)
+		fmt.Fprintf(&builder, "%s\n\n", g.Help)
 	}
 
 	if g.Winner != "" {
-		fmt.Fprintf(&builder, "%s игрок одерживает ПОБЕДУ!\n", g.Winner)
+		fmt.Fprintf(
+			&builder,
+			"%s игрок одерживает ПОБЕДУ!\n",
+			strings.ToUpper(string(g.Winner)),
+		)
 	} else {
 		fmt.Fprint(&builder, prompt)
 	}

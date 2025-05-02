@@ -57,6 +57,6 @@ func (g *Game) StartNextTurn() []error {
 }
 
 func (g *Game) StartGame() {
-	g.TopPlayer.DrawCards(3)
-	g.BotPlayer.DrawCards(3)
+	g.TopPlayer.DrawCards(10)
+	g.BotPlayer.DrawCards(10)
 }

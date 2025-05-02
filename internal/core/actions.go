@@ -1,22 +1,22 @@
 package core
 
 import (
-	"errors"
+	"fmt"
 )
 
 func DoPlay(args []string, game *ActiveGame) error {
 	if len(args) != 3 {
-		return errors.New("Некорректные аргументы\n" + playUsageHelp)
+		return fmt.Errorf("Некорректные аргументы\n%s", actionsHelp.play.usage())
 	}
 
-	handIdx, err := parseIndexFromPosition(args[1])
+	handIdx, err := parseIndexFromPosition(args[1]) // TEST
 	if err != nil {
-		return errors.New("Некорретный 1 аргумент\n" + playUsageHelp)
+		return fmt.Errorf("Некорретный 1 аргумент\n%s", actionsHelp.play.usage())
 	}
 
-	areaIdx, err := parseIndexFromPosition(args[1])
+	areaIdx, err := parseIndexFromPosition(args[1]) // TEST
 	if err != nil {
-		return errors.New("Некорретный 2 аргумент\n" + playUsageHelp)
+		return fmt.Errorf("Некорретный 2 аргумент\n%s", actionsHelp.play.usage())
 	}
 
 	err = game.GetActivePlayer().PlayCard(handIdx, areaIdx)
@@ -28,17 +28,17 @@ func DoPlay(args []string, game *ActiveGame) error {
 
 func DoAttack(args []string, game *ActiveGame) error {
 	if len(args) != 3 {
-		return errors.New("Некорректные аргументы\n" + attackUsageHelp)
+		return fmt.Errorf("Некорректные аргументы\n%s", actionsHelp.attack.usage())
 	}
 
-	allyIdx, err := parseIndexFromPosition(args[1]) //TODO: parse hero
+	allyIdx, err := parseIndexFromPosition(args[1]) //TEST
 	if err != nil {
-		return errors.New("Некорретный 1 аргумент\n" + attackUsageHelp)
+		return fmt.Errorf("Некорретный 1 аргумент\n%s", actionsHelp.attack.usage())
 	}
 
-	enemyIdx, err := parseIndexFromPosition(args[2]) //TODO: parse hero
+	enemyIdx, err := parseIndexFromPosition(args[2]) //TEST
 	if err != nil {
-		return errors.New("Некорретный 2 аргумент\n" + attackUsageHelp)
+		return fmt.Errorf("Некорретный 2 аргумент\n%s", actionsHelp.attack.usage())
 	}
 
 	err = game.GetActivePlayer().Attack(allyIdx, enemyIdx)

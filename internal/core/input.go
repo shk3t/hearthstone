@@ -27,13 +27,15 @@ func handleInput(game *ActiveGame) (exit bool) {
 		err = DoAttack(args, game)
 	case strings.HasPrefix(args[0], "e"):
 		DoEnd(game)
+	case strings.HasPrefix(args[0], "h"):
+		game.Help = fullHelp
 	default:
-		game.Help = actionsHelp
+		game.Help = availableActions
 	}
 
 	if err != nil {
 		game.Help = err.Error()
 	}
-	
+
 	return false
 }

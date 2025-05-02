@@ -12,6 +12,7 @@ func StartGame(topDeck, botDeck gamepkg.Deck) {
 		game.CheckWinner()
 		if game.TurnFinished && game.Winner == "" {
 			game.StartNextTurn()
+			game.CheckWinner()
 		}
 		game.Display()
 		if game.Winner != "" {
