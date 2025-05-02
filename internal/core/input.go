@@ -8,11 +8,11 @@ import (
 
 var scanner = bufio.NewScanner(os.Stdin)
 
-func handleInput(game *ActiveGame) {
+func handleInput(game *ActiveGame) (exit bool) {
 	var err error
 
 	if !scanner.Scan() {
-		scanner = bufio.NewScanner(os.Stdin)
+		return true
 	}
 	input := scanner.Text()
 
@@ -34,4 +34,6 @@ func handleInput(game *ActiveGame) {
 	if err != nil {
 		game.Help = err.Error()
 	}
+	
+	return false
 }

@@ -30,10 +30,10 @@ func (s Shrice[T]) Cap() int {
 
 func (s Shrice[T]) Get(idx int) (T, error) {
 	var null T
-	if idx > s.Cap() || s[idx] == null {
+	if idx < 0 || s.Cap() <= idx || s[idx] == null {
 		return null, errorpkg.NewIndexError(idx)
 	}
-	return s[idx], nil 
+	return s[idx], nil
 }
 
 func (s Shrice[T]) Insert(idx int, value T) error {

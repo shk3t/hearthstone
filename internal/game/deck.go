@@ -1,10 +1,10 @@
 package game
 
 import (
+	"hearthstone/internal/cards"
 	cardpkg "hearthstone/internal/cards"
 	"hearthstone/pkg/containers"
 	errorpkg "hearthstone/pkg/errors"
-	"hearthstone/pkg/helpers"
 )
 
 type Deck containers.Shrice[cardpkg.Playable]
@@ -17,7 +17,19 @@ func NewDeck(cards ...cardpkg.Playable) Deck {
 
 func (d Deck) Copy() Deck {
 	newContainer := containers.NewShrice[cardpkg.Playable](deckSize)
-	copy(newContainer, d)
+	dLen := containers.Shrice[cardpkg.Playable](d).Len()
+	for i := 0; i < dLen; i++ {
+		switch card := d[i].(type) {
+		case *cards.Minion:
+			newContainer[i] = card.Copy()
+		case *cards.Spell:
+			newContainer[i] = card.Copy()
+		case *cards.Weapon:
+			newContainer[i] = card.Copy()
+		default:
+			panic("Unexpected card type")
+		}
+	}
 	return Deck(newContainer)
 }
 
@@ -31,6 +43,6 @@ func (d Deck) takeTop() (cardpkg.Playable, error) {
 	case nil:
 		return card, nil
 	default:
-		panic(helpers.UnexpectedError(err))
+		panic(errorpkg.NewUnexpectedError(err))
 	}
 }

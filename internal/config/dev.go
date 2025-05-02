@@ -11,7 +11,8 @@ import (
 var Config config
 
 type config struct {
-	Debug bool
+	PrintFrame bool
+	FreeMana   bool
 }
 
 func Init() {
@@ -19,7 +20,8 @@ func Init() {
 		fmt.Println("Error loading .env file")
 	}
 
-	Config.Debug = parseBool("DEBUG", false)
+	Config.PrintFrame = parseBool("PRINT_FRAME", false)
+	Config.FreeMana = parseBool("FREE_MANA", false)
 }
 
 func parseBool(variable string, defaultValue bool) bool {

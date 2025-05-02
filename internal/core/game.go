@@ -14,13 +14,16 @@ type ActiveGame struct {
 	Winner       gamepkg.Side
 }
 
-func NewActiveGame(game *gamepkg.Game) *ActiveGame {
+func NewActiveGame(topDeck, botDeck gamepkg.Deck) *ActiveGame {
 	return &ActiveGame{
-		Game:         game,
+		Game:         gamepkg.NewGame(topDeck, botDeck),
 		Help:         "",
 		TurnFinished: true,
 		Winner:       "",
 	}
+}
+func (g *ActiveGame) StartGame() {
+	g.Game.StartGame()
 }
 
 func (g *ActiveGame) StartNextTurn() {
@@ -51,6 +54,10 @@ func (g *ActiveGame) String() string {
 
 func (g *ActiveGame) Display() {
 	DisplayFrame(g.String())
+}
+
+func (g *ActiveGame) Cleanup() {
+	g.Game.Table.CleanupDeadMinions()
 }
 
 func (g *ActiveGame) CheckWinner() {

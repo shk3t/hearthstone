@@ -32,6 +32,11 @@ func (m *Minion) String() string {
 	)
 }
 
+func (m *Minion) Copy() *Minion {
+	minionCopy := *m
+	return &minionCopy
+}
+
 func (m *Minion) ExecuteAttack(target *Minion) {
 	target.DealDamage(m.Attack)
 	m.DealDamage(target.Attack)

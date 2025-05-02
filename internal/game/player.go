@@ -3,8 +3,8 @@ package game
 import (
 	"fmt"
 	"hearthstone/internal/cards"
+	"hearthstone/internal/config"
 	errorpkg "hearthstone/pkg/errors"
-	"hearthstone/pkg/helpers"
 	"slices"
 	"strings"
 )
@@ -34,11 +34,16 @@ func NewPlayer(side Side, deck Deck, game *Game) *Player {
 }
 
 func (p *Player) String() string {
+	heroFormat := "%s"
+	if p.Side == p.game.Turn {
+		heroFormat = "> %s"
+	}
+
 	linesForTop := append(
 		make([]string, 0, 5),
-		string(p.Hero.Class),
-		p.healthString(),
-		p.manaString(),
+		fmt.Sprintf(heroFormat, p.Hero.Class),
+		fmt.Sprintf(heroFormat, p.healthString()),
+		fmt.Sprintf(heroFormat, p.manaString()),
 		p.Hand.String(),
 	)
 
@@ -63,32 +68,34 @@ func (p *Player) RestoreMana() {
 }
 
 func (p *Player) SpendMana(value int) error {
-	if p.Mana-value < 0 {
+	if p.Mana-value < 0 && !config.Config.FreeMana {
 		return NewNotEnoughManaError(p.Mana, value)
 	}
 	p.Mana -= value
 	return nil
 }
 
-func (p *Player) DrawCard() []error {
+func (p *Player) DrawCards(number int) []error {
 	errs := make([]error, 0, 4)
 
-	card, err := p.deck.takeTop()
-	switch err := err.(type) {
-	case EmptyDeckError:
-		p.Fatigue++
-		p.Hero.Health -= p.Fatigue
-		err.Fatigue = p.Fatigue
-		errs = append(errs, err)
-	case nil:
-		err = p.Hand.refill(card)
+	for range number {
+		card, err := p.deck.takeTop()
 		switch err := err.(type) {
-		case FullHandError:
-			err.BurnedCard = card
+		case EmptyDeckError:
+			p.Fatigue++
+			p.Hero.Health -= p.Fatigue
+			err.Fatigue = p.Fatigue
 			errs = append(errs, err)
+		case nil:
+			err = p.Hand.refill(card)
+			switch err := err.(type) {
+			case FullHandError:
+				err.BurnedCard = card
+				errs = append(errs, err)
+			}
+		default:
+			panic(errorpkg.NewUnexpectedError(err))
 		}
-	default:
-		panic(helpers.UnexpectedError(err))
 	}
 
 	return errs
@@ -142,20 +149,20 @@ func (p *Player) getOpponentArea() tableArea {
 	return p.game.Table.getArea(p.Side.Opposite())
 }
 
-func (p *Player) manaString() string {
-	return fmt.Sprintf(
-		"Мана:     %2d/%2d [%s%s]",
-		p.Mana, p.MaxMana,
-		strings.Repeat(" ", p.MaxMana-p.Mana),
-		strings.Repeat("*", p.Mana),
-	)
-}
-
 func (p *Player) healthString() string {
 	return fmt.Sprintf(
 		"Здоровье: %2d/%2d [%s%s]",
 		p.Hero.Health, p.Hero.MaxHealth,
 		strings.Repeat(" ", min(p.Hero.MaxHealth-p.Hero.Health, p.Hero.MaxHealth)),
 		strings.Repeat("#", max(p.Hero.Health, 0)),
+	)
+}
+
+func (p *Player) manaString() string {
+	return fmt.Sprintf(
+		"Мана:     %2d/%2d [%s%s]",
+		p.Mana, p.MaxMana,
+		strings.Repeat(" ", min(p.MaxMana-p.Mana, p.MaxMana)),
+		strings.Repeat("*", max(p.Mana, 0)),
 	)
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type Playable interface {
-	Play() error
+	Play()
 }
 
 type Card struct {
@@ -40,8 +40,8 @@ var Rarities = struct {
 	Legendary Raritiy
 }{"Базовая", "Обычная", "Редкая", "Эпическая", "Легендарная"}
 
-func (m *Card) Play() error {
-	return errorpkg.NewUnusableFeatureError()
+func (m *Card) Play() {
+	panic(errorpkg.NewUnusableFeatureError())
 }
 
 func OrderedPlayableString(cards []Playable) string {

@@ -4,7 +4,6 @@ import (
 	"hearthstone/internal/cards"
 	"hearthstone/pkg/containers"
 	errorpkg "hearthstone/pkg/errors"
-	"hearthstone/pkg/helpers"
 )
 
 type Hand containers.Shrice[cards.Playable]
@@ -29,7 +28,7 @@ func (h Hand) pick(idx int) (cards.Playable, error) {
 	case nil:
 		return card, nil
 	default:
-		panic(helpers.UnexpectedError(err))
+		panic(errorpkg.NewUnexpectedError(err))
 	}
 }
 
@@ -41,7 +40,7 @@ func (h Hand) refill(card cards.Playable) error {
 	case nil:
 		return nil
 	default:
-		panic(helpers.UnexpectedError(err))
+		panic(errorpkg.NewUnexpectedError(err))
 	}
 }
 

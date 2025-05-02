@@ -14,3 +14,8 @@ func (m *Spell) String() string {
 		m.Name,
 	)
 }
+
+func (s *Spell) Copy() *Spell {
+	spellCopy := *s
+	return &spellCopy
+}

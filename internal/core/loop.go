@@ -5,9 +5,9 @@ import (
 )
 
 func StartGame(topDeck, botDeck gamepkg.Deck) {
-	baseGame := gamepkg.NewGame(topDeck, botDeck)
-	game := NewActiveGame(baseGame)
+	game := NewActiveGame(topDeck, botDeck)
 
+	game.StartGame()
 	for {
 		game.CheckWinner()
 		if game.TurnFinished && game.Winner == "" {
@@ -17,6 +17,10 @@ func StartGame(topDeck, botDeck gamepkg.Deck) {
 		if game.Winner != "" {
 			return
 		}
-		handleInput(game)
+		exit := handleInput(game)
+		if exit {
+			return
+		}
+		game.Cleanup()
 	}
 }

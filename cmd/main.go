@@ -11,10 +11,10 @@ func main() {
 	defer core.DeinitAll()
 
 	startingDeck := game.NewDeck(
-		&cards.AllCards.RiverCrocolisk,
-		&cards.AllCards.ChillwindYeti,
-		&cards.AllCards.RiverCrocolisk,
-		&cards.AllCards.ChillwindYeti,
+		cards.AllCards.RiverCrocolisk.Copy(),
+		cards.AllCards.RiverCrocolisk.Copy(),
+		cards.AllCards.RiverCrocolisk.Copy(),
+		cards.AllCards.RiverCrocolisk.Copy(),
 	)
 
 	core.StartGame(startingDeck, startingDeck)

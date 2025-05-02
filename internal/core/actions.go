@@ -36,7 +36,7 @@ func DoAttack(args []string, game *ActiveGame) error {
 		return errors.New("Некорретный 1 аргумент\n" + attackUsageHelp)
 	}
 
-	enemyIdx, err := parseIndexFromPosition(args[1]) //TODO: parse hero
+	enemyIdx, err := parseIndexFromPosition(args[2]) //TODO: parse hero
 	if err != nil {
 		return errors.New("Некорретный 2 аргумент\n" + attackUsageHelp)
 	}

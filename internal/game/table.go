@@ -19,11 +19,13 @@ func NewTable() *Table {
 
 func (t *Table) String() string {
 	builder := strings.Builder{}
+	builder.WriteString("\n")
 	fmt.Fprintln(&builder, strings.Repeat("=", 50))
-	fmt.Fprint(&builder, &t.top)
+	fmt.Fprintln(&builder, &t.top)
 	fmt.Fprintln(&builder, strings.Repeat("-", 50))
-	fmt.Fprint(&builder, &t.bot)
+	fmt.Fprintln(&builder, &t.bot)
 	fmt.Fprintln(&builder, strings.Repeat("=", 50))
+	builder.WriteString("\n")
 	return builder.String()
 }
 

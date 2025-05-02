@@ -5,7 +5,6 @@ import (
 	"hearthstone/pkg/containers"
 	"hearthstone/pkg/conversions"
 	errorpkg "hearthstone/pkg/errors"
-	"hearthstone/pkg/helpers"
 )
 
 type tableArea struct {
@@ -38,7 +37,7 @@ func (a tableArea) place(idx int, minion *cards.Minion) error {
 	case nil:
 		return nil
 	default:
-		panic(helpers.UnexpectedError(err))
+		panic(errorpkg.NewUnexpectedError(err))
 	}
 }
 
@@ -50,7 +49,7 @@ func (a tableArea) choose(idx int) (*cards.Minion, error) {
 	case nil:
 		return card, nil
 	default:
-		panic(helpers.UnexpectedError(err))
+		panic(errorpkg.NewUnexpectedError(err))
 	}
 }
 

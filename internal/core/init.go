@@ -11,7 +11,7 @@ import (
 func initAll() {
 	config.Init()
 	logging.Init()
-	DisplayFrame = sugar.If(config.Config.Debug, ui.PrintFrame, ui.UpdateFrame)
+	DisplayFrame = sugar.If(config.Config.PrintFrame, ui.PrintFrame, ui.UpdateFrame)
 }
 
 func deinitAll() {

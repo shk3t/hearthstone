@@ -23,7 +23,6 @@ func NewGame(topDeck, botDeck Deck) *Game {
 
 func (g *Game) String() string {
 	builder := strings.Builder{}
-	fmt.Fprintf(&builder, "Ход: %s\n\n", g.Turn)
 	fmt.Fprint(&builder, &g.TopPlayer)
 	fmt.Fprint(&builder, &g.Table)
 	fmt.Fprint(&builder, &g.BotPlayer)
@@ -52,7 +51,12 @@ func (g *Game) StartNextTurn() []error {
 	activePlayer := g.GetActivePlayer()
 	activePlayer.IncreaseMana()
 	activePlayer.RestoreMana()
-	errs := activePlayer.DrawCard()
+	errs := activePlayer.DrawCards(1)
 
 	return errs
+}
+
+func (g *Game) StartGame() {
+	g.TopPlayer.DrawCards(3)
+	g.BotPlayer.DrawCards(3)
 }

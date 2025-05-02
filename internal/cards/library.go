@@ -1,12 +1,12 @@
 package cards
 
 var AllCards = struct {
-	Frostbolt      Spell
-	Fireball       Spell
-	RiverCrocolisk Minion
-	ChillwindYeti  Minion
+	Frostbolt      *Spell
+	Fireball       *Spell
+	RiverCrocolisk *Minion
+	ChillwindYeti  *Minion
 }{
-	Frostbolt: Spell{
+	Frostbolt: &Spell{
 		Card: Card{
 			ManaCost:    2,
 			Name:        "Ледяная стрела",
@@ -15,7 +15,7 @@ var AllCards = struct {
 		},
 		Damage: 3,
 	},
-	Fireball: Spell{
+	Fireball: &Spell{
 		Card: Card{
 			ManaCost:    4,
 			Name:        "Огненный шар",
@@ -24,7 +24,7 @@ var AllCards = struct {
 		},
 		Damage: 6,
 	},
-	RiverCrocolisk: Minion{
+	RiverCrocolisk: &Minion{
 		Card: Card{
 			ManaCost:    2,
 			Name:        "Речной кроколиск",
@@ -35,7 +35,7 @@ var AllCards = struct {
 		MinionType: MinionTypes.Beast,
 		Attack:     2,
 	},
-	ChillwindYeti: Minion{
+	ChillwindYeti: &Minion{
 		Card: Card{
 			ManaCost:    4,
 			Name:        "Морозный йети",
