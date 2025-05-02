@@ -1,7 +1,7 @@
 package main
 
 import (
-	"hearthstone/internal/cards"
+	"hearthstone/internal/cards/sets"
 	"hearthstone/internal/core"
 	"hearthstone/internal/game"
 )
@@ -11,10 +11,10 @@ func main() {
 	defer core.DeinitAll()
 
 	startingDeck := game.NewDeck(
-		cards.AllCards.RiverCrocolisk.Copy(),
-		cards.AllCards.RiverCrocolisk.Copy(),
-		cards.AllCards.RiverCrocolisk.Copy(),
-		cards.AllCards.RiverCrocolisk.Copy(),
+		sets.LegacySet.RiverCrocolisk.Copy(),
+		sets.LegacySet.RiverCrocolisk.Copy(),
+		sets.LegacySet.RiverCrocolisk.Copy(),
+		sets.LegacySet.RiverCrocolisk.Copy(),
 	)
 
 	core.StartGame(startingDeck, startingDeck)

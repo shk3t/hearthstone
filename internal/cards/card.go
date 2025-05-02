@@ -17,11 +17,6 @@ type Card struct {
 	Rarity      Raritiy
 }
 
-type Character struct {
-	Health    int
-	MaxHealth int
-}
-
 type Class string
 
 var Classes = struct {

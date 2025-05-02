@@ -8,8 +8,6 @@ type Minion struct {
 	Card
 	Character
 	MinionType
-	Attack int
-	IsDead bool
 }
 
 type MinionType string
@@ -35,16 +33,4 @@ func (m *Minion) String() string {
 func (m *Minion) Copy() *Minion {
 	minionCopy := *m
 	return &minionCopy
-}
-
-func (m *Minion) ExecuteAttack(target *Minion) {
-	target.DealDamage(m.Attack)
-	m.DealDamage(target.Attack)
-}
-
-func (m *Minion) DealDamage(damage int) {
-	m.Health -= damage
-	if m.Health <= 0 {
-		m.IsDead = true
-	}
 }

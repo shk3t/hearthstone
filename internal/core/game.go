@@ -66,9 +66,9 @@ func (g *ActiveGame) Cleanup() {
 
 func (g *ActiveGame) CheckWinner() {
 	switch {
-	case g.Game.TopPlayer.Hero.Health <= 0:
+	case g.Game.TopPlayer.Hero.IsDead:
 		g.Winner = gamepkg.Sides.Bot
-	case g.Game.BotPlayer.Hero.Health <= 0:
+	case g.Game.BotPlayer.Hero.IsDead:
 		g.Winner = gamepkg.Sides.Top
 	}
 }

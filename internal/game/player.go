@@ -11,7 +11,7 @@ import (
 
 type Player struct {
 	Side    Side
-	Hero    Hero
+	Hero    cards.Hero
 	Hand    Hand
 	Mana    int
 	MaxMana int
@@ -23,7 +23,7 @@ type Player struct {
 func NewPlayer(side Side, deck Deck, game *Game) *Player {
 	return &Player{
 		Side:    side,
-		Hero:    *NewHero(),
+		Hero:    *cards.NewHero(),
 		Hand:    NewHand(),
 		Mana:    0,
 		MaxMana: 0,
@@ -83,7 +83,7 @@ func (p *Player) DrawCards(number int) []error {
 		switch err := err.(type) {
 		case EmptyDeckError:
 			p.Fatigue++
-			p.Hero.Health -= p.Fatigue
+			p.Hero.DealDamage(p.Fatigue)
 			err.Fatigue = p.Fatigue
 			errs = append(errs, err)
 		case nil:
@@ -127,18 +127,42 @@ func (p *Player) PlayCard(handIdx, areaIdx int) error {
 	}
 }
 
-// TODO implement for heroes
 func (p *Player) Attack(allyIdx, enemyIdx int) error {
-	allyMinion, err := p.getOwnArea().choose(allyIdx)
-	if err != nil {
-		return err
+	var allyCharacter, enemyCharacter *cards.Character
+
+	if allyIdx == -1 {
+		allyCharacter = &p.Hero.Character
+	} else {
+		minion, err := p.getOwnArea().choose(allyIdx)
+		if err != nil {
+			return err
+		}
+		allyCharacter = &minion.Character
 	}
-	enemyMinion, err := p.getOpponentArea().choose(enemyIdx)
-	if err != nil {
-		return err
+
+	if enemyIdx == -1 {
+		enemyCharacter = &p.getOpponentHero().Character
+	} else {
+		minion, err := p.getOpponentArea().choose(enemyIdx)
+		if err != nil {
+			return err
+		}
+		enemyCharacter = &minion.Character
 	}
-	allyMinion.ExecuteAttack(enemyMinion)
+
+	allyCharacter.ExecuteAttack(enemyCharacter)
 	return nil
+}
+
+func (p *Player) getOpponentHero() *cards.Hero {
+	switch p.Side {
+	case Sides.Top:
+		return &p.game.BotPlayer.Hero
+	case Sides.Bot:
+		return &p.game.TopPlayer.Hero
+	default:
+		panic("Unexpected player side")
+	}
 }
 
 func (p *Player) getOwnArea() tableArea {
