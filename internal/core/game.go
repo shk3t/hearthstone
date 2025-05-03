@@ -19,7 +19,7 @@ func NewActiveGame(topDeck, botDeck gamepkg.Deck) *ActiveGame {
 		Game:         gamepkg.NewGame(topDeck, botDeck),
 		Help:         "",
 		TurnFinished: true,
-		Winner:       "",
+		Winner:       gamepkg.UnsetSide,
 	}
 }
 func (g *ActiveGame) StartGame() {
@@ -43,7 +43,7 @@ func (g *ActiveGame) String() string {
 		fmt.Fprintf(&builder, "%s\n\n", g.Help)
 	}
 
-	if g.Winner != "" {
+	if g.Winner != gamepkg.UnsetSide {
 		fmt.Fprintf(
 			&builder,
 			"%s игрок одерживает ПОБЕДУ!\n",
@@ -65,11 +65,11 @@ func (g *ActiveGame) Cleanup() {
 }
 
 func (g *ActiveGame) CheckWinner() {
-	switch {
-	case g.Game.TopPlayer.Hero.IsDead:
-		g.Winner = gamepkg.Sides.Bot
-	case g.Game.BotPlayer.Hero.IsDead:
-		g.Winner = gamepkg.Sides.Top
+	for i := range gamepkg.SidesCount {
+		side := gamepkg.Side(i)
+		if g.Game.Players[side].Hero.IsDead {
+			g.Winner = side.Opposite()
+		}
 	}
 }
 

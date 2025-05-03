@@ -21,14 +21,16 @@ func handleInput(game *ActiveGame) (exit bool) {
 
 	game.Help = ""
 	switch {
-	case strings.HasPrefix(args[0], "p"):
-		err = DoPlay(args, game)
-	case strings.HasPrefix(args[0], "a"):
-		err = DoAttack(args, game)
-	case strings.HasPrefix(args[0], "e"):
-		DoEnd(game)
-	case strings.HasPrefix(args[0], "h"):
+	case strings.HasPrefix(args[0], "h") || args[0] == "help":
 		game.Help = fullHelp
+	case strings.HasPrefix(args[0], "p") || args[0] == "play":
+		err = DoPlay(args, game)
+	case strings.HasPrefix(args[0], "a") || args[0] == "attack":
+		err = DoAttack(args, game)
+	case strings.HasPrefix(args[0], "w") || args[0] == "power":
+		err = DoUseHeroPower()
+	case strings.HasPrefix(args[0], "e") || args[0] == "end":
+		DoEnd(game)
 	default:
 		game.Help = availableActions
 	}

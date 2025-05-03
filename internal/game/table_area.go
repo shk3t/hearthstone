@@ -31,7 +31,7 @@ func (a tableArea) place(idx int, minion *cards.Minion) error {
 	err := a.minions.Insert(idx, minion)
 	switch err.(type) {
 	case errorpkg.IndexError:
-		return NewInvalidTableAreaPositionError(idx, "")
+		return NewInvalidTableAreaPositionError(idx, UnsetSide)
 	case errorpkg.FullError:
 		return NewFullTableAreaError()
 	case nil:

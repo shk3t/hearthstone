@@ -15,7 +15,7 @@ type Player struct {
 	Hand    Hand
 	Mana    int
 	MaxMana int
-	Fatigue int
+	fatigue int
 	deck    Deck
 	game    *Game
 }
@@ -27,7 +27,7 @@ func NewPlayer(side Side, deck Deck, game *Game) *Player {
 		Hand:    NewHand(),
 		Mana:    0,
 		MaxMana: 0,
-		Fatigue: 0,
+		fatigue: 0,
 		deck:    deck.Copy(),
 		game:    game,
 	}
@@ -47,12 +47,8 @@ func (p *Player) String() string {
 		p.Hand.String(),
 	)
 
-	switch p.Side {
-	case Sides.Top:
-	case Sides.Bot:
+	if p.Side == BotSide {
 		slices.Reverse(linesForTop)
-	default:
-		panic("Invalid player side")
 	}
 
 	linesForTop = append(linesForTop, "")
@@ -82,9 +78,9 @@ func (p *Player) DrawCards(number int) []error {
 		card, err := p.deck.takeTop()
 		switch err := err.(type) {
 		case EmptyDeckError:
-			p.Fatigue++
-			p.Hero.DealDamage(p.Fatigue)
-			err.Fatigue = p.Fatigue
+			p.fatigue++
+			p.Hero.DealDamage(p.fatigue)
+			err.Fatigue = p.fatigue
 			errs = append(errs, err)
 		case nil:
 			err = p.Hand.refill(card)
@@ -115,7 +111,7 @@ func (p *Player) PlayCard(handIdx, areaIdx int) error {
 
 	switch card := card.(type) {
 	case *cards.Minion:
-		err = p.getOwnArea().place(areaIdx, card)
+		err = p.game.getArea(p.Side).place(areaIdx, card)
 		if err != nil {
 			p.Hand.revert(handIdx, card)
 		}
@@ -128,49 +124,22 @@ func (p *Player) PlayCard(handIdx, areaIdx int) error {
 }
 
 func (p *Player) Attack(allyIdx, enemyIdx int) error {
-	var allyCharacter, enemyCharacter *cards.Character
-
-	if allyIdx == -1 {
-		allyCharacter = &p.Hero.Character
-	} else {
-		minion, err := p.getOwnArea().choose(allyIdx)
-		if err != nil {
-			return err
-		}
-		allyCharacter = &minion.Character
+	allyCharacter, err := p.game.getCharacter(allyIdx, p.Side)
+	if err != nil {
+		return err
 	}
-
-	if enemyIdx == -1 {
-		enemyCharacter = &p.getOpponentHero().Character
-	} else {
-		minion, err := p.getOpponentArea().choose(enemyIdx)
-		if err != nil {
-			return err
-		}
-		enemyCharacter = &minion.Character
+	enemyCharacter, err := p.game.getCharacter(enemyIdx, p.Side.Opposite())
+	if err != nil {
+		return err
 	}
 
 	allyCharacter.ExecuteAttack(enemyCharacter)
 	return nil
 }
 
-func (p *Player) getOpponentHero() *cards.Hero {
-	switch p.Side {
-	case Sides.Top:
-		return &p.game.BotPlayer.Hero
-	case Sides.Bot:
-		return &p.game.TopPlayer.Hero
-	default:
-		panic("Unexpected player side")
-	}
-}
-
-func (p *Player) getOwnArea() tableArea {
-	return p.game.Table.getArea(p.Side)
-}
-
-func (p *Player) getOpponentArea() tableArea {
-	return p.game.Table.getArea(p.Side.Opposite())
+func (p *Player) UseHeroPower() error {
+	// p.Hero.Power
+	return nil
 }
 
 func (p *Player) healthString() string {

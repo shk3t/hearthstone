@@ -70,7 +70,7 @@ func (err FullHandError) Error() string {
 	return "Полная рука"
 }
 func (err InvalidTableAreaPositionError) Error() string {
-	if err.side == "" {
+	if err.side == UnsetSide {
 		return fmt.Sprintf("Некорректная позиция на столе: %d", err.position)
 	}
 

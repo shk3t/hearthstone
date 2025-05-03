@@ -10,12 +10,12 @@ func StartGame(topDeck, botDeck gamepkg.Deck) {
 	game.StartGame()
 	for {
 		game.CheckWinner()
-		if game.TurnFinished && game.Winner == "" {
+		if game.TurnFinished && game.Winner == gamepkg.UnsetSide {
 			game.StartNextTurn()
 			game.CheckWinner()
 		}
 		game.Display()
-		if game.Winner != "" {
+		if game.Winner != gamepkg.UnsetSide {
 			return
 		}
 		exit := handleInput(game)

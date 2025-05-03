@@ -9,12 +9,12 @@ func DoPlay(args []string, game *ActiveGame) error {
 		return fmt.Errorf("Некорректные аргументы\n%s", actionsHelp.play.usage())
 	}
 
-	handIdx, err := parseIndexFromPosition(args[1]) // TEST
+	handIdx, _, err := ParsePositions(args[1])
 	if err != nil {
 		return fmt.Errorf("Некорретный 1 аргумент\n%s", actionsHelp.play.usage())
 	}
 
-	areaIdx, err := parseIndexFromPosition(args[1]) // TEST
+	areaIdx, _, err := ParsePositions(args[1])
 	if err != nil {
 		return fmt.Errorf("Некорретный 2 аргумент\n%s", actionsHelp.play.usage())
 	}
@@ -31,12 +31,12 @@ func DoAttack(args []string, game *ActiveGame) error {
 		return fmt.Errorf("Некорректные аргументы\n%s", actionsHelp.attack.usage())
 	}
 
-	allyIdx, err := parseIndexFromPosition(args[1]) //TEST
+	allyIdx, _, err := ParsePositions(args[1])
 	if err != nil {
 		return fmt.Errorf("Некорретный 1 аргумент\n%s", actionsHelp.attack.usage())
 	}
 
-	enemyIdx, err := parseIndexFromPosition(args[2]) //TEST
+	enemyIdx, _, err := ParsePositions(args[2])
 	if err != nil {
 		return fmt.Errorf("Некорретный 2 аргумент\n%s", actionsHelp.attack.usage())
 	}
@@ -45,6 +45,10 @@ func DoAttack(args []string, game *ActiveGame) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func DoUseHeroPower() error {
 	return nil
 }
 

@@ -27,34 +27,41 @@ func (e actionHelpEntry) usage() string {
 }
 
 var actionsHelp = struct {
+	help   actionHelpEntry
 	play   actionHelpEntry
 	attack actionHelpEntry
+	power  actionHelpEntry
 	end    actionHelpEntry
-	help   actionHelpEntry
 }{
-	actionHelpEntry{
+	help: actionHelpEntry{
+		name:        "help",
+		shortcut:    "h",
+		args:        "",
+		description: "вывести помощь по командам",
+	},
+	play: actionHelpEntry{
 		name:        "play",
 		shortcut:    "p",
 		args:        "<номер_карты> <позиция_на_столе>",
 		description: "сыграть карту",
 	},
-	actionHelpEntry{
+	attack: actionHelpEntry{
 		name:        "attack",
 		shortcut:    "a",
 		args:        "<номер_союзного_персонажа> <номер_персонажа_противника>",
 		description: "атаковать персонажа",
 	},
-	actionHelpEntry{
+	power: actionHelpEntry{
+		name:        "power",
+		shortcut:    "w",
+		args:        "???",
+		description: "использовать способность героя",
+	},
+	end: actionHelpEntry{
 		name:        "end",
 		shortcut:    "e",
 		args:        "",
 		description: "закончить ход",
-	},
-	actionHelpEntry{
-		name:        "help",
-		shortcut:    "h",
-		args:        "",
-		description: "вывести помощь по командам",
 	},
 }
 

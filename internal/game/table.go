@@ -5,15 +5,12 @@ import (
 	"strings"
 )
 
-type Table struct {
-	top tableArea
-	bot tableArea
-}
+type Table [SidesCount]tableArea
 
 func NewTable() *Table {
 	return &Table{
-		newTableArea(Sides.Top),
-		newTableArea(Sides.Bot),
+		newTableArea(TopSide),
+		newTableArea(BotSide),
 	}
 }
 
@@ -21,26 +18,15 @@ func (t *Table) String() string {
 	builder := strings.Builder{}
 	builder.WriteString("\n")
 	fmt.Fprintln(&builder, strings.Repeat("=", 50))
-	fmt.Fprintln(&builder, &t.top)
+	fmt.Fprintln(&builder, &t[TopSide])
 	fmt.Fprintln(&builder, strings.Repeat("-", 50))
-	fmt.Fprintln(&builder, &t.bot)
+	fmt.Fprintln(&builder, &t[BotSide])
 	fmt.Fprintln(&builder, strings.Repeat("=", 50))
 	builder.WriteString("\n")
 	return builder.String()
 }
 
 func (t *Table) CleanupDeadMinions() {
-	t.top.cleanupDeadMinions()
-	t.bot.cleanupDeadMinions()
-}
-
-func (t *Table) getArea(playerSide Side) tableArea {
-	switch playerSide {
-	case Sides.Top:
-		return t.top
-	case Sides.Bot:
-		return t.bot
-	default:
-		panic("Invalid player side")
-	}
+	t[TopSide].cleanupDeadMinions()
+	t[BotSide].cleanupDeadMinions()
 }
