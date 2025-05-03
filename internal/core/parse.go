@@ -12,7 +12,7 @@ import (
 // "0" position also can be considered as hero position.
 //
 // "t"/"b" for precise specifying target side (Top/Bottom).
-func ParsePositions(arg string) (idx int, side gamepkg.Side, err error) {
+func parsePosition(arg string) (idx int, side gamepkg.Side, err error) {
 	switch {
 	case strings.Contains(arg, "t"):
 		arg = strings.Trim(arg, "t")
@@ -34,4 +34,20 @@ func ParsePositions(arg string) (idx int, side gamepkg.Side, err error) {
 	}
 
 	return pos - 1, side, nil
+}
+
+func parseAllPositions(args []string) (idxes []int, sides []gamepkg.Side, errs []error) {
+	lenArgs := len(args)
+	idxes = make([]int, lenArgs)
+	sides = make([]gamepkg.Side, lenArgs)
+	errs = make([]error, lenArgs)
+
+	for i := range args {
+		idx, side, err := parsePosition(args[i])
+		idxes[i] = idx
+		sides[i] = side
+		errs[i] = err
+	}
+
+	return idxes, sides, errs
 }

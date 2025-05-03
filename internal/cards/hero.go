@@ -1,10 +1,14 @@
 package cards
 
+type HeroPower struct {
+	// TODO
+}
+
 type Hero struct {
 	Character
 	Class  Class
 	Weapon *Weapon
-	Power  func(...any)
+	Power  HeroPower
 }
 
 func NewHero() *Hero {

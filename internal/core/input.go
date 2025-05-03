@@ -17,22 +17,23 @@ func handleInput(game *ActiveGame) (exit bool) {
 	input := scanner.Text()
 
 	input = strings.ToLower(input)
-	args := strings.Split(input, " ")
+	allArgs := strings.Split(input, " ")
+	command, args := allArgs[0], allArgs[1:]
 
 	game.Help = ""
 	switch {
-	case strings.HasPrefix(args[0], "h") || args[0] == "help":
-		game.Help = fullHelp
-	case strings.HasPrefix(args[0], "p") || args[0] == "play":
-		err = DoPlay(args, game)
-	case strings.HasPrefix(args[0], "a") || args[0] == "attack":
-		err = DoAttack(args, game)
-	case strings.HasPrefix(args[0], "w") || args[0] == "power":
-		err = DoUseHeroPower()
-	case strings.HasPrefix(args[0], "e") || args[0] == "end":
-		DoEnd(game)
+	case strings.HasPrefix(command, "h") || command == "help":
+		err = Actions.Help.Do(args, game)
+	case strings.HasPrefix(command, "p") || command == "play":
+		err = Actions.Play.Do(args, game)
+	case strings.HasPrefix(command, "a") || command == "attack":
+		err = Actions.Attack.Do(args, game)
+	case strings.HasPrefix(command, "w") || command == "power":
+		// err = DoUseHeroPower(args, game)
+	case strings.HasPrefix(command, "e") || command == "end":
+		_ = Actions.End.Do(args, game)
 	default:
-		game.Help = availableActions
+		err = Actions.Default.Do(args, game)
 	}
 
 	if err != nil {

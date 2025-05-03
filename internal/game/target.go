@@ -37,16 +37,6 @@ var TargetPresets = struct {
 		target, err := g.getCharacter(idxes[0], sides[0])
 		return []*cards.Character{target}, err
 	},
-	// TargetSelector{
-	// 	parser: func(args ...string) ([]int, []Side, error) {
-	// 		idx, side, err := DefaultParse(args[0])
-	// 		return []int{idx}, []Side{side}, err
-	// 	},
-	// 	selector: func(g *Game, idxes []int, sides []Side) ([]*cards.Character, error) {
-	// 		target, err := g.getCharacter(idxes[0], sides[0])
-	// 		return []*cards.Character{target}, err
-	// 	},
-	// },
 }
 
 func ApplyEffect(

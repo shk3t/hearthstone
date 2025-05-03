@@ -4,14 +4,13 @@ import (
 	"hearthstone/internal/config"
 	"hearthstone/internal/logging"
 	"hearthstone/pkg/helpers"
-	"hearthstone/pkg/sugar"
-	"hearthstone/pkg/ui"
 )
 
 func initAll() {
 	config.Init()
 	logging.Init()
-	DisplayFrame = sugar.If(config.Config.PrintFrame, ui.PrintFrame, ui.UpdateFrame)
+	InitDisplayFrame()
+	InitActions()
 }
 
 func deinitAll() {

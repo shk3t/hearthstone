@@ -12,3 +12,12 @@ func JoinErrors(errs []error, sep string) string {
 	}
 	return strings.TrimSuffix(builder.String(), sep)
 }
+
+func FirstError(errs []error) error {
+	for _, err := range errs{
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}

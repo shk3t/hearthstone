@@ -1,57 +1,57 @@
 package sets
 
-import c "hearthstone/internal/cards"
+import "hearthstone/internal/cards"
 
 var LegacySet = struct {
-	Frostbolt      *c.Spell
-	Fireball       *c.Spell
-	RiverCrocolisk *c.Minion
-	ChillwindYeti  *c.Minion
+	Frostbolt      *cards.Spell
+	Fireball       *cards.Spell
+	RiverCrocolisk *cards.Minion
+	ChillwindYeti  *cards.Minion
 }{
-	Frostbolt: &c.Spell{
-		Card: c.Card{
+	Frostbolt: &cards.Spell{
+		Card: cards.Card{
 			ManaCost:    2,
 			Name:        "Ледяная стрела",
 			Description: "Наносит 3 ед. урона персонажу и замораживает его",
-			Rarity:      c.Rarities.Base,
+			Rarity:      cards.Rarities.Base,
 		},
 		Damage: 3,
 	},
-	Fireball: &c.Spell{
-		Card: c.Card{
+	Fireball: &cards.Spell{
+		Card: cards.Card{
 			ManaCost:    4,
 			Name:        "Огненный шар",
 			Description: "Наносит 6 ед. урона",
-			Rarity:      c.Rarities.Base,
+			Rarity:      cards.Rarities.Base,
 		},
 		Damage: 6,
 	},
-	RiverCrocolisk: &c.Minion{
-		Card: c.Card{
+	RiverCrocolisk: &cards.Minion{
+		Card: cards.Card{
 			ManaCost:    2,
 			Name:        "Речной кроколиск",
 			Description: "",
-			Rarity:      c.Rarities.Base,
+			Rarity:      cards.Rarities.Base,
 		},
-		Character: c.Character{
+		Character: cards.Character{
 			Attack:    2,
 			Health:    3,
 			MaxHealth: 3,
 		},
-		MinionType: c.MinionTypes.Beast,
+		MinionType: cards.MinionTypes.Beast,
 	},
-	ChillwindYeti: &c.Minion{
-		Card: c.Card{
+	ChillwindYeti: &cards.Minion{
+		Card: cards.Card{
 			ManaCost:    4,
 			Name:        "Морозный йети",
 			Description: "",
-			Rarity:      c.Rarities.Base,
+			Rarity:      cards.Rarities.Base,
 		},
-		Character: c.Character{
+		Character: cards.Character{
 			Attack:    4,
 			Health:    5,
 			MaxHealth: 5,
 		},
-		MinionType: c.MinionTypes.No,
+		MinionType: cards.MinionTypes.No,
 	},
 }
