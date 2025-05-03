@@ -1,10 +1,17 @@
-package cards
+package game
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Spell struct {
 	Card
 	Damage int
+}
+
+type Targeting struct {
+	Selector TargetSelector
+	// Effect
 }
 
 func (m *Spell) String() string {

@@ -1,32 +1,31 @@
 package game
 
 import (
-	"hearthstone/internal/cards"
 	"hearthstone/pkg/containers"
 	"hearthstone/pkg/conversions"
 	errorpkg "hearthstone/pkg/errors"
 )
 
 type tableArea struct {
-	minions containers.Shrice[*cards.Minion]
+	minions containers.Shrice[*Minion]
 	side    Side
 }
 
 func newTableArea(side Side) tableArea {
 	return tableArea{
-		minions: containers.NewShrice[*cards.Minion](areaSize),
+		minions: containers.NewShrice[*Minion](areaSize),
 		side:    side,
 	}
 }
 
 func (a tableArea) String() string {
-	playables := conversions.TrueNilInterfaceSlice[cards.Minion, cards.Playable](a.minions)
-	return cards.OrderedPlayableString(playables)
+	playables := conversions.TrueNilInterfaceSlice[Minion, Playable](a.minions)
+	return OrderedPlayableString(playables)
 }
 
 const areaSize = 7
 
-func (a tableArea) place(idx int, minion *cards.Minion) error {
+func (a tableArea) place(idx int, minion *Minion) error {
 	idx = min(idx, areaSize-1)
 	err := a.minions.Insert(idx, minion)
 	switch err.(type) {
@@ -41,7 +40,7 @@ func (a tableArea) place(idx int, minion *cards.Minion) error {
 	}
 }
 
-func (a tableArea) choose(idx int) (*cards.Minion, error) {
+func (a tableArea) choose(idx int) (*Minion, error) {
 	card, err := a.minions.Get(idx)
 	switch err.(type) {
 	case errorpkg.IndexError:

@@ -1,25 +1,24 @@
 package game
 
 import (
-	"hearthstone/internal/cards"
 	"hearthstone/pkg/containers"
 	errorpkg "hearthstone/pkg/errors"
 )
 
-type Hand containers.Shrice[cards.Playable]
+type Hand containers.Shrice[Playable]
 
 func NewHand() Hand {
-	return Hand(containers.NewShrice[cards.Playable](handSize))
+	return Hand(containers.NewShrice[Playable](handSize))
 }
 
 func (h Hand) String() string {
-	return cards.OrderedPlayableString(h)
+	return OrderedPlayableString(h)
 }
 
 const handSize = 10
 
-func (h Hand) pick(idx int) (cards.Playable, error) {
-	card, err := containers.Shrice[cards.Playable](h).Pop(idx)
+func (h Hand) pick(idx int) (Playable, error) {
+	card, err := containers.Shrice[Playable](h).Pop(idx)
 	switch err.(type) {
 	case errorpkg.IndexError:
 		return nil, NewCardPickError(idx)
@@ -32,8 +31,8 @@ func (h Hand) pick(idx int) (cards.Playable, error) {
 	}
 }
 
-func (h Hand) refill(card cards.Playable) error {
-	err := containers.Shrice[cards.Playable](h).PushBack(card)
+func (h Hand) refill(card Playable) error {
+	err := containers.Shrice[Playable](h).PushBack(card)
 	switch err.(type) {
 	case errorpkg.NotEnoughSpaceError:
 		return NewFullHandError()
@@ -44,8 +43,8 @@ func (h Hand) refill(card cards.Playable) error {
 	}
 }
 
-func (h Hand) revert(idx int, card cards.Playable) {
-	err := containers.Shrice[cards.Playable](h).Insert(idx, card)
+func (h Hand) revert(idx int, card Playable) {
+	err := containers.Shrice[Playable](h).Insert(idx, card)
 	if err != nil {
 		panic("Can't return the card to hand")
 	}

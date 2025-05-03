@@ -1,4 +1,4 @@
-package core
+package loop
 
 import (
 	gamepkg "hearthstone/internal/game"

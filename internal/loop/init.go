@@ -1,4 +1,4 @@
-package core
+package loop
 
 import (
 	"hearthstone/internal/config"

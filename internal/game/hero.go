@@ -1,7 +1,6 @@
-package cards
+package game
 
 type HeroPower struct {
-	// TODO
 }
 
 type Hero struct {

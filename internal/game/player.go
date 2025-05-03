@@ -2,7 +2,6 @@ package game
 
 import (
 	"fmt"
-	"hearthstone/internal/cards"
 	"hearthstone/internal/config"
 	errorpkg "hearthstone/pkg/errors"
 	"slices"
@@ -11,7 +10,7 @@ import (
 
 type Player struct {
 	Side    Side
-	Hero    cards.Hero
+	Hero    Hero
 	Hand    Hand
 	Mana    int
 	MaxMana int
@@ -23,7 +22,7 @@ type Player struct {
 func NewPlayer(side Side, deck Deck, game *Game) *Player {
 	return &Player{
 		Side:    side,
-		Hero:    *cards.NewHero(),
+		Hero:    *NewHero(),
 		Hand:    NewHand(),
 		Mana:    0,
 		MaxMana: 0,
@@ -103,20 +102,20 @@ func (p *Player) PlayCard(handIdx, areaIdx int) error {
 		return err
 	}
 
-	err = p.SpendMana(cards.ToCard(card).ManaCost)
+	err = p.SpendMana(ToCard(card).ManaCost)
 	if err != nil {
 		p.Hand.revert(handIdx, card)
 		return err
 	}
 
 	switch card := card.(type) {
-	case *cards.Minion:
+	case *Minion:
 		err = p.game.getArea(p.Side).place(areaIdx, card)
 		if err != nil {
 			p.Hand.revert(handIdx, card)
 		}
 		return err
-	case *cards.Spell:
+	case *Spell:
 		return errorpkg.NewNotImplementedError("Spells")
 	default:
 		panic("Invalid card type")

@@ -1,10 +1,6 @@
 package game
 
-import (
-	"hearthstone/internal/cards"
-)
-
-type TargetSelector func(game *Game, idxes []int, sides []Side) (targets []*cards.Character, err error)
+type TargetSelector func(game *Game, idxes []int, sides []Side) (targets []*Character, err error)
 
 var TargetPresets = struct {
 	// EnemyHero            TargetSelector
@@ -29,19 +25,19 @@ var TargetPresets = struct {
 	// SingleMinion         TargetSelector
 	// MultipleMinions      TargetSelector
 	// AllMinions           TargetSelector
-	Single               TargetSelector
+	Single TargetSelector
 	// Multiple             TargetSelector
 	// All                  TargetSelector
 }{
-	Single: func(g *Game, idxes []int, sides []Side) ([]*cards.Character, error) {
+	Single: func(g *Game, idxes []int, sides []Side) ([]*Character, error) {
 		target, err := g.getCharacter(idxes[0], sides[0])
-		return []*cards.Character{target}, err
+		return []*Character{target}, err
 	},
 }
 
 func ApplyEffect(
-	effectFunc func(target *cards.Character),
-	targetSelector func() []*cards.Character,
+	effectFunc func(target *Character),
+	targetSelector func() []*Character,
 ) {
 	targets := targetSelector()
 	for _, target := range targets {

@@ -1,4 +1,4 @@
-package core
+package loop
 
 import (
 	"bufio"
@@ -29,7 +29,7 @@ func handleInput(game *ActiveGame) (exit bool) {
 	case strings.HasPrefix(command, "a") || command == "attack":
 		err = Actions.Attack.Do(args, game)
 	case strings.HasPrefix(command, "w") || command == "power":
-		// err = DoUseHeroPower(args, game)
+		err = Actions.Power.Do(args, game)
 	case strings.HasPrefix(command, "e") || command == "end":
 		_ = Actions.End.Do(args, game)
 	default:

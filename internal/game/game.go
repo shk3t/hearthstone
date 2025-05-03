@@ -2,7 +2,6 @@ package game
 
 import (
 	"fmt"
-	"hearthstone/internal/cards"
 	"hearthstone/pkg/sugar"
 	"strings"
 )
@@ -57,12 +56,12 @@ func (g *Game) getArea(side Side) tableArea {
 	return g.Table[side]
 }
 
-func (g *Game) getHero(side Side) *cards.Hero {
+func (g *Game) getHero(side Side) *Hero {
 	return &g.Players[side].Hero
 }
 
 // Considers -1 as hero index.
-func (g *Game) getCharacter(idx int, side Side) (*cards.Character, error) {
+func (g *Game) getCharacter(idx int, side Side) (*Character, error) {
 	if idx == -1 {
 		return &g.getHero(side).Character, nil
 	} else {

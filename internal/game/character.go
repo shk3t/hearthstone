@@ -1,4 +1,4 @@
-package cards
+package game
 
 type Character struct {
 	Attack    int

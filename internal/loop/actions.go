@@ -1,4 +1,4 @@
-package core
+package loop
 
 import (
 	"errors"
@@ -6,13 +6,6 @@ import (
 	"hearthstone/pkg/helpers"
 	"strings"
 )
-
-// func DoUseHeroPower(args []string, game *ActiveGame) error {
-// 	idxes, _, errs := parseAllPositions(args)
-//
-// 	game.GetActivePlayer().UseHeroPower()
-// 	return nil
-// }
 
 type playerAction struct {
 	name        string
@@ -78,6 +71,10 @@ var Actions = struct {
 		args:        nil,
 		description: "использовать способность героя",
 		do: func(idxes []int, game *ActiveGame) error {
+			// err := game.GetActivePlayer().UseHeroPower(idxes)
+			// if err != nil {
+			// 	return err
+			// }
 			return nil
 		},
 	},
@@ -153,6 +150,6 @@ func (e playerAction) whatis() string {
 func (e playerAction) usage() string {
 	return fmt.Sprintf(
 		"%8s (%s) %-56s: %s",
-		e.name, e.shortcut, e.args, e.description,
+		e.name, e.shortcut, strings.Join(e.args, ""), e.description,
 	)
 }

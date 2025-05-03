@@ -2,7 +2,6 @@ package game
 
 import (
 	"fmt"
-	"hearthstone/internal/cards"
 	"strings"
 )
 
@@ -15,7 +14,7 @@ type NotEnoughManaError struct {
 }
 type EmptyHandError struct{}
 type FullHandError struct {
-	BurnedCard cards.Playable
+	BurnedCard Playable
 }
 type InvalidTableAreaPositionError struct {
 	position int
@@ -64,7 +63,7 @@ func (err FullHandError) Error() string {
 	if err.BurnedCard != nil {
 		return fmt.Sprintf(
 			"Полная рука. Последняя сожженная карта: \"%s\"",
-			cards.ToCard(err.BurnedCard).Name,
+			ToCard(err.BurnedCard).Name,
 		)
 	}
 	return "Полная рука"
