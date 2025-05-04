@@ -1,9 +1,10 @@
 package main
 
 import (
-	"hearthstone/internal/sets"
-	"hearthstone/internal/loop"
 	"hearthstone/internal/game"
+	"hearthstone/internal/loop"
+	"hearthstone/internal/sets"
+	"hearthstone/internal/sets/base"
 )
 
 func main() {
@@ -17,5 +18,10 @@ func main() {
 		sets.LegacySet.RiverCrocolisk.Copy(),
 	)
 
-	loop.StartGame(startingDeck, startingDeck)
+	loop.StartGame(
+		base.Heroes.Mage.Copy(),
+		base.Heroes.Priest.Copy(),
+		startingDeck,
+		startingDeck,
+	)
 }

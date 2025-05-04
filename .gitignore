@@ -5,6 +5,8 @@ env.*
 # Logs
 logs/
 *.log
+!internal/logs
+!pkg/logs
 
 # Builds
 build/

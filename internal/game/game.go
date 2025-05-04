@@ -12,14 +12,14 @@ type Game struct {
 	Turn    Side
 }
 
-func NewGame(topDeck, botDeck Deck) *Game {
+func NewGame(topHero, botHero *Hero, topDeck, botDeck Deck) *Game {
 	game := &Game{
 		Table: *NewTable(),
 		Turn:  UnsetSide,
 	}
 	game.Players = [SidesCount]Player{
-		TopSide: *NewPlayer(TopSide, topDeck, game),
-		BotSide: *NewPlayer(BotSide, botDeck, game),
+		TopSide: *NewPlayer(TopSide, topHero, topDeck, game),
+		BotSide: *NewPlayer(BotSide, botHero, botDeck, game),
 	}
 	return game
 }
@@ -57,7 +57,7 @@ func (g *Game) getArea(side Side) tableArea {
 }
 
 func (g *Game) getHero(side Side) *Hero {
-	return &g.Players[side].Hero
+	return g.Players[side].Hero
 }
 
 // Considers -1 as hero index.

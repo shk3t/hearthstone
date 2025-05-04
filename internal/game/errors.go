@@ -73,7 +73,7 @@ func (err InvalidTableAreaPositionError) Error() string {
 		return fmt.Sprintf("Некорректная позиция на столе: %d", err.position)
 	}
 
-	sideText := strings.ToLower(string(err.side))
+	sideText := strings.ToLower(err.side.String())
 	sideText = strings.Replace(sideText, "ий", "ей", 1)
 	return fmt.Sprintf(
 		"Некорректная позиция на %s части стола: %d",

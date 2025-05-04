@@ -12,9 +12,13 @@ func (c *Character) ExecuteAttack(target *Character) {
 	c.DealDamage(target.Attack)
 }
 
-func (m *Character) DealDamage(damage int) {
-	m.Health -= damage
-	if m.Health <= 0 {
-		m.IsDead = true
+func (c *Character) DealDamage(value int) {
+	c.Health -= value
+	if c.Health <= 0 {
+		c.IsDead = true
 	}
+}
+
+func (c *Character) RestoreHealth(value int) {
+	c.Health = min(c.Health+value, c.MaxHealth)
 }

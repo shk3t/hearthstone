@@ -15,7 +15,6 @@ var LegacySet = struct {
 			Description: "Наносит 3 ед. урона персонажу и замораживает его",
 			Rarity:      game.Rarities.Base,
 		},
-		Damage: 3,
 	},
 	Fireball: &game.Spell{
 		Card: game.Card{
@@ -24,7 +23,6 @@ var LegacySet = struct {
 			Description: "Наносит 6 ед. урона",
 			Rarity:      game.Rarities.Base,
 		},
-		Damage: 6,
 	},
 	RiverCrocolisk: &game.Minion{
 		Card: game.Card{
@@ -38,7 +36,7 @@ var LegacySet = struct {
 			Health:    3,
 			MaxHealth: 3,
 		},
-		MinionType: game.MinionTypes.Beast,
+		Type: game.MinionTypes.Beast,
 	},
 	ChillwindYeti: &game.Minion{
 		Card: game.Card{
@@ -52,6 +50,6 @@ var LegacySet = struct {
 			Health:    5,
 			MaxHealth: 5,
 		},
-		MinionType: game.MinionTypes.No,
+		Type: game.MinionTypes.No,
 	},
 }

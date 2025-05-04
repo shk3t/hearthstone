@@ -7,7 +7,7 @@ import (
 type Minion struct {
 	Card
 	Character
-	MinionType
+	Type MinionType
 }
 
 type MinionType string

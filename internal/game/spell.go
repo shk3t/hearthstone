@@ -4,14 +4,14 @@ import (
 	"fmt"
 )
 
+type TargetEffect func(target *Character)
+type GlobalEffect func(player *Player)
+
 type Spell struct {
 	Card
-	Damage int
-}
-
-type Targeting struct {
-	Selector TargetSelector
-	// Effect
+	TargetSelector TargetSelector
+	TargetEffect   TargetEffect
+	GlobalEffect   GlobalEffect
 }
 
 func (m *Spell) String() string {

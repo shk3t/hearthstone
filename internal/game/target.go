@@ -1,8 +1,9 @@
 package game
 
+// TODO: Explosive shot? Arcane missiles?
 type TargetSelector func(game *Game, idxes []int, sides []Side) (targets []*Character, err error)
 
-var TargetPresets = struct {
+var TargetSelectorPresets = struct {
 	// EnemyHero            TargetSelector
 	// SingleEnemyMinion    TargetSelector
 	// MultipleEnemyMinions TargetSelector
@@ -33,14 +34,4 @@ var TargetPresets = struct {
 		target, err := g.getCharacter(idxes[0], sides[0])
 		return []*Character{target}, err
 	},
-}
-
-func ApplyEffect(
-	effectFunc func(target *Character),
-	targetSelector func() []*Character,
-) {
-	targets := targetSelector()
-	for _, target := range targets {
-		effectFunc(target)
-	}
 }

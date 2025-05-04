@@ -4,8 +4,8 @@ import (
 	gamepkg "hearthstone/internal/game"
 )
 
-func StartGame(topDeck, botDeck gamepkg.Deck) {
-	game := NewActiveGame(topDeck, botDeck)
+func StartGame(topHero, botHero *gamepkg.Hero, topDeck, botDeck gamepkg.Deck) {
+	game := NewActiveGame(topHero, botHero, topDeck, botDeck)
 
 	game.StartGame()
 	for {

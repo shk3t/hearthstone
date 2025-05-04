@@ -10,7 +10,7 @@ import (
 
 type Player struct {
 	Side    Side
-	Hero    Hero
+	Hero    *Hero
 	Hand    Hand
 	Mana    int
 	MaxMana int
@@ -19,10 +19,10 @@ type Player struct {
 	game    *Game
 }
 
-func NewPlayer(side Side, deck Deck, game *Game) *Player {
+func NewPlayer(side Side, hero *Hero, deck Deck, game *Game) *Player {
 	return &Player{
 		Side:    side,
-		Hero:    *NewHero(),
+		Hero:    hero,
 		Hand:    NewHand(),
 		Mana:    0,
 		MaxMana: 0,
@@ -35,7 +35,7 @@ func NewPlayer(side Side, deck Deck, game *Game) *Player {
 func (p *Player) String() string {
 	heroFormat := "%s"
 	if p.Side == p.game.Turn {
-		heroFormat = "> %s"
+		heroFormat = "| %s"
 	}
 
 	linesForTop := append(
@@ -136,8 +136,17 @@ func (p *Player) Attack(allyIdx, enemyIdx int) error {
 	return nil
 }
 
-func (p *Player) UseHeroPower() error {
-	// p.Hero.Power
+// TODO generalize
+func (p *Player) UseHeroPower(idxes []int, sides []Side) error {
+	targets, err := p.Hero.Power.TargetSelector(p.game, idxes, sides)
+	if err != nil {
+		return err
+	}
+	for _, target := range targets {
+		p.Hero.Power.TargetEffect(target)
+	}
+	p.Hero.Power.GlobalEffect(p)  // BUG
+	p.SpendMana(p.Hero.Power.ManaCost)
 	return nil
 }
 

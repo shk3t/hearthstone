@@ -14,9 +14,9 @@ type ActiveGame struct {
 	Winner       gamepkg.Side
 }
 
-func NewActiveGame(topDeck, botDeck gamepkg.Deck) *ActiveGame {
+func NewActiveGame(topHero, botHero *gamepkg.Hero, topDeck, botDeck gamepkg.Deck) *ActiveGame {
 	return &ActiveGame{
-		Game:         gamepkg.NewGame(topDeck, botDeck),
+		Game:         gamepkg.NewGame(topHero, botHero, topDeck, botDeck),
 		Help:         "",
 		TurnFinished: true,
 		Winner:       gamepkg.UnsetSide,
@@ -47,7 +47,7 @@ func (g *ActiveGame) String() string {
 		fmt.Fprintf(
 			&builder,
 			"%s игрок одерживает ПОБЕДУ!\n",
-			strings.ToUpper(string(g.Winner)),
+			strings.ToUpper(g.Winner.String()),
 		)
 	} else {
 		fmt.Fprint(&builder, prompt)
