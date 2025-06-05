@@ -44,6 +44,10 @@ func (h Hand) refill(card Playable) error {
 }
 
 func (h Hand) revert(idx int, card Playable) {
+	if idx == HeroIdx {
+		return // TODO
+	}
+
 	err := containers.Shrice[Playable](h).Insert(idx, card)
 	if err != nil {
 		panic("Can't return the card to hand")

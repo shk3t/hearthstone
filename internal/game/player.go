@@ -107,7 +107,7 @@ func (p *Player) PlayCard(
 	var err error
 
 	log.DLog(handIdx)
-	if handIdx == -1 {
+	if handIdx == HeroIdx {
 		card, err = &p.Hero.Power, nil
 	} else {
 		card, err = p.Hand.pick(handIdx)
@@ -119,24 +119,23 @@ func (p *Player) PlayCard(
 
 	err = p.SpendMana(ToCard(card).ManaCost)
 	if err != nil {
-		if handIdx != -1 {
-			p.Hand.revert(handIdx, card)
-		}
+		p.Hand.revert(handIdx, card)
 		return err
 	}
 
 	switch card := card.(type) {
 	case *Minion:
 		err = p.game.getArea(p.Side).place(areaIdx, card)
-		if err != nil {
-			p.Hand.revert(handIdx, card)
-		}
-		return err
 	case *Spell:
-		return p.castSpell(card, spellIdxes, spellSides) // TODO revert
+		err = p.castSpell(card, spellIdxes, spellSides)
 	default:
 		panic("Invalid card type")
 	}
+
+	if err != nil {
+		p.Hand.revert(handIdx, card)
+	}
+	return err
 }
 
 func (p *Player) Attack(allyIdx, enemyIdx int) error {

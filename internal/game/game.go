@@ -60,9 +60,8 @@ func (g *Game) getHero(side Side) *Hero {
 	return g.Players[side].Hero
 }
 
-// Considers -1 as hero index.
 func (g *Game) getCharacter(idx int, side Side) (*Character, error) {
-	if idx == -1 {
+	if idx == HeroIdx {
 		return &g.getHero(side).Character, nil
 	} else {
 		minion, err := g.getArea(side).choose(idx)

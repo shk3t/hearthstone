@@ -85,7 +85,7 @@ var Actions = struct {
 		args:        []string{"<позиции_целей_силы_героя>"},
 		description: "использовать способность героя",
 		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
-			err := game.GetActivePlayer().PlayCard(-1, -1, idxes, sides)
+			err := game.GetActivePlayer().PlayCard(gamepkg.HeroIdx, -1, idxes, sides)
 			if err != nil {
 				return err
 			}

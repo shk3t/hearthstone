@@ -102,7 +102,7 @@ func (s Shrice[T]) PopBack() (T, error) {
 	return value, nil
 }
 
-func (s Shrice[T]) Shrink() {
+func (s Shrice[T]) Shrink() {  // BUG ???
 	var null T
 	j := s.Len()
 	for i := j + 1; i < s.Cap(); i++ {

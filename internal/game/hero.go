@@ -7,6 +7,8 @@ type Hero struct {
 	Power  Spell
 }
 
+const HeroIdx = -1
+
 func (h *Hero) Copy() *Hero {
 	heroCopy := *h
 	return &heroCopy

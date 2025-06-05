@@ -25,7 +25,7 @@ func parsePosition(arg string) (idx int, side gamepkg.Side, err error) {
 	}
 
 	if strings.Contains(arg, "h") {
-		return -1, side, nil
+		return gamepkg.HeroIdx, side, nil
 	}
 
 	pos, err := strconv.Atoi(arg)
