@@ -29,6 +29,10 @@ type UnmatchedEffectsAndTargetsError struct {
 	effectsLen int
 	targetsLen int
 }
+type InvalidTargettingError struct {
+	speicified int
+	required   int
+}
 
 func NewCardPickError(idx int) CardPickError {
 	return CardPickError{position: idx + 1}
@@ -54,7 +58,6 @@ func NewFullTableAreaError() FullTableAreaError {
 func NewEmptyDeckError() EmptyDeckError {
 	return EmptyDeckError{}
 }
-
 func NewUnmatchedEffectsAndTargetsError[T any](
 	spell *Spell,
 	targets []T,
@@ -63,6 +66,12 @@ func NewUnmatchedEffectsAndTargetsError[T any](
 		spellName:  spell.Name,
 		effectsLen: len(spell.TargetEffects),
 		targetsLen: len(targets),
+	}
+}
+func NewInvalidTargettingError(specified, required int) InvalidTargettingError {
+	return InvalidTargettingError{
+		speicified: specified,
+		required:   required,
 	}
 }
 
@@ -102,7 +111,7 @@ func (err FullTableAreaError) Error() string {
 }
 func (err EmptyDeckError) Error() string {
 	if err.Fatigue != 0 {
-		return fmt.Sprintf("Пустая колода. Потеря здоровья из-за усталости: %d", err.Fatigue)
+		return fmt.Sprintf("Пустая колода.\nПотеря здоровья из-за усталости: %d", err.Fatigue)
 	}
 	return "Пустая колода"
 }
@@ -110,5 +119,11 @@ func (err UnmatchedEffectsAndTargetsError) Error() string {
 	return fmt.Sprintf(
 		"Число эффектов и целей не соответствует для \"%s\".\nЭффектов: %d, Целей: %d",
 		err.spellName, err.effectsLen, err.targetsLen,
+	)
+}
+func (err InvalidTargettingError) Error() string {
+	return fmt.Sprintf(
+		"Некорректный выбор цели.\nУказано целей: %d, Требуется: %d",
+		err.speicified, err.required,
 	)
 }

@@ -50,7 +50,7 @@ var Actions = struct {
 		},
 		description: "сыграть карту",
 		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
-			if len(idxes) < 1 {
+			if len(idxes) == 0 {
 				return NewInvalidArgumentsError("")
 			} else if len(idxes) == 1 {
 				idxes = append(idxes, 0)
@@ -91,6 +91,11 @@ var Actions = struct {
 		args:        []string{"<позиции_целей_силы_героя>"},
 		description: "использовать способность героя",
 		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
+			if len(idxes) == 0 {
+				idxes = append(idxes, 0)
+				sides = append(sides, gamepkg.UnsetSide)
+			}
+
 			err := game.GetActivePlayer().PlayCard(gamepkg.HeroIdx, -1, idxes, sides)
 			if err != nil {
 				return err
@@ -137,10 +142,10 @@ func InitActions() {
 			for _, entry := range actionList {
 				fmt.Fprintln(&builder, entry.usage(false))
 			}
-			fmt.Fprint(&builder, "Чтобы указать героя в качестве цели, используйте 'h' или '0'")
+			fmt.Fprint(&builder, "Чтобы указать героя в качестве цели, используйте 'h' или '0'\n")
 			fmt.Fprint(
 				&builder,
-				"Чтобы указать сторону цели, используйте постфикс 't' (верх) ил 'b' (низ), например '5b'",
+				"Чтобы указать сторону цели, используйте 't' (верх) ил 'b' (низ), например '5b'",
 			)
 			return builder.String()
 		}(),
@@ -183,7 +188,7 @@ func (e playerAction) whatis(shrinkContent bool) string {
 
 func (e playerAction) usage(compactContent bool) string {
 	output := fmt.Sprintf(
-		"%8s (%s) %-56s: %s",
+		"%8s (%s) %-60s: %s",
 		e.name, e.shortcut, strings.Join(e.args, " "), e.description,
 	)
 	if compactContent {
