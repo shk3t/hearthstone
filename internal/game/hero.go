@@ -2,9 +2,10 @@ package game
 
 type Hero struct {
 	Character
-	Class  Class
-	Weapon *Weapon
-	Power  Spell
+	Class       Class
+	Weapon      *Weapon
+	Power       Spell
+	PowerIsUsed bool
 }
 
 const HeroIdx = -1

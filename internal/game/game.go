@@ -42,6 +42,7 @@ func (g *Game) StartNextTurn() []error {
 	activePlayer := g.GetActivePlayer()
 	activePlayer.IncreaseMana()
 	activePlayer.RestoreMana()
+	activePlayer.Hero.PowerIsUsed = false
 	errs := activePlayer.DrawCards(1)
 
 	return errs

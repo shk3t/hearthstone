@@ -33,6 +33,8 @@ type InvalidTargettingError struct {
 	speicified int
 	required   int
 }
+type UsedHeroPowerError struct{}
+type UsedMinionAttackError struct{}
 
 func NewCardPickError(idx int) CardPickError {
 	return CardPickError{position: idx + 1}
@@ -73,6 +75,12 @@ func NewInvalidTargettingError(specified, required int) InvalidTargettingError {
 		speicified: specified,
 		required:   required,
 	}
+}
+func NewUsedHeroPowerError() UsedHeroPowerError {
+	return UsedHeroPowerError{}
+}
+func NewUsedMinionAttackError() UsedMinionAttackError {
+	return UsedMinionAttackError{}
 }
 
 func (err CardPickError) Error() string {
@@ -130,4 +138,10 @@ func (err InvalidTargettingError) Error() string {
 		"Некорректный выбор цели.\nУказано целей: %d, требуется: %d",
 		err.speicified, err.required,
 	)
+}
+func (err UsedHeroPowerError) Error() string {
+	return "Сила героя уже была использована в этом ходу"
+}
+func (err UsedMinionAttackError) Error() string {
+	return "Это существо уже совершало атаку в этом ходу"
 }

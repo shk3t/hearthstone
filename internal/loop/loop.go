@@ -9,19 +9,23 @@ func StartGame(topHero, botHero *gamepkg.Hero, topDeck, botDeck gamepkg.Deck) {
 
 	game.StartGame()
 	for {
-		game.CheckWinner()
-		if game.TurnFinished && game.Winner == gamepkg.UnsetSide {
+		if game.TurnFinished && !game.HasWinner() {
 			game.StartNextTurn()
 			game.CheckWinner()
 		}
+
 		game.Display()
-		if game.Winner != gamepkg.UnsetSide {
+
+		if game.HasWinner() {
 			return
 		}
+
 		exit := handleInput(game)
 		if exit {
 			return
 		}
+
 		game.Cleanup()
+		game.CheckWinner()
 	}
 }

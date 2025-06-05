@@ -73,4 +73,8 @@ func (g *ActiveGame) CheckWinner() {
 	}
 }
 
+func (g *ActiveGame) HasWinner() bool {
+	return g.Winner != gamepkg.UnsetSide
+}
+
 const prompt = "> "

@@ -111,8 +111,12 @@ func (p *Player) PlayCard(
 ) error {
 	var card Playable
 	var err error
+	heroPowerUse := handIdx == HeroIdx
 
-	if handIdx == HeroIdx {
+	if heroPowerUse {
+		if p.Hero.PowerIsUsed {
+			return NewUsedHeroPowerError()
+		}
 		card = &p.Hero.Power
 	} else {
 		card, err = p.Hand.get(handIdx)
@@ -131,6 +135,9 @@ func (p *Player) PlayCard(
 		err = p.game.getArea(p.Side).place(areaIdx, card)
 	case *Spell:
 		err = p.castSpell(card, spellIdxes, spellSides)
+		if heroPowerUse && err == nil {
+			p.Hero.PowerIsUsed = true
+		}
 	default:
 		panic("Invalid card type")
 	}
