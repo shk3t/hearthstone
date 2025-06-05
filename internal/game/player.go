@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"hearthstone/internal/config"
 	errorpkg "hearthstone/pkg/errors"
-	"hearthstone/pkg/log"
 	"hearthstone/pkg/sugar"
 	"slices"
 	"strings"
@@ -106,7 +105,6 @@ func (p *Player) PlayCard(
 	var card Playable
 	var err error
 
-	log.DLog(handIdx)
 	if handIdx == HeroIdx {
 		card, err = &p.Hero.Power, nil
 	} else {

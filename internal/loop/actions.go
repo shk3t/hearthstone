@@ -50,15 +50,21 @@ var Actions = struct {
 		},
 		description: "сыграть карту",
 		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
-			if len(idxes) != 2 {
+			if len(idxes) < 1 {
 				return NewInvalidArgumentsError("")
+			} else if len(idxes) == 1 {
+				idxes = append(idxes, 0)
+				sides = append(sides, gamepkg.UnsetSide)
 			}
+
 			handIdx, areaIdx := idxes[0], idxes[1]
 			spellIdxes, spellSides := idxes[1:], sides[1:]
+
 			err := game.GetActivePlayer().PlayCard(handIdx, areaIdx, spellIdxes, spellSides)
 			if err != nil {
 				return err
 			}
+
 			return nil
 		},
 	},

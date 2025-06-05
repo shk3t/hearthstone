@@ -54,9 +54,7 @@ func (a tableArea) choose(idx int) (*Minion, error) {
 
 func (a tableArea) cleanupDeadMinions() {
 	for i, minion := range a.minions {
-		if minion == nil {
-			return
-		} else if minion.IsDead {
+		if minion != nil && minion.IsDead {
 			a.minions[i] = nil
 		}
 	}
