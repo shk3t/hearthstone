@@ -11,14 +11,16 @@ type Spell struct {
 	Card
 	TargetSelector TargetSelector
 	TargetEffect   TargetEffect
+	TargetEffects  []TargetEffect // Separate effect for each target
 	GlobalEffect   GlobalEffect
+	AllyPrimarily  bool
 }
 
-func (m *Spell) String() string {
+func (s *Spell) String() string {
 	return fmt.Sprintf(
 		"<%d> %s",
-		m.ManaCost,
-		m.Name,
+		s.ManaCost,
+		s.Name,
 	)
 }
 

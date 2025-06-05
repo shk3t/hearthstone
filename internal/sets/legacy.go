@@ -15,6 +15,11 @@ var LegacySet = struct {
 			Description: "Наносит 3 ед. урона персонажу и замораживает его",
 			Rarity:      game.Rarities.Base,
 		},
+		TargetSelector: game.TargetSelectorPresets.Single,
+		TargetEffect: func(target *game.Character) {
+			target.DealDamage(3)
+			// TODO: Freeze
+		},
 	},
 	Fireball: &game.Spell{
 		Card: game.Card{
@@ -22,6 +27,10 @@ var LegacySet = struct {
 			Name:        "Огненный шар",
 			Description: "Наносит 6 ед. урона",
 			Rarity:      game.Rarities.Base,
+		},
+		TargetSelector: game.TargetSelectorPresets.Single,
+		TargetEffect: func(target *game.Character) {
+			target.DealDamage(6)
 		},
 	},
 	RiverCrocolisk: &game.Minion{

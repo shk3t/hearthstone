@@ -12,7 +12,7 @@ var Config config
 
 type config struct {
 	PrintFrame bool
-	FreeMana   bool
+	UnlimitedMana   bool
 }
 
 func Init() {
@@ -21,7 +21,7 @@ func Init() {
 	}
 
 	Config.PrintFrame = parseBool("PRINT_FRAME", false)
-	Config.FreeMana = parseBool("FREE_MANA", false)
+	Config.UnlimitedMana = parseBool("UNLIMITED_MANA", false)
 }
 
 func parseBool(variable string, defaultValue bool) bool {

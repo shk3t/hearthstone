@@ -33,7 +33,7 @@ func handleInput(game *ActiveGame) (exit bool) {
 	case strings.HasPrefix(command, "e") || command == "end":
 		_ = Actions.End.Do(args, game)
 	default:
-		err = Actions.Default.Do(args, game)
+		err = Actions.ShortHelp.Do(args, game)
 	}
 
 	if err != nil {

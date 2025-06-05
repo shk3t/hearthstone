@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"hearthstone/internal/config"
 	errorpkg "hearthstone/pkg/errors"
+	"hearthstone/pkg/log"
+	"hearthstone/pkg/sugar"
 	"slices"
 	"strings"
 )
@@ -27,7 +29,7 @@ func NewPlayer(side Side, hero *Hero, deck Deck, game *Game) *Player {
 		Mana:    0,
 		MaxMana: 0,
 		fatigue: 0,
-		deck:    deck.Copy(),
+		deck:    deck,
 		game:    game,
 	}
 }
@@ -63,7 +65,7 @@ func (p *Player) RestoreMana() {
 }
 
 func (p *Player) SpendMana(value int) error {
-	if p.Mana-value < 0 && !config.Config.FreeMana {
+	if p.Mana-value < 0 && !config.Config.UnlimitedMana {
 		return NewNotEnoughManaError(p.Mana, value)
 	}
 	p.Mana -= value
@@ -96,15 +98,30 @@ func (p *Player) DrawCards(number int) []error {
 	return errs
 }
 
-func (p *Player) PlayCard(handIdx, areaIdx int) error {
-	card, err := p.Hand.pick(handIdx)
+func (p *Player) PlayCard(
+	handIdx int,
+	areaIdx int,
+	spellIdxes []int, spellSides []Side,
+) error {
+	var card Playable
+	var err error
+
+	log.DLog(handIdx)
+	if handIdx == -1 {
+		card, err = &p.Hero.Power, nil
+	} else {
+		card, err = p.Hand.pick(handIdx)
+	}
+
 	if err != nil {
 		return err
 	}
 
 	err = p.SpendMana(ToCard(card).ManaCost)
 	if err != nil {
-		p.Hand.revert(handIdx, card)
+		if handIdx != -1 {
+			p.Hand.revert(handIdx, card)
+		}
 		return err
 	}
 
@@ -116,7 +133,7 @@ func (p *Player) PlayCard(handIdx, areaIdx int) error {
 		}
 		return err
 	case *Spell:
-		return errorpkg.NewNotImplementedError("Spells")
+		return p.castSpell(card, spellIdxes, spellSides) // TODO revert
 	default:
 		panic("Invalid card type")
 	}
@@ -136,17 +153,42 @@ func (p *Player) Attack(allyIdx, enemyIdx int) error {
 	return nil
 }
 
-// TODO generalize
-func (p *Player) UseHeroPower(idxes []int, sides []Side) error {
-	targets, err := p.Hero.Power.TargetSelector(p.game, idxes, sides)
-	if err != nil {
-		return err
+func (p *Player) castSpell(spell *Spell, idxes []int, sides Sides) error {
+	sides.setUnset(
+		sugar.If(spell.AllyPrimarily, p.Side, p.Side.Opposite()),
+	)
+
+	if spell.TargetSelector != nil {
+		targets, err := spell.TargetSelector(p.game, idxes, sides)
+		if err != nil {
+			return err
+		}
+
+		if spell.TargetEffect != nil {
+			for _, target := range targets {
+				if target != nil {
+					spell.TargetEffect(target)
+				}
+			}
+		}
+
+		if len(spell.TargetEffects) > 0 {
+			if len(spell.TargetEffects) != len(targets) {
+				panic(NewUnmatchedEffectsAndTargetsError(spell, targets))
+			}
+
+			for i, target := range targets {
+				if target != nil {
+					spell.TargetEffects[i](target)
+				}
+			}
+		}
 	}
-	for _, target := range targets {
-		p.Hero.Power.TargetEffect(target)
+
+	if spell.GlobalEffect != nil {
+		spell.GlobalEffect(p)
 	}
-	p.Hero.Power.GlobalEffect(p)  // BUG
-	p.SpendMana(p.Hero.Power.ManaCost)
+
 	return nil
 }
 

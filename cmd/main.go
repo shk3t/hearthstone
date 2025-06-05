@@ -12,16 +12,16 @@ func main() {
 	defer loop.DeinitAll()
 
 	startingDeck := game.NewDeck(
-		sets.LegacySet.RiverCrocolisk.Copy(),
-		sets.LegacySet.RiverCrocolisk.Copy(),
-		sets.LegacySet.RiverCrocolisk.Copy(),
-		sets.LegacySet.RiverCrocolisk.Copy(),
+		sets.LegacySet.RiverCrocolisk,
+		sets.LegacySet.ChillwindYeti,
+		sets.LegacySet.Frostbolt,
+		sets.LegacySet.Fireball,
 	)
 
 	loop.StartGame(
 		base.Heroes.Mage.Copy(),
 		base.Heroes.Priest.Copy(),
-		startingDeck,
-		startingDeck,
+		startingDeck.Copy(),
+		startingDeck.Copy(),
 	)
 }

@@ -24,7 +24,6 @@ var Heroes = struct {
 			TargetEffect: func(target *game.Character) {
 				target.DealDamage(1)
 			},
-			GlobalEffect: nil,
 		},
 	},
 	Priest: &game.Hero{
@@ -45,7 +44,7 @@ var Heroes = struct {
 			TargetEffect: func(target *game.Character) {
 				target.RestoreHealth(2)
 			},
-			GlobalEffect: nil,
+			AllyPrimarily: true,
 		},
 	},
 }

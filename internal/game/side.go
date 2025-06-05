@@ -2,6 +2,8 @@ package game
 
 type Side int
 
+type Sides []Side
+
 const (
 	UnsetSide Side = iota - 1
 	TopSide
@@ -18,4 +20,12 @@ func (s Side) Opposite() Side {
 
 func (s Side) String() string {
 	return sideStrings[s]
+}
+
+func (ss Sides) setUnset(toSide Side) {
+	for i := range ss {
+		if ss[i] == UnsetSide {
+			ss[i] = toSide
+		}
+	}
 }

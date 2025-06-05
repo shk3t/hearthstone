@@ -3,18 +3,18 @@ package loop
 import (
 	"hearthstone/internal/config"
 	"hearthstone/pkg/helpers"
-	"hearthstone/pkg/logs"
+	"hearthstone/pkg/log"
 )
 
 func initAll() {
 	config.Init()
-	logs.Init()
+	log.Init()
 	InitDisplayFrame()
 	InitActions()
 }
 
 func deinitAll() {
-	logs.Deinit()
+	log.Deinit()
 }
 
 var initializer = helpers.NewInitializer(initAll, deinitAll)

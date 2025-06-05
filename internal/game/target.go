@@ -1,6 +1,5 @@
 package game
 
-// TODO: Explosive shot? Arcane missiles?
 type TargetSelector func(game *Game, idxes []int, sides []Side) (targets []*Character, err error)
 
 var TargetSelectorPresets = struct {

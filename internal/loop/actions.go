@@ -20,14 +20,14 @@ type playerAction struct {
 }
 
 var Actions = struct {
-	Default playerAction
-	Help    playerAction
-	Play    playerAction
-	Attack  playerAction
-	Power   playerAction
-	End     playerAction
+	ShortHelp playerAction
+	Help      playerAction
+	Play      playerAction
+	Attack    playerAction
+	Power     playerAction
+	End       playerAction
 }{
-	Default: playerAction{
+	ShortHelp: playerAction{
 		name:        "",
 		shortcut:    "",
 		args:        nil,
@@ -42,16 +42,20 @@ var Actions = struct {
 		do:          nil,
 	},
 	Play: playerAction{
-		name:        "play",
-		shortcut:    "p",
-		args:        []string{"<номер_карты>", "<позиция_на_столе>"},
+		name:     "play",
+		shortcut: "p",
+		args: []string{
+			"<номер_карты>",
+			"<позиция_на_столе>/<позиции_целей_заклинания>",
+		},
 		description: "сыграть карту",
 		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
 			if len(idxes) != 2 {
 				return NewInvalidArgumentsError("")
 			}
 			handIdx, areaIdx := idxes[0], idxes[1]
-			err := game.GetActivePlayer().PlayCard(handIdx, areaIdx)
+			spellIdxes, spellSides := idxes[1:], sides[1:]
+			err := game.GetActivePlayer().PlayCard(handIdx, areaIdx, spellIdxes, spellSides)
 			if err != nil {
 				return err
 			}
@@ -78,10 +82,10 @@ var Actions = struct {
 	Power: playerAction{
 		name:        "power",
 		shortcut:    "w",
-		args:        nil,
+		args:        []string{"<позиции_целей_силы_героя>"},
 		description: "использовать способность героя",
 		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
-			err := game.GetActivePlayer().UseHeroPower(idxes, sides)  // TODO: process invalid arguments
+			err := game.GetActivePlayer().PlayCard(-1, -1, idxes, sides)
 			if err != nil {
 				return err
 			}
@@ -101,10 +105,11 @@ var Actions = struct {
 }
 
 var actionList = []playerAction{
+	Actions.Help,
 	Actions.Play,
 	Actions.Attack,
+	Actions.Power,
 	Actions.End,
-	Actions.Help,
 }
 
 func InitActions() {
@@ -127,12 +132,15 @@ func InitActions() {
 				fmt.Fprintln(&builder, entry.usage(false))
 			}
 			fmt.Fprint(&builder, "Чтобы указать героя в качестве цели, используйте 'h' или '0'")
-
+			fmt.Fprint(
+				&builder,
+				"Чтобы указать сторону цели, используйте постфикс 't' (верх) ил 'b' (низ), например '5b'",
+			)
 			return builder.String()
 		}(),
 	}
 
-	Actions.Default.do = func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
+	Actions.ShortHelp.do = func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
 		return errors.New(actionsHelp.short)
 	}
 	Actions.Help.do = func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
@@ -170,7 +178,7 @@ func (e playerAction) whatis(shrinkContent bool) string {
 func (e playerAction) usage(compactContent bool) string {
 	output := fmt.Sprintf(
 		"%8s (%s) %-56s: %s",
-		e.name, e.shortcut, strings.Join(e.args, ""), e.description,
+		e.name, e.shortcut, strings.Join(e.args, " "), e.description,
 	)
 	if compactContent {
 		output = multipleSpaceRegex.ReplaceAllString(output, " ")
