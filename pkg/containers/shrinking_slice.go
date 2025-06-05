@@ -77,9 +77,7 @@ func (s Shrice[T]) PushBack(values ...T) error {
 
 func (s Shrice[T]) Pop(idx int) (T, error) {
 	var null T
-	if s[0] == null {
-		return null, errorpkg.NewEmptyError()
-	} else if idx < 0 || s.Cap() <= idx || s[idx] == null {
+	if idx < 0 || s.Cap() <= idx || s[idx] == null {
 		return null, errorpkg.NewIndexError(idx)
 	}
 

@@ -63,11 +63,18 @@ func (p *Player) RestoreMana() {
 	p.Mana = p.MaxMana
 }
 
-func (p *Player) SpendMana(value int) error {
+func (p *Player) HaveEnoughMana(value int) bool {
 	if p.Mana-value < 0 && !config.Config.UnlimitedMana {
+		return false
+	}
+	return true
+}
+
+func (p *Player) SpendMana(value int) error {
+	if !p.HaveEnoughMana(value) {
 		return NewNotEnoughManaError(p.Mana, value)
 	}
-	p.Mana -= value
+	p.Mana = min(0, p.Mana-value)
 	return nil
 }
 
@@ -106,19 +113,17 @@ func (p *Player) PlayCard(
 	var err error
 
 	if handIdx == HeroIdx {
-		card, err = &p.Hero.Power, nil
+		card = &p.Hero.Power
 	} else {
-		card, err = p.Hand.pick(handIdx)
+		card, err = p.Hand.get(handIdx)
+		if err != nil {
+			return err
+		}
 	}
 
-	if err != nil {
-		return err
-	}
-
-	err = p.SpendMana(ToCard(card).ManaCost)
-	if err != nil {
-		p.Hand.revert(handIdx, card)
-		return err
+	manaCost := ToCard(card).ManaCost
+	if !p.HaveEnoughMana(manaCost) {
+		return NewNotEnoughManaError(p.Mana, manaCost)
 	}
 
 	switch card := card.(type) {
@@ -129,11 +134,13 @@ func (p *Player) PlayCard(
 	default:
 		panic("Invalid card type")
 	}
-
 	if err != nil {
-		p.Hand.revert(handIdx, card)
+		return err
 	}
-	return err
+
+	p.Hand.discard(handIdx)
+	_ = p.SpendMana(manaCost)
+	return nil
 }
 
 func (p *Player) Attack(allyIdx, enemyIdx int) error {

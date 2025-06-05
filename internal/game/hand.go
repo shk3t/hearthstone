@@ -17,18 +17,24 @@ func (h Hand) String() string {
 
 const handSize = 10
 
-func (h Hand) pick(idx int) (Playable, error) {
-	card, err := containers.Shrice[Playable](h).Pop(idx)
+func (h Hand) get(idx int) (Playable, error) {
+	card, err := containers.Shrice[Playable](h).Get(idx)
+
 	switch err.(type) {
 	case errorpkg.IndexError:
+		if containers.Shrice[Playable](h).Len() == 0 {
+			return nil, NewEmptyHandError()
+		}
 		return nil, NewCardPickError(idx)
-	case errorpkg.EmptyError:
-		return nil, NewEmptyHandError()
 	case nil:
 		return card, nil
 	default:
 		panic(errorpkg.NewUnexpectedError(err))
 	}
+}
+
+func (h Hand) discard(idx int) {
+	containers.Shrice[Playable](h).Pop(idx)
 }
 
 func (h Hand) refill(card Playable) error {
@@ -40,16 +46,5 @@ func (h Hand) refill(card Playable) error {
 		return nil
 	default:
 		panic(errorpkg.NewUnexpectedError(err))
-	}
-}
-
-func (h Hand) revert(idx int, card Playable) {
-	if idx == HeroIdx {
-		return // TODO
-	}
-
-	err := containers.Shrice[Playable](h).Insert(idx, card)
-	if err != nil {
-		panic("Can't return the card to hand")
 	}
 }

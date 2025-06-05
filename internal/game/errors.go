@@ -79,7 +79,11 @@ func (err CardPickError) Error() string {
 	return fmt.Sprintf("Выбрана некорректная карта: %d", err.position)
 }
 func (err NotEnoughManaError) Error() string {
-	return fmt.Sprintf("Недостаточно маны. Нужно: %d, имеется: %d", err.available, err.required)
+	return fmt.Sprintf(
+		"Недостаточно маны. Нужно: %d, имеется: %d",
+		err.required,
+		err.available,
+	)
 }
 func (err EmptyHandError) Error() string {
 	return "Пустая рука"
@@ -117,13 +121,13 @@ func (err EmptyDeckError) Error() string {
 }
 func (err UnmatchedEffectsAndTargetsError) Error() string {
 	return fmt.Sprintf(
-		"Число эффектов и целей не соответствует для \"%s\".\nЭффектов: %d, Целей: %d",
+		"Число эффектов и целей не соответствует для \"%s\".\nЭффектов: %d, целей: %d",
 		err.spellName, err.effectsLen, err.targetsLen,
 	)
 }
 func (err InvalidTargettingError) Error() string {
 	return fmt.Sprintf(
-		"Некорректный выбор цели.\nУказано целей: %d, Требуется: %d",
+		"Некорректный выбор цели.\nУказано целей: %d, требуется: %d",
 		err.speicified, err.required,
 	)
 }
