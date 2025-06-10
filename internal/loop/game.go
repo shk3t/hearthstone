@@ -22,18 +22,6 @@ func NewActiveGame(topHero, botHero *gamepkg.Hero, topDeck, botDeck gamepkg.Deck
 		Winner:       gamepkg.UnsetSide,
 	}
 }
-func (g *ActiveGame) StartGame() {
-	g.Game.StartGame()
-}
-
-func (g *ActiveGame) StartNextTurn() {
-	g.TurnFinished = false
-	g.Help = ""
-	errs := g.Game.StartNextTurn()
-	if len(errs) > 0 {
-		g.Help = helpers.JoinErrors(errs, "\n")
-	}
-}
 
 func (g *ActiveGame) String() string {
 	builder := strings.Builder{}
@@ -56,6 +44,19 @@ func (g *ActiveGame) String() string {
 	return builder.String()
 }
 
+func (g *ActiveGame) StartGame() {
+	g.Game.StartGame()
+}
+
+func (g *ActiveGame) StartNextTurn() {
+	g.TurnFinished = false
+	g.Help = ""
+	errs := g.Game.StartNextTurn()
+	if len(errs) > 0 {
+		g.Help = helpers.JoinErrors(errs, "\n")
+	}
+}
+
 func (g *ActiveGame) Display() {
 	DisplayFrame(g.String())
 }
@@ -67,7 +68,7 @@ func (g *ActiveGame) Cleanup() {
 func (g *ActiveGame) CheckWinner() {
 	for i := range gamepkg.SidesCount {
 		side := gamepkg.Side(i)
-		if g.Game.Players[side].Hero.IsDead {
+		if !g.Game.Players[side].Hero.Alive {
 			g.Winner = side.Opposite()
 		}
 	}

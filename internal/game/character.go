@@ -1,10 +1,31 @@
 package game
 
+import "strings"
+
+type CharacterStatus struct {
+	Sleep bool
+}
+
 type Character struct {
 	Attack    int
 	Health    int
 	MaxHealth int
-	IsDead    bool
+	Alive     bool
+	Status    CharacterStatus
+}
+
+func (cs *CharacterStatus) String() string {
+	builder := strings.Builder{}
+
+	if cs.Sleep {
+		builder.WriteString("Z")
+	}
+
+	return builder.String()
+}
+
+func (c *Character) Awake() {
+	c.Status.Sleep = false
 }
 
 func (c *Character) ExecuteAttack(target *Character) {
@@ -15,7 +36,7 @@ func (c *Character) ExecuteAttack(target *Character) {
 func (c *Character) DealDamage(value int) {
 	c.Health -= value
 	if c.Health <= 0 {
-		c.IsDead = true
+		c.Alive = false
 	}
 }
 

@@ -36,6 +36,10 @@ func (g *Game) GetActivePlayer() *Player {
 	return &g.Players[g.Turn]
 }
 
+func (g *Game) GetActiveArea() tableArea {
+	return g.Table[g.Turn]
+}
+
 func (g *Game) StartNextTurn() []error {
 	g.Turn = sugar.If(g.Turn == TopSide, BotSide, TopSide)
 
@@ -44,6 +48,14 @@ func (g *Game) StartNextTurn() []error {
 	activePlayer.RestoreMana()
 	activePlayer.Hero.PowerIsUsed = false
 	errs := activePlayer.DrawCards(1)
+
+	activeArea := g.GetActiveArea()
+	for _, minion := range activeArea.minions {
+		if minion != nil {
+			minion.Awake()
+		}
+	}
+	activePlayer.Hero.Awake()
 
 	return errs
 }

@@ -11,6 +11,8 @@ var Heroes = struct {
 			Attack:    0,
 			Health:    30,
 			MaxHealth: 30,
+			Alive:     true,
+			Status:    game.CharacterStatus{},
 		},
 		Class: game.Classes.Mage,
 		Power: game.Spell{
@@ -31,6 +33,8 @@ var Heroes = struct {
 			Attack:    0,
 			Health:    30,
 			MaxHealth: 30,
+			Alive:     true,
+			Status:    game.CharacterStatus{},
 		},
 		Class: game.Classes.Priest,
 		Power: game.Spell{

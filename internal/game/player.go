@@ -34,16 +34,16 @@ func NewPlayer(side Side, hero *Hero, deck Deck, game *Game) *Player {
 }
 
 func (p *Player) String() string {
-	heroFormat := "%s"
+	selectedHeroFormat := "%s"
 	if p.Side == p.game.Turn {
-		heroFormat = "| %s"
+		selectedHeroFormat = "> %s"
 	}
 
 	linesForTop := append(
 		make([]string, 0, 5),
-		fmt.Sprintf(heroFormat, p.Hero.Class),
-		fmt.Sprintf(heroFormat, p.healthString()),
-		fmt.Sprintf(heroFormat, p.manaString()),
+		fmt.Sprintf(selectedHeroFormat, p.Hero.String()),
+		fmt.Sprintf(selectedHeroFormat, p.Hero.healthString()),
+		fmt.Sprintf(selectedHeroFormat, p.manaString()),
 		p.Hand.String(),
 	)
 
@@ -133,6 +133,9 @@ func (p *Player) PlayCard(
 	switch card := card.(type) {
 	case *Minion:
 		err = p.game.getArea(p.Side).place(areaIdx, card)
+		if err == nil {
+			card.Status.Sleep = true
+		}
 	case *Spell:
 		err = p.castSpell(card, spellIdxes, spellSides)
 		if heroPowerUse && err == nil {
@@ -160,7 +163,14 @@ func (p *Player) Attack(allyIdx, enemyIdx int) error {
 		return err
 	}
 
+	if allyCharacter.Status.Sleep {
+		return NewUsedMinionAttackError()
+	}
+
 	allyCharacter.ExecuteAttack(enemyCharacter)
+
+	allyCharacter.Status.Sleep = true
+
 	return nil
 }
 
@@ -201,15 +211,6 @@ func (p *Player) castSpell(spell *Spell, idxes []int, sides Sides) error {
 	}
 
 	return nil
-}
-
-func (p *Player) healthString() string {
-	return fmt.Sprintf(
-		"Здоровье: %2d/%2d [%s%s]",
-		p.Hero.Health, p.Hero.MaxHealth,
-		strings.Repeat(" ", min(p.Hero.MaxHealth-p.Hero.Health, p.Hero.MaxHealth)),
-		strings.Repeat("#", max(p.Hero.Health, 0)),
-	)
 }
 
 func (p *Player) manaString() string {

@@ -143,5 +143,5 @@ func (err UsedHeroPowerError) Error() string {
 	return "Сила героя уже была использована в этом ходу"
 }
 func (err UsedMinionAttackError) Error() string {
-	return "Это существо уже совершало атаку в этом ходу"
+	return "Это существо сможет атаковать только в следующем ходу"
 }
