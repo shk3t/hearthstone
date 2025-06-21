@@ -104,6 +104,26 @@ func (p *Player) DrawCards(number int) []error {
 	return errs
 }
 
+func (p *Player) GetCardInfo(handIdx int) (string, error) {
+	if handIdx == HeroIdx {
+		return p.Hero.Power.Info(), nil
+	}
+
+	card, err := p.Hand.get(handIdx)
+	if err != nil {
+		return "", err
+	}
+
+	switch card := card.(type) {
+	case *Minion:
+		return card.Info(), nil
+	case *Spell:
+		return card.Info(), nil
+	default:
+		panic("Invalid card type")
+	}
+}
+
 func (p *Player) PlayCard(
 	handIdx int,
 	areaIdx int,

@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 
@@ -16,10 +15,7 @@ type config struct {
 }
 
 func Init() {
-	if err := godotenv.Load(".env"); err != nil {
-		fmt.Println("Error loading .env file")
-	}
-
+	godotenv.Load(".env")
 	Config.PrintFrame = parseBool("PRINT_FRAME", false)
 	Config.UnlimitedMana = parseBool("UNLIMITED_MANA", false)
 }

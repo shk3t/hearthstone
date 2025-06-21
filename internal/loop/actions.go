@@ -5,6 +5,7 @@ import (
 	"fmt"
 	gamepkg "hearthstone/internal/game"
 	"hearthstone/pkg/helpers"
+	"hearthstone/pkg/sugar"
 	"regexp"
 	"strings"
 )
@@ -19,9 +20,12 @@ type playerAction struct {
 	do          doAction
 }
 
+var actionList []playerAction
+
 var Actions = struct {
 	ShortHelp playerAction
 	Help      playerAction
+	Info      playerAction
 	Play      playerAction
 	Attack    playerAction
 	Power     playerAction
@@ -32,14 +36,44 @@ var Actions = struct {
 		shortcut:    "",
 		args:        nil,
 		description: "вывести краткую помощь по командам",
-		do:          nil,
+		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
+			builder := strings.Builder{}
+			fmt.Fprint(&builder, "Некорректное действие. Доступны:\n")
+			for _, action := range actionList {
+				fmt.Fprintln(&builder, action.whatis(false))
+			}
+			text := strings.TrimSuffix(builder.String(), "\n")
+			return errors.New(text)
+		},
 	},
 	Help: playerAction{
 		name:        "help",
 		shortcut:    "h",
 		args:        nil,
 		description: "вывести полную помощь по командам",
-		do:          nil,
+		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
+			builder := strings.Builder{}
+			fmt.Fprint(&builder, "Доступные действия:\n")
+			for _, action := range actionList {
+				fmt.Fprintln(&builder, action.usage(false))
+			}
+			fmt.Fprint(&builder, "Чтобы указать героя в качестве цели, используйте 'h' или '0'\n")
+			fmt.Fprint(
+				&builder,
+				"Чтобы указать сторону цели, используйте 't' (верх) ил 'b' (низ), например '5b'",
+			)
+			return errors.New(builder.String())
+		},
+	},
+	Info: playerAction{
+		name:        "info",
+		shortcut:    "i",
+		args:        []string{"<номер_карты>"},
+		description: "подробное описание карты",
+		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
+			info, err := game.GetActivePlayer().GetCardInfo(idxes[0])
+			return sugar.If(err == nil, errors.New(info), err)
+		},
 	},
 	Play: playerAction{
 		name:     "play",
@@ -115,47 +149,14 @@ var Actions = struct {
 	},
 }
 
-var actionList = []playerAction{
-	Actions.Help,
-	Actions.Play,
-	Actions.Attack,
-	Actions.Power,
-	Actions.End,
-}
-
 func InitActions() {
-	var actionsHelp = struct {
-		short string
-		full  string
-	}{
-		short: func() string {
-			builder := strings.Builder{}
-			fmt.Fprint(&builder, "Некорректное действие. Доступны:\n")
-			for _, entry := range actionList {
-				fmt.Fprintln(&builder, entry.whatis(false))
-			}
-			return strings.TrimSuffix(builder.String(), "\n")
-		}(),
-		full: func() string {
-			builder := strings.Builder{}
-			fmt.Fprint(&builder, "Доступные действия:\n")
-			for _, entry := range actionList {
-				fmt.Fprintln(&builder, entry.usage(false))
-			}
-			fmt.Fprint(&builder, "Чтобы указать героя в качестве цели, используйте 'h' или '0'\n")
-			fmt.Fprint(
-				&builder,
-				"Чтобы указать сторону цели, используйте 't' (верх) ил 'b' (низ), например '5b'",
-			)
-			return builder.String()
-		}(),
-	}
-
-	Actions.ShortHelp.do = func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
-		return errors.New(actionsHelp.short)
-	}
-	Actions.Help.do = func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
-		return errors.New(actionsHelp.full)
+	actionList = []playerAction{
+		Actions.Help,
+		Actions.Info,
+		Actions.Play,
+		Actions.Attack,
+		Actions.Power,
+		Actions.End,
 	}
 }
 

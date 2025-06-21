@@ -11,6 +11,7 @@ func initAll() {
 	log.Init()
 	InitDisplayFrame()
 	InitActions()
+	log.DLog("ACTIONS INITED")
 }
 
 func deinitAll() {

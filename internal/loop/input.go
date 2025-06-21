@@ -2,6 +2,7 @@ package loop
 
 import (
 	"bufio"
+	"hearthstone/pkg/log"
 	"os"
 	"strings"
 )
@@ -21,24 +22,18 @@ func handleInput(game *ActiveGame) (exit bool) {
 	command, args := allArgs[0], allArgs[1:]
 
 	game.Help = ""
-	switch {
-	case strings.HasPrefix(command, "h") || command == "help":
-		err = Actions.Help.Do(args, game)
-	case strings.HasPrefix(command, "p") || command == "play":
-		err = Actions.Play.Do(args, game)
-	case strings.HasPrefix(command, "a") || command == "attack":
-		err = Actions.Attack.Do(args, game)
-	case strings.HasPrefix(command, "w") || command == "power":
-		err = Actions.Power.Do(args, game)
-	case strings.HasPrefix(command, "e") || command == "end":
-		_ = Actions.End.Do(args, game)
-	default:
-		err = Actions.ShortHelp.Do(args, game)
+
+	err = Actions.ShortHelp.Do(args, game) // Display short help by default
+	for _, action := range actionList {
+		log.DLog(action)
+		if strings.HasPrefix(command, action.shortcut) || command == action.name {
+			err = action.Do(args, game)
+			break
+		}
 	}
 
 	if err != nil {
 		game.Help = err.Error()
 	}
-
 	return false
 }

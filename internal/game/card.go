@@ -35,8 +35,18 @@ var Rarities = struct {
 	Legendary Raritiy
 }{"Базовая", "Обычная", "Редкая", "Эпическая", "Легендарная"}
 
-func (m *Card) Play() {
+func (c *Card) Play() {
 	panic(errorpkg.NewUnusableFeatureError())
+}
+
+func (c *Card) Info() string {
+	builder := strings.Builder{}
+	fmt.Fprintln(&builder, c.Name)
+	if c.Description != "" {
+		fmt.Fprintln(&builder, c.Description)
+	}
+	fmt.Fprintf(&builder, "Мана: %d", c.ManaCost)
+	return builder.String()
 }
 
 func OrderedPlayableString(cards []Playable) string {
