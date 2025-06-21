@@ -18,7 +18,7 @@ func handleInput(game *ActiveGame) (exit bool) {
 	input := scanner.Text()
 
 	input = strings.ToLower(input)
-	allArgs := strings.Split(input, " ")
+	allArgs := strings.Fields(input)
 	command, args := allArgs[0], allArgs[1:]
 
 	game.Help = ""
