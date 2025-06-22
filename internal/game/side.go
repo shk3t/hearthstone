@@ -22,7 +22,7 @@ func (s Side) String() string {
 	return sideStrings[s]
 }
 
-func (ss Sides) setUnset(toSide Side) {
+func (ss Sides) SetUnset(toSide Side) {
 	for i := range ss {
 		if ss[i] == UnsetSide {
 			ss[i] = toSide

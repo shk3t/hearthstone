@@ -195,7 +195,7 @@ func (p *Player) Attack(allyIdx, enemyIdx int) error {
 }
 
 func (p *Player) castSpell(spell *Spell, idxes []int, sides Sides) error {
-	sides.setUnset(
+	sides.SetUnset(
 		sugar.If(spell.AllyPrimarily, p.Side, p.Side.Opposite()),
 	)
 

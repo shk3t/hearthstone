@@ -45,7 +45,7 @@ func (c *Card) Info() string {
 	if c.Description != "" {
 		fmt.Fprintln(&builder, c.Description)
 	}
-	fmt.Fprintf(&builder, "Мана: %d", c.ManaCost)
+	fmt.Fprintf(&builder, "Мана:     %d", c.ManaCost)
 	return builder.String()
 }
 

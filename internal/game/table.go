@@ -26,10 +26,13 @@ func (t *Table) String() string {
 	return builder.String()
 }
 
-func (t *Table) GetMinionInfo(idx int, side Side) string {
-	return ""
+func (t *Table) GetMinionInfo(idx int, side Side) (string, error) {
+	minion, err := t[side].choose(idx)
+	if err != nil {
+		return "", err
+	}
+	return minion.Info(), nil
 }
-
 
 func (t *Table) CleanupDeadMinions() {
 	t[TopSide].cleanupDeadMinions()

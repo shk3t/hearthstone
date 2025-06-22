@@ -19,7 +19,12 @@ func handleInput(game *ActiveGame) (exit bool) {
 
 	input = strings.ToLower(input)
 	allArgs := strings.Fields(input)
-	command, args := allArgs[0], allArgs[1:]
+
+	var command string
+	var args []string
+	if len(allArgs) > 0 {
+		command, args = allArgs[0], allArgs[1:]
+	}
 
 	game.Help = ""
 

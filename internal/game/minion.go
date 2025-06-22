@@ -72,7 +72,7 @@ func (m *Minion) Copy() *Minion {
 func (m *Minion) Info() string {
 	builder := strings.Builder{}
 	fmt.Fprintln(&builder, m.Card.Info())
-	fmt.Fprintf(&builder, "Атака: %d\n", m.Attack)
-	fmt.Fprintf(&builder, "Здоровье: %d\n", m.Health)
+	fmt.Fprintf(&builder, "Атака:    %d\n", m.Attack)
+	fmt.Fprintf(&builder, "Здоровье: %d", m.Health)
 	return builder.String()
 }

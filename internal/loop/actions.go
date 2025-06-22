@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-type doAction = func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error
+type doAction = func(game *ActiveGame, idxes []int, sides gamepkg.Sides) error
 
 type playerAction struct {
 	name        string
@@ -37,7 +37,7 @@ var Actions = struct {
 		shortcut:    "",
 		args:        nil,
 		description: "вывести краткую помощь по командам",
-		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
+		do: func(game *ActiveGame, idxes []int, sides gamepkg.Sides) error {
 			builder := strings.Builder{}
 			fmt.Fprint(&builder, "Некорректное действие. Доступны:\n")
 			for _, action := range actionList {
@@ -52,7 +52,7 @@ var Actions = struct {
 		shortcut:    "h",
 		args:        nil,
 		description: "вывести полную помощь по командам",
-		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
+		do: func(game *ActiveGame, idxes []int, sides gamepkg.Sides) error {
 			builder := strings.Builder{}
 			fmt.Fprint(&builder, "Доступные действия:\n")
 			for _, action := range actionList {
@@ -71,7 +71,10 @@ var Actions = struct {
 		shortcut:    "ih",
 		args:        []string{"<номер_карты>"},
 		description: "подробное описание карты в руке",
-		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
+		do: func(game *ActiveGame, idxes []int, sides gamepkg.Sides) error {
+			if len(idxes) != 1 {
+				return NewInvalidArgumentsError("")
+			}
 			info, err := game.GetActivePlayer().GetCardInfo(idxes[0])
 			return sugar.If(err == nil, errors.New(info), err)
 		},
@@ -81,8 +84,12 @@ var Actions = struct {
 		shortcut:    "it",
 		args:        []string{"<позиция_на_столе>"},
 		description: "подробное описание существа на столе",
-		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
-			info, err := game.Table.GetMinionInfo(idxes[0], sides[0])  // TODO: args amount
+		do: func(game *ActiveGame, idxes []int, sides gamepkg.Sides) error {
+			if len(idxes) != 1 {
+				return NewInvalidArgumentsError("")
+			}
+			sides.SetUnset(game.Turn.Opposite())
+			info, err := game.Table.GetMinionInfo(idxes[0], sides[0])
 			return sugar.If(err == nil, errors.New(info), err)
 		},
 	},
@@ -94,7 +101,7 @@ var Actions = struct {
 			"<позиция_на_столе>/<позиции_целей_заклинания>",
 		},
 		description: "сыграть карту",
-		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
+		do: func(game *ActiveGame, idxes []int, sides gamepkg.Sides) error {
 			if len(idxes) == 0 {
 				return NewInvalidArgumentsError("")
 			} else if len(idxes) == 1 {
@@ -105,12 +112,7 @@ var Actions = struct {
 			handIdx, areaIdx := idxes[0], idxes[1]
 			spellIdxes, spellSides := idxes[1:], sides[1:]
 
-			err := game.GetActivePlayer().PlayCard(handIdx, areaIdx, spellIdxes, spellSides)
-			if err != nil {
-				return err
-			}
-
-			return nil
+			return game.GetActivePlayer().PlayCard(handIdx, areaIdx, spellIdxes, spellSides)
 		},
 	},
 	Attack: playerAction{
@@ -118,16 +120,12 @@ var Actions = struct {
 		shortcut:    "a",
 		args:        []string{"<номер_союзного_персонажа>", "<номер_персонажа_противника>"},
 		description: "атаковать персонажа",
-		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
+		do: func(game *ActiveGame, idxes []int, sides gamepkg.Sides) error {
 			if len(idxes) != 2 {
 				return NewInvalidArgumentsError("")
 			}
 			allyIdx, enemyIdx := idxes[0], idxes[1]
-			err := game.GetActivePlayer().Attack(allyIdx, enemyIdx)
-			if err != nil {
-				return err
-			}
-			return nil
+			return game.GetActivePlayer().Attack(allyIdx, enemyIdx)
 		},
 	},
 	Power: playerAction{
@@ -135,7 +133,7 @@ var Actions = struct {
 		shortcut:    "w",
 		args:        []string{"<позиции_целей_силы_героя>"},
 		description: "использовать способность героя",
-		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
+		do: func(game *ActiveGame, idxes []int, sides gamepkg.Sides) error {
 			if len(idxes) == 0 {
 				idxes = append(idxes, 0)
 				sides = append(sides, gamepkg.UnsetSide)
@@ -153,7 +151,7 @@ var Actions = struct {
 		shortcut:    "e",
 		args:        nil,
 		description: "закончить ход",
-		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
+		do: func(game *ActiveGame, idxes []int, sides gamepkg.Sides) error {
 			game.TurnFinished = true
 			return nil
 		},
@@ -164,6 +162,7 @@ func InitActions() {
 	actionList = []playerAction{
 		Actions.Help,
 		Actions.InfoHand,
+		Actions.InfoTable,
 		Actions.Play,
 		Actions.Attack,
 		Actions.Power,
@@ -186,12 +185,14 @@ func (action *playerAction) Do(args []string, game *ActiveGame) error {
 	return err
 }
 
-func (e playerAction) whatis(shrinkContent bool) string {
+func (e playerAction) whatis(compactContent bool) string {
 	output := fmt.Sprintf(
-		"%8s (%s): %s",
-		e.name, e.shortcut, e.description,
+		"%10s %4s: %s",
+		e.name,
+		fmt.Sprintf("(%s)", e.shortcut),
+		e.description,
 	)
-	if shrinkContent {
+	if compactContent {
 		output = multipleSpaceRegex.ReplaceAllString(output, " ")
 		output = strings.Trim(output, " ")
 	}
@@ -200,8 +201,11 @@ func (e playerAction) whatis(shrinkContent bool) string {
 
 func (e playerAction) usage(compactContent bool) string {
 	output := fmt.Sprintf(
-		"%8s (%s) %-60s: %s",
-		e.name, e.shortcut, strings.Join(e.args, " "), e.description,
+		"%10s %4s %-60s: %s",
+		e.name,
+		fmt.Sprintf("(%s)", e.shortcut),
+		strings.Join(e.args, " "),
+		e.description,
 	)
 	if compactContent {
 		output = multipleSpaceRegex.ReplaceAllString(output, " ")
