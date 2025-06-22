@@ -26,42 +26,24 @@ func (m *Minion) String() string {
 }
 
 func (m *Minion) InHandString() string {
-	elems := make([]string, 0, 2)
-
-	baseStr := fmt.Sprintf(
+	return fmt.Sprintf(
 		"<%d> %s %d/%d",
 		m.ManaCost,
 		m.Name,
 		m.Attack,
 		m.Health,
 	)
-	elems = append(elems, baseStr)
-
-	statusStr := m.Status.String()
-	if statusStr != "" {
-		elems = append(elems, statusStr)
-	}
-
-	return strings.Join(elems, " | ")
 }
-func (m *Minion) InTableString() string {
-	elems := make([]string, 0, 2)
-
-	baseStr := fmt.Sprintf(
-		"%s %d/%d",
-		m.Name,
-		m.Attack,
-		m.Health,
-	)
-	elems = append(elems, baseStr)
-
-	statusStr := m.Status.String()
-	if statusStr != "" {
-		elems = append(elems, statusStr)
+func (m *Minion) InTableString(fieldWidths ...int) string {
+	format := "%s %s | %s"
+	if len(fieldWidths) == 2 {
+		format = fmt.Sprintf("%%-%ds %%%ds | %%s", fieldWidths[0], fieldWidths[1])
 	}
 
-	return strings.Join(elems, " | ")
+	attackHealthStr := fmt.Sprintf("%d/%d", m.Attack, m.Health)
+	str := fmt.Sprintf(format, m.Name, attackHealthStr, m.Status.String())
 
+	return strings.TrimRight(str, "| ")
 }
 
 func (m *Minion) Copy() *Minion {

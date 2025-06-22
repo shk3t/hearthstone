@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"hearthstone/pkg/containers"
 	errorpkg "hearthstone/pkg/errors"
+	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 type tableArea struct {
@@ -21,11 +23,22 @@ func newTableArea(side Side) tableArea {
 
 func (a tableArea) String() string {
 	builder := strings.Builder{}
-	i := 1
 
-	for _, minion := range a.minions {
-		if minion != nil {
-			fmt.Fprintf(&builder, "%d. %s\n", i, minion.InTableString())
+	nameMaxLen, attackHpMaxLen := 0, 0
+	for _, m := range a.minions {
+		if m != nil {
+			nameMaxLen = max(nameMaxLen, utf8.RuneCountInString(m.Name))
+			attackHpMaxLen = max(
+				attackHpMaxLen,
+				len(strconv.Itoa(m.Attack))+len(strconv.Itoa(m.Health))+1,
+			)
+		}
+	}
+
+	i := 1
+	for _, m := range a.minions {
+		if m != nil {
+			fmt.Fprintf(&builder, "%d. %s\n", i, m.InTableString(nameMaxLen, attackHpMaxLen))
 			i++
 		}
 	}

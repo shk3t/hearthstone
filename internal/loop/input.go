@@ -2,7 +2,6 @@ package loop
 
 import (
 	"bufio"
-	"hearthstone/pkg/log"
 	"os"
 	"strings"
 )
@@ -30,7 +29,6 @@ func handleInput(game *ActiveGame) (exit bool) {
 
 	err = Actions.ShortHelp.Do(args, game) // Display short help by default
 	for _, action := range actionList {
-		log.DLog(action)
 		if strings.HasPrefix(command, action.shortcut) || command == action.name {
 			err = action.Do(args, game)
 			break
