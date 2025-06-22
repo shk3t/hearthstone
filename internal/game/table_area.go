@@ -1,9 +1,10 @@
 package game
 
 import (
+	"fmt"
 	"hearthstone/pkg/containers"
-	"hearthstone/pkg/conversions"
 	errorpkg "hearthstone/pkg/errors"
+	"strings"
 )
 
 type tableArea struct {
@@ -19,8 +20,16 @@ func newTableArea(side Side) tableArea {
 }
 
 func (a tableArea) String() string {
-	playables := conversions.TrueNilInterfaceSlice[Minion, Playable](a.minions)
-	return OrderedPlayableString(playables)
+	builder := strings.Builder{}
+	i := 1
+
+	for _, minion := range a.minions {
+		if minion != nil {
+			fmt.Fprintf(&builder, "%d. %s\n", i, minion.InTableString())
+			i++
+		}
+	}
+	return strings.TrimSuffix(builder.String(), "\n")
 }
 
 const areaSize = 7

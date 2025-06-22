@@ -49,19 +49,6 @@ func (c *Card) Info() string {
 	return builder.String()
 }
 
-func OrderedPlayableString(cards []Playable) string {
-	builder := strings.Builder{}
-	i := 1
-
-	for _, card := range cards {
-		if card != nil {
-			fmt.Fprintf(&builder, "%d. %s\n", i, card)
-			i++
-		}
-	}
-	return strings.TrimSuffix(builder.String(), "\n")
-}
-
 func ToCard(p Playable) *Card {
 	switch card := p.(type) {
 	case *Card:

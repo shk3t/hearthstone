@@ -1,8 +1,10 @@
 package game
 
 import (
+	"fmt"
 	"hearthstone/pkg/containers"
 	errorpkg "hearthstone/pkg/errors"
+	"strings"
 )
 
 type Hand containers.Shrice[Playable]
@@ -12,7 +14,16 @@ func NewHand() Hand {
 }
 
 func (h Hand) String() string {
-	return OrderedPlayableString(h)
+	builder := strings.Builder{}
+	i := 1
+
+	for _, card := range h {
+		if card != nil {
+			fmt.Fprintf(&builder, "%d. %s\n", i, card)
+			i++
+		}
+	}
+	return strings.TrimSuffix(builder.String(), "\n")
 }
 
 const handSize = 10
