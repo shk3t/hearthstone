@@ -26,6 +26,11 @@ func (t *Table) String() string {
 	return builder.String()
 }
 
+func (t *Table) GetMinionInfo(idx int, side Side) string {
+	return ""
+}
+
+
 func (t *Table) CleanupDeadMinions() {
 	t[TopSide].cleanupDeadMinions()
 	t[BotSide].cleanupDeadMinions()

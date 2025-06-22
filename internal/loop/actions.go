@@ -25,7 +25,8 @@ var actionList []playerAction
 var Actions = struct {
 	ShortHelp playerAction
 	Help      playerAction
-	Info      playerAction
+	InfoHand  playerAction
+	InfoTable playerAction
 	Play      playerAction
 	Attack    playerAction
 	Power     playerAction
@@ -65,13 +66,23 @@ var Actions = struct {
 			return errors.New(builder.String())
 		},
 	},
-	Info: playerAction{
-		name:        "info",
-		shortcut:    "i",
+	InfoHand: playerAction{
+		name:        "info_hand",
+		shortcut:    "ih",
 		args:        []string{"<номер_карты>"},
-		description: "подробное описание карты",
+		description: "подробное описание карты в руке",
 		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
 			info, err := game.GetActivePlayer().GetCardInfo(idxes[0])
+			return sugar.If(err == nil, errors.New(info), err)
+		},
+	},
+	InfoTable: playerAction{
+		name:        "info_table",
+		shortcut:    "it",
+		args:        []string{"<позиция_на_столе>"},
+		description: "подробное описание существа на столе",
+		do: func(game *ActiveGame, idxes []int, sides []gamepkg.Side) error {
+			info, err := game.Table.GetMinionInfo(idxes[0], sides[0])  // TODO: args amount
 			return sugar.If(err == nil, errors.New(info), err)
 		},
 	},
@@ -152,7 +163,7 @@ var Actions = struct {
 func InitActions() {
 	actionList = []playerAction{
 		Actions.Help,
-		Actions.Info,
+		Actions.InfoHand,
 		Actions.Play,
 		Actions.Attack,
 		Actions.Power,
