@@ -85,8 +85,9 @@ var Actions = struct {
 		args:        []string{"<позиция_на_столе>"},
 		description: "подробное описание существа на столе",
 		do: func(game *ActiveGame, idxes []int, sides gamepkg.Sides) error {
-			if len(idxes) != 1 {
-				return NewInvalidArgumentsError("")
+			if len(idxes) == 0 {
+				idxes = append(idxes, 0)
+				sides = append(sides, gamepkg.UnsetSide)
 			}
 			sides.SetUnset(game.Turn.Opposite())
 			info, err := game.Table.GetMinionInfo(idxes[0], sides[0])
