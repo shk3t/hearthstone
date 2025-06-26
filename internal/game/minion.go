@@ -55,6 +55,7 @@ func (m *Minion) Info() string {
 	builder := strings.Builder{}
 	fmt.Fprintln(&builder, m.Card.Info())
 	fmt.Fprintf(&builder, "Атака:    %d\n", m.Attack)
-	fmt.Fprintf(&builder, "Здоровье: %d", m.Health)
-	return builder.String()
+	fmt.Fprintf(&builder, "Здоровье: %d\n", m.Health)
+	builder.WriteString(m.Status.Info())
+	return strings.TrimSuffix(builder.String(), "\n")
 }

@@ -34,16 +34,16 @@ func NewPlayer(side Side, hero *Hero, deck Deck, game *Game) *Player {
 }
 
 func (p *Player) String() string {
-	selectedHeroFormat := "%s"
+	heroFormat := "    %s"
 	if p.Side == p.game.Turn {
-		selectedHeroFormat = "> %s"
+		heroFormat = "  > %s"
 	}
 
 	linesForTop := append(
 		make([]string, 0, 5),
-		fmt.Sprintf(selectedHeroFormat, p.Hero.String()),
-		fmt.Sprintf(selectedHeroFormat, p.Hero.healthString()),
-		fmt.Sprintf(selectedHeroFormat, p.manaString()),
+		fmt.Sprintf(heroFormat, p.Hero.String()),
+		fmt.Sprintf(heroFormat, p.Hero.healthString()),
+		fmt.Sprintf(heroFormat, p.manaString()),
 		p.Hand.String(),
 	)
 
