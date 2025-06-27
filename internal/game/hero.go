@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -37,10 +36,5 @@ func (h *Hero) Copy() *Hero {
 }
 
 func (h *Hero) healthString() string {
-	return fmt.Sprintf(
-		"Здоровье: %2d/%2d [%s%s]",
-		h.Health, h.MaxHealth,
-		strings.Repeat(" ", min(h.MaxHealth-h.Health, h.MaxHealth)),
-		strings.Repeat("#", max(h.Health, 0)),
-	)
+	return playerBarString("Здоровье:", h.Health, h.MaxHealth, "+")
 }

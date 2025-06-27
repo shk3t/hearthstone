@@ -6,6 +6,7 @@ import (
 	errorpkg "hearthstone/pkg/errors"
 	"hearthstone/pkg/sugar"
 	"slices"
+	"strconv"
 	"strings"
 )
 
@@ -44,7 +45,11 @@ func (p *Player) String() string {
 		fmt.Sprintf(heroFormat, p.Hero.String()),
 		fmt.Sprintf(heroFormat, p.Hero.healthString()),
 		fmt.Sprintf(heroFormat, p.manaString()),
-		p.Hand.String(),
+		sugar.If(
+			p.Side == p.game.Turn || config.Config.RevealOpponentsHand,
+			p.Hand.String(),
+			p.Hand.lenString(),
+		),
 	)
 
 	if p.Side == BotSide {
@@ -233,11 +238,32 @@ func (p *Player) castSpell(spell *Spell, idxes []int, sides Sides) error {
 	return nil
 }
 
-func (p *Player) manaString() string {
-	return fmt.Sprintf(
-		"Мана:     %2d/%2d [%s%s]",
-		p.Mana, p.MaxMana,
-		strings.Repeat(" ", min(p.MaxMana-p.Mana, p.MaxMana)),
-		strings.Repeat("*", max(p.Mana, 0)),
+const playerBarLeftAlign = 10
+const playerBarRightAlign = 33
+
+func playerBarString(head string, val, maxVal int, sym string) string {
+	builder := strings.Builder{}
+
+	fmt.Fprintf(&builder,
+		"%-"+strconv.Itoa(playerBarLeftAlign)+"s",
+		head,
 	)
+	fmt.Fprintf(&builder,
+		"%2d/%2d",
+		val, maxVal,
+	)
+	fmt.Fprintf(&builder,
+		"%"+strconv.Itoa(playerBarRightAlign)+"s",
+		fmt.Sprintf(
+			"[%s%s]",
+			strings.Repeat(" ", min(maxVal-val, maxVal)),
+			strings.Repeat(sym, max(val, 0)),
+		),
+	)
+
+	return builder.String()
+}
+
+func (p *Player) manaString() string {
+	return playerBarString("Мана:", p.Mana, p.MaxMana, "*")
 }

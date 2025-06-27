@@ -10,7 +10,7 @@ import (
 type Shrice[T comparable] []T
 
 func NewShrice[T comparable](size int) Shrice[T] {
-	return make([]T, size, size)
+	return make([]T, size)
 }
 
 // Returns number of first non-nil consecutive elements
@@ -69,7 +69,7 @@ func (s Shrice[T]) PushBack(values ...T) error {
 		return errorpkg.NewNotEnoughSpaceError(sCap-sLen, vLen)
 	}
 
-	for i := 0; i < vLen; i++ {
+	for i := range vLen {
 		s[sLen+i] = values[i]
 	}
 	return nil

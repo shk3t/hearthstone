@@ -10,7 +10,7 @@ import (
 type Hand containers.Shrice[Playable]
 
 func NewHand() Hand {
-	return Hand(containers.NewShrice[Playable](handSize))
+	return Hand(containers.NewShrice[Playable](handCap))
 }
 
 func (h Hand) String() string {
@@ -26,7 +26,11 @@ func (h Hand) String() string {
 	return strings.TrimSuffix(builder.String(), "\n")
 }
 
-const handSize = 10
+func (h Hand) Len() int {
+	return containers.Shrice[Playable](h).Len()
+}
+
+const handCap = 10
 
 func (h Hand) get(idx int) (Playable, error) {
 	card, err := containers.Shrice[Playable](h).Get(idx)
@@ -58,4 +62,11 @@ func (h Hand) refill(card Playable) error {
 	default:
 		panic(errorpkg.NewUnexpectedError(err))
 	}
+}
+
+func (h Hand) lenString() string {
+	return fmt.Sprintf(
+		"    %s",
+		playerBarString("Карт:", h.Len(), handCap, "#"),
+	)
 }
