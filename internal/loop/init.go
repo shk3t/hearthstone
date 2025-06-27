@@ -8,7 +8,7 @@ import (
 )
 
 func initAll() error {
-	setup.Init()
+	setup.LoadEnv()
 	if err := log.Init(); err != nil {
 		return err
 	}

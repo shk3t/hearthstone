@@ -9,7 +9,7 @@ import (
 
 var Env envFields
 
-func Init() {
+func LoadEnv() {
 	godotenv.Load(".env")
 	Env.PrintFrame = parseBool("PRINT_FRAME", false)
 	Env.UnlimitedMana = parseBool("UNLIMITED_MANA", false)
