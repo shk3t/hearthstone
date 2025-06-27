@@ -74,7 +74,7 @@ func (p *Player) SpendMana(value int) error {
 	if !p.HaveEnoughMana(value) {
 		return NewNotEnoughManaError(p.Mana, value)
 	}
-	p.Mana = min(0, p.Mana-value)
+	p.Mana = max(0, p.Mana-value)
 	return nil
 }
 
@@ -154,7 +154,7 @@ func (p *Player) PlayCard(
 	case *Minion:
 		err = p.game.getArea(p.Side).place(areaIdx, card)
 		if err == nil {
-			card.Status.Sleep = true
+			card.Status.SetSleep(true)
 		}
 	case *Spell:
 		err = p.castSpell(card, spellIdxes, spellSides)
@@ -183,13 +183,13 @@ func (p *Player) Attack(allyIdx, enemyIdx int) error {
 		return err
 	}
 
-	if allyCharacter.Status.Sleep {
-		return NewUsedMinionAttackError()
+	if allyCharacter.Status.Sleep() || allyCharacter.Status.Freeze() {
+		return NewUnavailableMinionAttackError()
 	}
 
 	allyCharacter.ExecuteAttack(enemyCharacter)
 
-	allyCharacter.Status.Sleep = true
+	allyCharacter.Status.SetSleep(true)
 
 	return nil
 }

@@ -34,7 +34,7 @@ type InvalidTargettingError struct {
 	required   int
 }
 type UsedHeroPowerError struct{}
-type UsedMinionAttackError struct{}
+type UnavailableMinionAttackError struct{}
 
 func NewCardPickError(idx int) CardPickError {
 	return CardPickError{position: idx + 1}
@@ -79,8 +79,8 @@ func NewInvalidTargettingError(specified, required int) InvalidTargettingError {
 func NewUsedHeroPowerError() UsedHeroPowerError {
 	return UsedHeroPowerError{}
 }
-func NewUsedMinionAttackError() UsedMinionAttackError {
-	return UsedMinionAttackError{}
+func NewUnavailableMinionAttackError() UnavailableMinionAttackError {
+	return UnavailableMinionAttackError{}
 }
 
 func (err CardPickError) Error() string {
@@ -142,6 +142,6 @@ func (err InvalidTargettingError) Error() string {
 func (err UsedHeroPowerError) Error() string {
 	return "Сила героя уже была использована в этом ходу"
 }
-func (err UsedMinionAttackError) Error() string {
+func (err UnavailableMinionAttackError) Error() string {
 	return "Это существо сможет атаковать только в следующем ходу"
 }

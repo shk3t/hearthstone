@@ -50,12 +50,16 @@ func (g *Game) StartNextTurn() []error {
 	errs := activePlayer.DrawCards(1)
 
 	activeArea := g.GetActiveArea()
+	statuses := []*characterStatus{&activePlayer.Hero.Status}
 	for _, minion := range activeArea.minions {
 		if minion != nil {
-			minion.Awake()
+			statuses = append(statuses, &minion.Character.Status)
 		}
 	}
-	activePlayer.Hero.Awake()
+	for _, status := range statuses {
+		status.SetSleep(false)
+		status.Unfreeze()
+	}
 
 	return errs
 }

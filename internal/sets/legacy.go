@@ -18,7 +18,7 @@ var LegacySet = struct {
 		TargetSelector: game.TargetSelectorPresets.Single,
 		TargetEffect: func(target *game.Character) {
 			target.DealDamage(3)
-			// TODO: Freeze
+			target.Status.SetFreeze(true)
 		},
 	},
 	Fireball: &game.Spell{

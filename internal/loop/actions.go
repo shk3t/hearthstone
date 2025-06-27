@@ -87,9 +87,8 @@ var Actions = struct {
 		do: func(game *ActiveGame, idxes []int, sides gamepkg.Sides) error {
 			if len(idxes) == 0 {
 				idxes = append(idxes, 0)
-				sides = append(sides, gamepkg.UnsetSide)
+				sides = append(sides, game.Turn)
 			}
-			sides.SetUnset(game.Turn.Opposite())
 			info, err := game.Table.GetMinionInfo(idxes[0], sides[0])
 			return sugar.If(err == nil, errors.New(info), err)
 		},
@@ -122,8 +121,11 @@ var Actions = struct {
 		args:        []string{"<номер_союзного_персонажа>", "<номер_персонажа_противника>"},
 		description: "атаковать персонажа",
 		do: func(game *ActiveGame, idxes []int, sides gamepkg.Sides) error {
-			if len(idxes) != 2 {
+			if len(idxes) == 0 {
 				return NewInvalidArgumentsError("")
+			} else if len(idxes) == 1 {
+				idxes = append(idxes, 0)
+				sides = append(sides, game.Turn)
 			}
 			allyIdx, enemyIdx := idxes[0], idxes[1]
 			return game.GetActivePlayer().Attack(allyIdx, enemyIdx)
