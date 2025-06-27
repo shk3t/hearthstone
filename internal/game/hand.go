@@ -65,8 +65,5 @@ func (h Hand) refill(card Playable) error {
 }
 
 func (h Hand) lenString() string {
-	return fmt.Sprintf(
-		"    %s",
-		playerBarString("Карт:", h.Len(), handCap, "#"),
-	)
+	return playerBarString("Карт:", h.Len(), handCap, "#")
 }

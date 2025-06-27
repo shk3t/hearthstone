@@ -35,7 +35,7 @@ func NewPlayer(side Side, hero *Hero, deck Deck, game *Game) *Player {
 }
 
 func (p *Player) String() string {
-	heroFormat := "    %s"
+	heroFormat := "%s"
 	if p.Side == p.game.Turn {
 		heroFormat = "  > %s"
 	}
@@ -48,7 +48,7 @@ func (p *Player) String() string {
 		sugar.If(
 			p.Side == p.game.Turn || setup.Env.RevealOpponentsHand,
 			p.Hand.String(),
-			p.Hand.lenString(),
+			fmt.Sprintf(heroFormat, p.Hand.lenString()),
 		),
 	)
 
