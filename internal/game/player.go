@@ -2,7 +2,7 @@ package game
 
 import (
 	"fmt"
-	"hearthstone/internal/config"
+	"hearthstone/internal/setup"
 	errorpkg "hearthstone/pkg/errors"
 	"hearthstone/pkg/sugar"
 	"slices"
@@ -46,7 +46,7 @@ func (p *Player) String() string {
 		fmt.Sprintf(heroFormat, p.Hero.healthString()),
 		fmt.Sprintf(heroFormat, p.manaString()),
 		sugar.If(
-			p.Side == p.game.Turn || config.Config.RevealOpponentsHand,
+			p.Side == p.game.Turn || setup.Env.RevealOpponentsHand,
 			p.Hand.String(),
 			p.Hand.lenString(),
 		),
@@ -69,7 +69,7 @@ func (p *Player) RestoreMana() {
 }
 
 func (p *Player) HaveEnoughMana(value int) bool {
-	if p.Mana-value < 0 && !config.Config.UnlimitedMana {
+	if p.Mana-value < 0 && !setup.Env.UnlimitedMana {
 		return false
 	}
 	return true

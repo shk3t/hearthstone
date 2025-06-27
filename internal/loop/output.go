@@ -1,7 +1,7 @@
 package loop
 
 import (
-	"hearthstone/internal/config"
+	"hearthstone/internal/setup"
 	"hearthstone/pkg/sugar"
 	"hearthstone/pkg/ui"
 )
@@ -9,5 +9,5 @@ import (
 var DisplayFrame func(string)
 
 func InitDisplayFrame() {
-	DisplayFrame = sugar.If(config.Config.PrintFrame, ui.PrintFrame, ui.UpdateFrame)
+	DisplayFrame = sugar.If(setup.Env.PrintFrame, ui.PrintFrame, ui.UpdateFrame)
 }
