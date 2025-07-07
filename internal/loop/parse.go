@@ -1,7 +1,7 @@
 package loop
 
 import (
-	gamepkg "hearthstone/internal/game"
+	"hearthstone/internal/game"
 	"strconv"
 	"strings"
 )
@@ -12,34 +12,34 @@ import (
 // "0" position also can be considered as hero position.
 //
 // "t"/"b" for precise specifying target side (Top/Bottom).
-func parsePosition(arg string) (idx int, side gamepkg.Side, err error) {
+func parsePosition(arg string) (idx int, side game.Side, err error) {
 	switch {
 	case strings.Contains(arg, "t"):
 		arg = strings.Trim(arg, "t")
-		side = gamepkg.TopSide
+		side = game.TopSide
 	case strings.Contains(arg, "b"):
 		arg = strings.Trim(arg, "b")
-		side = gamepkg.BotSide
+		side = game.BotSide
 	default:
-		side = gamepkg.UnsetSide
+		side = game.UnsetSide
 	}
 
 	if strings.Contains(arg, "h") {
-		return gamepkg.HeroIdx, side, nil
+		return game.HeroIdx, side, nil
 	}
 
 	pos, err := strconv.Atoi(arg)
 	if err != nil {
-		return 0, gamepkg.UnsetSide, err
+		return 0, game.UnsetSide, err
 	}
 
 	return pos - 1, side, nil
 }
 
-func parseAllPositions(args []string) (idxes []int, sides []gamepkg.Side, errs []error) {
+func parseAllPositions(args []string) (idxes []int, sides []game.Side, errs []error) {
 	lenArgs := len(args)
 	idxes = make([]int, lenArgs)
-	sides = make([]gamepkg.Side, lenArgs)
+	sides = make([]game.Side, lenArgs)
 	errs = make([]error, lenArgs)
 
 	for i := range args {

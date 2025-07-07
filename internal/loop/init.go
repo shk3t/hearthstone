@@ -2,6 +2,7 @@ package loop
 
 import (
 	"hearthstone/internal/setup"
+	"hearthstone/internal/tui"
 	"hearthstone/pkg/helpers"
 	"hearthstone/pkg/log"
 	"os"
@@ -12,7 +13,7 @@ func initAll() error {
 	if err := log.Init(); err != nil {
 		return err
 	}
-	InitDisplayFrame()
+	tui.InitDisplayFrame()
 	InitActions()
 	return nil
 }

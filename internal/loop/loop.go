@@ -1,31 +1,32 @@
 package loop
 
 import (
-	gamepkg "hearthstone/internal/game"
+	"hearthstone/internal/game"
+	"hearthstone/internal/tui"
 )
 
-func StartGame(topHero, botHero *gamepkg.Hero, topDeck, botDeck gamepkg.Deck) {
-	game := NewActiveGame(topHero, botHero, topDeck, botDeck)
+func StartGame(topHero, botHero *game.Hero, topDeck, botDeck game.Deck) {
+	session := game.NewGameSession(topHero, botHero, topDeck, botDeck)
 
-	game.StartGame()
+	session.StartGame()
 	for {
-		if game.TurnFinished && !game.HasWinner() {
-			game.StartNextTurn()
-			game.CheckWinner()
+		if session.TurnFinished && !session.HasWinner() {
+			session.StartNextTurn()
+			session.CheckWinner()
 		}
 
-		game.Display()
+		tui.Display(session)
 
-		if game.HasWinner() {
+		if session.HasWinner() {
 			return
 		}
 
-		exit := handleInput(game)
+		exit := handleInput(session)
 		if exit {
 			return
 		}
 
-		game.Cleanup()
-		game.CheckWinner()
+		session.Cleanup()
+		session.CheckWinner()
 	}
 }
