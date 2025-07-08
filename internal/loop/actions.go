@@ -4,13 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"hearthstone/internal/game"
+	"hearthstone/internal/tui"
 	"hearthstone/pkg/helpers"
 	"hearthstone/pkg/sugar"
 	"regexp"
 	"strings"
 )
 
-type doAction = func(session *game.GameSession, idxes []int, sides game.Sides) error
+type doAction = func(session *game.Session, idxes []int, sides game.Sides) error
 
 type playerAction struct {
 	name        string
@@ -37,7 +38,7 @@ var Actions = struct {
 		shortcut:    "",
 		args:        nil,
 		description: "вывести краткую помощь по командам",
-		do: func(session *game.GameSession, idxes []int, sides game.Sides) error {
+		do: func(session *game.Session, idxes []int, sides game.Sides) error {
 			builder := strings.Builder{}
 			fmt.Fprint(&builder, "Некорректное действие. Доступны:\n")
 			for _, action := range actionList {
@@ -52,7 +53,7 @@ var Actions = struct {
 		shortcut:    "h",
 		args:        nil,
 		description: "вывести полную помощь по командам",
-		do: func(session *game.GameSession, idxes []int, sides game.Sides) error {
+		do: func(session *game.Session, idxes []int, sides game.Sides) error {
 			builder := strings.Builder{}
 			fmt.Fprint(&builder, "Доступные действия:\n")
 			for _, action := range actionList {
@@ -71,11 +72,12 @@ var Actions = struct {
 		shortcut:    "ih",
 		args:        []string{"<номер_карты>"},
 		description: "подробное описание карты в руке",
-		do: func(session *game.GameSession, idxes []int, sides game.Sides) error {
+		do: func(session *game.Session, idxes []int, sides game.Sides) error {
 			if len(idxes) != 1 {
 				return NewInvalidArgumentsError("")
 			}
-			info, err := session.GetActivePlayer().GetCardInfo(idxes[0])
+			info, err := tui.GetCardInfo(session.GetActivePlayer(), idxes[0])
+			// TODO use abstract getCardInfo, getMinionInfo
 			return sugar.If(err == nil, errors.New(info), err)
 		},
 	},
@@ -84,13 +86,13 @@ var Actions = struct {
 		shortcut:    "it",
 		args:        []string{"<позиция_на_столе>"},
 		description: "подробное описание существа на столе",
-		do: func(session *game.GameSession, idxes []int, sides game.Sides) error {
+		do: func(session *game.Session, idxes []int, sides game.Sides) error {
 			if len(idxes) == 0 {
 				idxes = append(idxes, 0)
 				sides = append(sides, game.UnsetSide)
 			}
 			sides.SetUnset(session.Turn)
-			info, err := session.Table.GetMinionInfo(idxes[0], sides[0])
+			info, err := tui.GetMinionInfo(&session.Table, idxes[0], sides[0])
 			return sugar.If(err == nil, errors.New(info), err)
 		},
 	},
@@ -102,7 +104,7 @@ var Actions = struct {
 			"<позиция_на_столе>/<позиции_целей_заклинания>",
 		},
 		description: "сыграть карту",
-		do: func(session *game.GameSession, idxes []int, sides game.Sides) error {
+		do: func(session *game.Session, idxes []int, sides game.Sides) error {
 			if len(idxes) == 0 {
 				return NewInvalidArgumentsError("")
 			} else if len(idxes) == 1 {
@@ -121,7 +123,7 @@ var Actions = struct {
 		shortcut:    "a",
 		args:        []string{"<номер_союзного_персонажа>", "<номер_персонажа_противника>"},
 		description: "атаковать персонажа",
-		do: func(session *game.GameSession, idxes []int, sides game.Sides) error {
+		do: func(session *game.Session, idxes []int, sides game.Sides) error {
 			if len(idxes) == 0 {
 				return NewInvalidArgumentsError("")
 			} else if len(idxes) == 1 {
@@ -136,7 +138,7 @@ var Actions = struct {
 		shortcut:    "w",
 		args:        []string{"<позиции_целей_силы_героя>"},
 		description: "использовать способность героя",
-		do: func(session *game.GameSession, idxes []int, sides game.Sides) error {
+		do: func(session *game.Session, idxes []int, sides game.Sides) error {
 			if len(idxes) == 0 {
 				idxes = append(idxes, 0)
 				sides = append(sides, game.UnsetSide)
@@ -154,7 +156,7 @@ var Actions = struct {
 		shortcut:    "e",
 		args:        nil,
 		description: "закончить ход",
-		do: func(session *game.GameSession, idxes []int, sides game.Sides) error {
+		do: func(session *game.Session, idxes []int, sides game.Sides) error {
 			session.TurnFinished = true
 			return nil
 		},
@@ -173,7 +175,7 @@ func InitActions() {
 	}
 }
 
-func (action *playerAction) Do(args []string, session *game.GameSession) error {
+func (action *playerAction) Do(args []string, session *game.Session) error {
 	idxes, sides, errs := parseAllPositions(args)
 
 	if helpers.FirstError(errs) != nil {

@@ -1,0 +1,78 @@
+package tui
+
+import (
+	"fmt"
+	"hearthstone/internal/game"
+	errorpkg "hearthstone/pkg/errors"
+	"strings"
+)
+
+func tuiError(err error) string {
+	switch err := err.(type) {
+
+	case game.CardPickError:
+		return fmt.Sprintf("Выбрана некорректная карта: %d", err.Position)
+
+	case game.NotEnoughManaError:
+		return fmt.Sprintf(
+			"Недостаточно маны. Нужно: %d, имеется: %d",
+			err.Required,
+			err.Available,
+		)
+
+	case game.EmptyHandError:
+		return "Пустая рука"
+
+	case game.FullHandError:
+		if err.BurnedCard != nil {
+			return fmt.Sprintf(
+				"Полная рука. Последняя сожженная карта: \"%s\"",
+				game.ToCard(err.BurnedCard).Name,
+			)
+		}
+		return "Полная рука"
+
+	case game.InvalidTableAreaPositionError:
+		if err.Side == game.UnsetSide {
+			return fmt.Sprintf("Некорректная позиция на столе: %d", err.Position)
+		}
+
+		sideText := strings.ToLower(sideString(err.Side))
+		sideText = strings.Replace(sideText, "ий", "ей", 1)
+		return fmt.Sprintf(
+			"Некорректная позиция на %s части стола: %d",
+			sideText,
+			err.Position,
+		)
+
+	case game.FullTableAreaError:
+		return "Полный стол"
+
+	case game.EmptyDeckError:
+		if err.Fatigue != 0 {
+			return fmt.Sprintf("Пустая колода.\nПотеря здоровья из-за усталости: %d", err.Fatigue)
+		}
+		return "Пустая колода"
+
+	case game.UnmatchedEffectsAndTargetsError:
+		return fmt.Sprintf(
+			"Число эффектов и целей не соответствует для \"%s\".\nЭффектов: %d, целей: %d",
+			err.SpellName, err.EffectsLen, err.TargetsLen,
+		)
+
+	case game.InvalidTargettingError:
+		return fmt.Sprintf(
+			"Некорректный выбор цели.\nУказано целей: %d, требуется: %d",
+			err.Speicified, err.Required,
+		)
+
+	case game.UsedHeroPowerError:
+		return "Сила героя уже была использована в этом ходу"
+
+	case game.UnavailableMinionAttackError:
+		return "Это существо сможет атаковать только в следующем ходу"
+
+	default:
+		panic(errorpkg.NewUnexpectedError(err))
+	}
+}

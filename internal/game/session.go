@@ -4,15 +4,15 @@ import (
 	"hearthstone/pkg/helpers"
 )
 
-type GameSession struct {
+type Session struct {
 	*Game
 	Help         string
 	TurnFinished bool
 	Winner       Side
 }
 
-func NewGameSession(topHero, botHero *Hero, topDeck, botDeck Deck) *GameSession {
-	return &GameSession{
+func NewGameSession(topHero, botHero *Hero, topDeck, botDeck Deck) *Session {
+	return &Session{
 		Game:         NewGame(topHero, botHero, topDeck, botDeck),
 		Help:         "",
 		TurnFinished: true,
@@ -20,32 +20,32 @@ func NewGameSession(topHero, botHero *Hero, topDeck, botDeck Deck) *GameSession 
 	}
 }
 
-func (gs *GameSession) StartGame() {
-	gs.Game.StartGame()
+func (s *Session) StartGame() {
+	s.Game.StartGame()
 }
 
-func (gs *GameSession) StartNextTurn() {
-	gs.TurnFinished = false
-	gs.Help = ""
-	errs := gs.Game.StartNextTurn()
+func (s *Session) StartNextTurn() {
+	s.TurnFinished = false
+	s.Help = ""
+	errs := s.Game.StartNextTurn()
 	if len(errs) > 0 {
-		gs.Help = helpers.JoinErrors(errs, "\n")
+		s.Help = helpers.JoinErrors(errs, "\n")
 	}
 }
 
-func (gs *GameSession) Cleanup() {
-	gs.Game.Table.CleanupDeadMinions()
+func (s *Session) Cleanup() {
+	s.Game.Table.CleanupDeadMinions()
 }
 
-func (gs *GameSession) CheckWinner() {
+func (s *Session) CheckWinner() {
 	for i := range SidesCount {
 		side := Side(i)
-		if !gs.Game.Players[side].Hero.Alive {
-			gs.Winner = side.Opposite()
+		if !s.Game.Players[side].Hero.Alive {
+			s.Winner = side.Opposite()
 		}
 	}
 }
 
-func (gs *GameSession) HasWinner() bool {
-	return gs.Winner != UnsetSide
+func (s *Session) HasWinner() bool {
+	return s.Winner != UnsetSide
 }

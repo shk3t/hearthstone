@@ -1,38 +1,23 @@
 package game
 
 import (
-	"fmt"
 	"hearthstone/pkg/containers"
 	errorpkg "hearthstone/pkg/errors"
-	"strings"
 )
 
 type Hand containers.Shrice[Playable]
 
+const HandCap = 10
+
 func NewHand() Hand {
-	return Hand(containers.NewShrice[Playable](handCap))
-}
-
-func (h Hand) String() string {
-	builder := strings.Builder{}
-	i := 1
-
-	for _, card := range h {
-		if card != nil {
-			fmt.Fprintf(&builder, "%d. %s\n", i, card)
-			i++
-		}
-	}
-	return strings.TrimSuffix(builder.String(), "\n")
+	return Hand(containers.NewShrice[Playable](HandCap))
 }
 
 func (h Hand) Len() int {
 	return containers.Shrice[Playable](h).Len()
 }
 
-const handCap = 10
-
-func (h Hand) get(idx int) (Playable, error) {
+func (h Hand) Get(idx int) (Playable, error) {
 	card, err := containers.Shrice[Playable](h).Get(idx)
 
 	switch err.(type) {
@@ -62,8 +47,4 @@ func (h Hand) refill(card Playable) error {
 	default:
 		panic(errorpkg.NewUnexpectedError(err))
 	}
-}
-
-func (h Hand) lenString() string {
-	return playerBarString("Карт:", h.Len(), handCap, "#")
 }

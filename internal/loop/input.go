@@ -9,7 +9,7 @@ import (
 
 var scanner = bufio.NewScanner(os.Stdin)
 
-func handleInput(session *game.GameSession) (exit bool) {
+func handleInput(session *game.Session) (exit bool) {
 	var err error
 
 	if !scanner.Scan() {

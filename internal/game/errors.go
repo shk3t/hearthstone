@@ -1,46 +1,64 @@
 package game
 
-import (
-	"fmt"
-	"strings"
-)
+import errorpkg "hearthstone/pkg/errors"
+
+type BaseError struct{}
+
+func (err BaseError) Error() string {
+	panic(errorpkg.NewUnusableFeatureError())
+}
 
 type CardPickError struct {
-	position int
+	BaseError
+	Position int
 }
 type NotEnoughManaError struct {
-	available int
-	required  int
+	BaseError
+	Available int
+	Required  int
 }
-type EmptyHandError struct{}
+type EmptyHandError struct {
+	BaseError
+}
 type FullHandError struct {
+	BaseError
 	BurnedCard Playable
 }
 type InvalidTableAreaPositionError struct {
-	position int
-	side     Side
+	BaseError
+	Position int
+	Side     Side
 }
-type FullTableAreaError struct{}
+type FullTableAreaError struct {
+	BaseError
+}
 type EmptyDeckError struct {
+	BaseError
 	Fatigue int
 }
 type UnmatchedEffectsAndTargetsError struct {
-	spellName  string
-	effectsLen int
-	targetsLen int
+	BaseError
+	SpellName  string
+	EffectsLen int
+	TargetsLen int
 }
 type InvalidTargettingError struct {
-	speicified int
-	required   int
+	BaseError
+	Speicified int
+	Required   int
 }
-type UsedHeroPowerError struct{}
-type UnavailableMinionAttackError struct{}
+type UsedHeroPowerError struct {
+	BaseError
+}
+type UnavailableMinionAttackError struct {
+	BaseError
+}
 
 func NewCardPickError(idx int) CardPickError {
-	return CardPickError{position: idx + 1}
+	return CardPickError{Position: idx + 1}
 }
 func NewNotEnoughManaError(available, required int) NotEnoughManaError {
-	return NotEnoughManaError{available, required}
+	return NotEnoughManaError{Available: available, Required: required}
 }
 func NewEmptyHandError() EmptyHandError {
 	return EmptyHandError{}
@@ -50,8 +68,8 @@ func NewFullHandError() FullHandError {
 }
 func NewInvalidTableAreaPositionError(idx int, side Side) InvalidTableAreaPositionError {
 	return InvalidTableAreaPositionError{
-		position: idx + 1,
-		side:     side,
+		Position: idx + 1,
+		Side:     side,
 	}
 }
 func NewFullTableAreaError() FullTableAreaError {
@@ -65,15 +83,15 @@ func NewUnmatchedEffectsAndTargetsError[T any](
 	targets []T,
 ) UnmatchedEffectsAndTargetsError {
 	return UnmatchedEffectsAndTargetsError{
-		spellName:  spell.Name,
-		effectsLen: len(spell.TargetEffects),
-		targetsLen: len(targets),
+		SpellName:  spell.Name,
+		EffectsLen: len(spell.TargetEffects),
+		TargetsLen: len(targets),
 	}
 }
 func NewInvalidTargettingError(specified, required int) InvalidTargettingError {
 	return InvalidTargettingError{
-		speicified: specified,
-		required:   required,
+		Speicified: specified,
+		Required:   required,
 	}
 }
 func NewUsedHeroPowerError() UsedHeroPowerError {
@@ -81,67 +99,4 @@ func NewUsedHeroPowerError() UsedHeroPowerError {
 }
 func NewUnavailableMinionAttackError() UnavailableMinionAttackError {
 	return UnavailableMinionAttackError{}
-}
-
-func (err CardPickError) Error() string {
-	return fmt.Sprintf("Выбрана некорректная карта: %d", err.position)
-}
-func (err NotEnoughManaError) Error() string {
-	return fmt.Sprintf(
-		"Недостаточно маны. Нужно: %d, имеется: %d",
-		err.required,
-		err.available,
-	)
-}
-func (err EmptyHandError) Error() string {
-	return "Пустая рука"
-}
-func (err FullHandError) Error() string {
-	if err.BurnedCard != nil {
-		return fmt.Sprintf(
-			"Полная рука. Последняя сожженная карта: \"%s\"",
-			ToCard(err.BurnedCard).Name,
-		)
-	}
-	return "Полная рука"
-}
-func (err InvalidTableAreaPositionError) Error() string {
-	if err.side == UnsetSide {
-		return fmt.Sprintf("Некорректная позиция на столе: %d", err.position)
-	}
-
-	sideText := strings.ToLower(err.side.String())
-	sideText = strings.Replace(sideText, "ий", "ей", 1)
-	return fmt.Sprintf(
-		"Некорректная позиция на %s части стола: %d",
-		sideText,
-		err.position,
-	)
-}
-func (err FullTableAreaError) Error() string {
-	return "Полный стол"
-}
-func (err EmptyDeckError) Error() string {
-	if err.Fatigue != 0 {
-		return fmt.Sprintf("Пустая колода.\nПотеря здоровья из-за усталости: %d", err.Fatigue)
-	}
-	return "Пустая колода"
-}
-func (err UnmatchedEffectsAndTargetsError) Error() string {
-	return fmt.Sprintf(
-		"Число эффектов и целей не соответствует для \"%s\".\nЭффектов: %d, целей: %d",
-		err.spellName, err.effectsLen, err.targetsLen,
-	)
-}
-func (err InvalidTargettingError) Error() string {
-	return fmt.Sprintf(
-		"Некорректный выбор цели.\nУказано целей: %d, требуется: %d",
-		err.speicified, err.required,
-	)
-}
-func (err UsedHeroPowerError) Error() string {
-	return "Сила героя уже была использована в этом ходу"
-}
-func (err UnavailableMinionAttackError) Error() string {
-	return "Это существо сможет атаковать только в следующем ходу"
 }

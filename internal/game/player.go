@@ -1,16 +1,13 @@
 package game
 
 import (
-	"fmt"
 	"hearthstone/internal/setup"
 	errorpkg "hearthstone/pkg/errors"
 	"hearthstone/pkg/sugar"
-	"slices"
-	"strconv"
-	"strings"
 )
 
 type Player struct {
+	Game    *Game
 	Side    Side
 	Hero    *Hero
 	Hand    Hand
@@ -18,11 +15,11 @@ type Player struct {
 	MaxMana int
 	fatigue int
 	deck    Deck
-	game    *Game
 }
 
 func NewPlayer(side Side, hero *Hero, deck Deck, game *Game) *Player {
 	return &Player{
+		Game:    game,
 		Side:    side,
 		Hero:    hero,
 		Hand:    NewHand(),
@@ -30,34 +27,7 @@ func NewPlayer(side Side, hero *Hero, deck Deck, game *Game) *Player {
 		MaxMana: 0,
 		fatigue: 0,
 		deck:    deck,
-		game:    game,
 	}
-}
-
-func (p *Player) String() string {
-	heroFormat := "%s"
-	if p.Side == p.game.Turn {
-		heroFormat = "  > %s"
-	}
-
-	linesForTop := append(
-		make([]string, 0, 5),
-		fmt.Sprintf(heroFormat, p.Hero.String()),
-		fmt.Sprintf(heroFormat, p.Hero.healthString()),
-		fmt.Sprintf(heroFormat, p.manaString()),
-		sugar.If(
-			p.Side == p.game.Turn || setup.Env.RevealOpponentsHand,
-			p.Hand.String(),
-			fmt.Sprintf(heroFormat, p.Hand.lenString()),
-		),
-	)
-
-	if p.Side == BotSide {
-		slices.Reverse(linesForTop)
-	}
-
-	linesForTop = append(linesForTop, "")
-	return strings.Join(linesForTop, "\n")
 }
 
 func (p *Player) IncreaseMana() {
@@ -109,26 +79,6 @@ func (p *Player) DrawCards(number int) []error {
 	return errs
 }
 
-func (p *Player) GetCardInfo(handIdx int) (string, error) {
-	if handIdx == HeroIdx {
-		return p.Hero.Power.Info(), nil
-	}
-
-	card, err := p.Hand.get(handIdx)
-	if err != nil {
-		return "", err
-	}
-
-	switch card := card.(type) {
-	case *Minion:
-		return card.Info(), nil
-	case *Spell:
-		return card.Info(), nil
-	default:
-		panic("Invalid card type")
-	}
-}
-
 func (p *Player) PlayCard(
 	handIdx int,
 	areaIdx int,
@@ -144,7 +94,7 @@ func (p *Player) PlayCard(
 		}
 		card = &p.Hero.Power
 	} else {
-		card, err = p.Hand.get(handIdx)
+		card, err = p.Hand.Get(handIdx)
 		if err != nil {
 			return err
 		}
@@ -157,7 +107,7 @@ func (p *Player) PlayCard(
 
 	switch card := card.(type) {
 	case *Minion:
-		err = p.game.getArea(p.Side).place(areaIdx, card)
+		err = p.Game.getArea(p.Side).place(areaIdx, card)
 		if err == nil {
 			card.Status.SetSleep(true)
 		}
@@ -179,16 +129,16 @@ func (p *Player) PlayCard(
 }
 
 func (p *Player) Attack(allyIdx, enemyIdx int) error {
-	allyCharacter, err := p.game.getCharacter(allyIdx, p.Side)
+	allyCharacter, err := p.Game.getCharacter(allyIdx, p.Side)
 	if err != nil {
 		return err
 	}
-	enemyCharacter, err := p.game.getCharacter(enemyIdx, p.Side.Opposite())
+	enemyCharacter, err := p.Game.getCharacter(enemyIdx, p.Side.Opposite())
 	if err != nil {
 		return err
 	}
 
-	if allyCharacter.Status.Sleep() || allyCharacter.Status.Freeze() {
+	if allyCharacter.Status.IsSleep() || allyCharacter.Status.IsFreeze() {
 		return NewUnavailableMinionAttackError()
 	}
 
@@ -205,7 +155,7 @@ func (p *Player) castSpell(spell *Spell, idxes []int, sides Sides) error {
 	)
 
 	if spell.TargetSelector != nil {
-		targets, err := spell.TargetSelector(p.game, idxes, sides)
+		targets, err := spell.TargetSelector(p.Game, idxes, sides)
 		if err != nil {
 			return err
 		}
@@ -236,34 +186,4 @@ func (p *Player) castSpell(spell *Spell, idxes []int, sides Sides) error {
 	}
 
 	return nil
-}
-
-const playerBarLeftAlign = 10
-const playerBarRightAlign = 33
-
-func playerBarString(head string, val, maxVal int, sym string) string {
-	builder := strings.Builder{}
-
-	fmt.Fprintf(&builder,
-		"%-"+strconv.Itoa(playerBarLeftAlign)+"s",
-		head,
-	)
-	fmt.Fprintf(&builder,
-		"%2d/%2d",
-		val, maxVal,
-	)
-	fmt.Fprintf(&builder,
-		"%"+strconv.Itoa(playerBarRightAlign)+"s",
-		fmt.Sprintf(
-			"[%s%s]",
-			strings.Repeat(" ", min(maxVal-val, maxVal)),
-			strings.Repeat(sym, max(val, 0)),
-		),
-	)
-
-	return builder.String()
-}
-
-func (p *Player) manaString() string {
-	return playerBarString("Мана:", p.Mana, p.MaxMana, "*")
 }

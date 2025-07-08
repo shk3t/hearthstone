@@ -1,9 +1,7 @@
 package game
 
 import (
-	"fmt"
 	"hearthstone/pkg/sugar"
-	"strings"
 )
 
 type Game struct {
@@ -24,19 +22,11 @@ func NewGame(topHero, botHero *Hero, topDeck, botDeck Deck) *Game {
 	return game
 }
 
-func (g *Game) String() string {
-	builder := strings.Builder{}
-	fmt.Fprint(&builder, &g.Players[TopSide])
-	fmt.Fprint(&builder, &g.Table)
-	fmt.Fprint(&builder, &g.Players[BotSide])
-	return builder.String()
-}
-
 func (g *Game) GetActivePlayer() *Player {
 	return &g.Players[g.Turn]
 }
 
-func (g *Game) GetActiveArea() tableArea {
+func (g *Game) GetActiveArea() TableArea {
 	return g.Table[g.Turn]
 }
 
@@ -50,8 +40,8 @@ func (g *Game) StartNextTurn() []error {
 	errs := activePlayer.DrawCards(1)
 
 	activeArea := g.GetActiveArea()
-	statuses := []*characterStatus{&activePlayer.Hero.Status}
-	for _, minion := range activeArea.minions {
+	statuses := []*CharacterStatus{&activePlayer.Hero.Status}
+	for _, minion := range activeArea.Minions {
 		if minion != nil {
 			statuses = append(statuses, &minion.Character.Status)
 		}
@@ -69,7 +59,7 @@ func (g *Game) StartGame() {
 	g.Players[BotSide].DrawCards(3)
 }
 
-func (g *Game) getArea(side Side) tableArea {
+func (g *Game) getArea(side Side) TableArea {
 	return g.Table[side]
 }
 
@@ -81,7 +71,7 @@ func (g *Game) getCharacter(idx int, side Side) (*Character, error) {
 	if idx == HeroIdx {
 		return &g.getHero(side).Character, nil
 	} else {
-		minion, err := g.getArea(side).choose(idx)
+		minion, err := g.getArea(side).Choose(idx)
 		if err != nil {
 			return nil, err
 		}

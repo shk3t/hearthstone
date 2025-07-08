@@ -1,37 +1,12 @@
 package game
 
-import (
-	"fmt"
-	"strings"
-)
-
-type Table [SidesCount]tableArea
+type Table [SidesCount]TableArea
 
 func NewTable() *Table {
 	return &Table{
 		newTableArea(TopSide),
 		newTableArea(BotSide),
 	}
-}
-
-func (t *Table) String() string {
-	builder := strings.Builder{}
-	fmt.Fprintln(&builder)
-	fmt.Fprintln(&builder, strings.Repeat("=", 50))
-	fmt.Fprintln(&builder, &t[TopSide])
-	fmt.Fprintln(&builder, strings.Repeat("-", 50))
-	fmt.Fprintln(&builder, &t[BotSide])
-	fmt.Fprintln(&builder, strings.Repeat("=", 50))
-	fmt.Fprintln(&builder)
-	return builder.String()
-}
-
-func (t *Table) GetMinionInfo(idx int, side Side) (string, error) {
-	minion, err := t[side].choose(idx)
-	if err != nil {
-		return "", err
-	}
-	return minion.Info(), nil
 }
 
 func (t *Table) CleanupDeadMinions() {

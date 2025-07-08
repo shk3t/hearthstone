@@ -1,55 +1,40 @@
 package game
 
 import (
-	"fmt"
 	"hearthstone/pkg/containers"
 	errorpkg "hearthstone/pkg/errors"
-	"strconv"
-	"strings"
-	"unicode/utf8"
 )
 
-type tableArea struct {
-	minions containers.Shrice[*Minion]
-	side    Side
+type TableArea struct {
+	Minions containers.Shrice[*Minion]
+	Side    Side
 }
 
-func newTableArea(side Side) tableArea {
-	return tableArea{
-		minions: containers.NewShrice[*Minion](areaSize),
-		side:    side,
+func (a TableArea) Choose(idx int) (*Minion, error) {
+	card, err := a.Minions.Get(idx)
+	switch err.(type) {
+	case errorpkg.IndexError:
+		return nil, NewInvalidTableAreaPositionError(idx, a.Side)
+	case nil:
+		return card, nil
+	default:
+		panic(errorpkg.NewUnexpectedError(err))
 	}
 }
 
-func (a tableArea) String() string {
-	builder := strings.Builder{}
 
-	nameMaxLen, attackHpMaxLen := 0, 0
-	for _, m := range a.minions {
-		if m != nil {
-			nameMaxLen = max(nameMaxLen, utf8.RuneCountInString(m.Name))
-			attackHpMaxLen = max(
-				attackHpMaxLen,
-				len(strconv.Itoa(m.Attack))+len(strconv.Itoa(m.Health))+1,
-			)
-		}
+func newTableArea(side Side) TableArea {
+	return TableArea{
+		Minions: containers.NewShrice[*Minion](areaSize),
+		Side:    side,
 	}
-
-	i := 1
-	for _, m := range a.minions {
-		if m != nil {
-			fmt.Fprintf(&builder, "%d. %s\n", i, m.InTableString(nameMaxLen, attackHpMaxLen))
-			i++
-		}
-	}
-	return strings.TrimSuffix(builder.String(), "\n")
 }
 
 const areaSize = 7
 
-func (a tableArea) place(idx int, minion *Minion) error {
+func (a TableArea) place(idx int, minion *Minion) error {
 	idx = min(idx, areaSize-1)
-	err := a.minions.Insert(idx, minion)
+	err := a.Minions.Insert(idx, minion)
 	switch err.(type) {
 	case errorpkg.IndexError:
 		return NewInvalidTableAreaPositionError(idx, UnsetSide)
@@ -62,23 +47,11 @@ func (a tableArea) place(idx int, minion *Minion) error {
 	}
 }
 
-func (a tableArea) choose(idx int) (*Minion, error) {
-	card, err := a.minions.Get(idx)
-	switch err.(type) {
-	case errorpkg.IndexError:
-		return nil, NewInvalidTableAreaPositionError(idx, a.side)
-	case nil:
-		return card, nil
-	default:
-		panic(errorpkg.NewUnexpectedError(err))
-	}
-}
-
-func (a tableArea) cleanupDeadMinions() {
-	for i, minion := range a.minions {
+func (a TableArea) cleanupDeadMinions() {
+	for i, minion := range a.Minions {
 		if minion != nil && !minion.Alive {
-			a.minions[i] = nil
+			a.Minions[i] = nil
 		}
 	}
-	a.minions.Shrink()
+	a.Minions.Shrink()
 }

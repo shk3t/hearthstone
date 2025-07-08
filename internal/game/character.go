@@ -5,7 +5,7 @@ type Character struct {
 	Health    int
 	MaxHealth int
 	Alive     bool
-	Status    characterStatus
+	Status    CharacterStatus
 }
 
 func (c *Character) ExecuteAttack(target *Character) {
