@@ -3,6 +3,7 @@ package tui
 import (
 	"fmt"
 	"hearthstone/internal/game"
+	"hearthstone/internal/session"
 	"strings"
 )
 
@@ -12,12 +13,14 @@ func sideString(s game.Side) string {
 	return sideStrings[s]
 }
 
-func sessionString(s *game.Session) string {
+const prompt = "> "
+
+func sessionString(s *session.Session) string {
 	builder := strings.Builder{}
 	fmt.Fprintln(&builder, gameString(s.Game))
 
-	if s.Help != "" {
-		fmt.Fprintf(&builder, "%s\n\n", s.Help)
+	if s.Hint != "" {
+		fmt.Fprintf(&builder, "%s\n\n", s.Hint)
 	}
 
 	if s.Winner != game.UnsetSide {

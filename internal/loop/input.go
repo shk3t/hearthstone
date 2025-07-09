@@ -2,14 +2,14 @@ package loop
 
 import (
 	"bufio"
-	"hearthstone/internal/game"
+	sessionpkg "hearthstone/internal/session"
 	"os"
 	"strings"
 )
 
 var scanner = bufio.NewScanner(os.Stdin)
 
-func handleInput(session *game.Session) (exit bool) {
+func handleInput(session *sessionpkg.Session) (exit bool) {
 	var err error
 
 	if !scanner.Scan() {
@@ -26,7 +26,7 @@ func handleInput(session *game.Session) (exit bool) {
 		command, args = allArgs[0], allArgs[1:]
 	}
 
-	session.Help = ""
+	session.Hint = ""
 
 	err = Actions.ShortHelp.Do(args, session) // Display short help by default
 	for _, action := range actionList {
@@ -37,7 +37,7 @@ func handleInput(session *game.Session) (exit bool) {
 	}
 
 	if err != nil {
-		session.Help = err.Error()
+		session.Hint = err.Error()
 	}
 	return false
 }

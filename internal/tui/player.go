@@ -2,8 +2,8 @@ package tui
 
 import (
 	"fmt"
+	"hearthstone/internal/config"
 	"hearthstone/internal/game"
-	"hearthstone/internal/setup"
 	"hearthstone/pkg/sugar"
 	"slices"
 	"strings"
@@ -21,7 +21,7 @@ func playerString(p *game.Player) string {
 		fmt.Sprintf(heroFormat, healthString(p.Hero)),
 		fmt.Sprintf(heroFormat, manaString(p)),
 		sugar.If(
-			p.Side == p.Game.Turn || setup.Env.RevealOpponentsHand,
+			p.Side == p.Game.Turn || config.Env.RevealOpponentsHand,
 			handString(p.Hand),
 			fmt.Sprintf(heroFormat, handLenString(p.Hand)),
 		),

@@ -1,7 +1,7 @@
 package game
 
 import (
-	"hearthstone/internal/setup"
+	"hearthstone/internal/config"
 	errorpkg "hearthstone/pkg/errors"
 	"hearthstone/pkg/sugar"
 )
@@ -39,7 +39,7 @@ func (p *Player) RestoreMana() {
 }
 
 func (p *Player) HaveEnoughMana(value int) bool {
-	if p.Mana-value < 0 && !setup.Env.UnlimitedMana {
+	if p.Mana-value < 0 && !config.Env.UnlimitedMana {
 		return false
 	}
 	return true

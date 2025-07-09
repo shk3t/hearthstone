@@ -1,20 +1,18 @@
-package loop
+package setup
 
 import (
-	"hearthstone/internal/setup"
-	"hearthstone/internal/tui"
+	"hearthstone/internal/config"
 	"hearthstone/pkg/helpers"
 	"hearthstone/pkg/log"
 	"os"
 )
 
 func initAll() error {
-	setup.LoadEnv()
+	config.LoadEnv()
 	if err := log.Init(); err != nil {
 		return err
 	}
-	tui.InitDisplayFrame()
-	InitActions()
+	setupUI()
 	return nil
 }
 

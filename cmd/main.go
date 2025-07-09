@@ -5,11 +5,12 @@ import (
 	"hearthstone/internal/loop"
 	"hearthstone/internal/sets"
 	"hearthstone/internal/sets/base"
+	"hearthstone/internal/setup"
 )
 
 func main() {
-	loop.InitAll()
-	defer loop.DeinitAll()
+	setup.InitAll()
+	defer setup.DeinitAll()
 
 	startingDeck := game.NewDeck(
 		sets.LegacySet.RiverCrocolisk,

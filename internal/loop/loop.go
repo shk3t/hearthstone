@@ -2,11 +2,12 @@ package loop
 
 import (
 	"hearthstone/internal/game"
-	"hearthstone/internal/tui"
+	sessionpkg "hearthstone/internal/session"
+	"hearthstone/internal/setup"
 )
 
 func StartGame(topHero, botHero *game.Hero, topDeck, botDeck game.Deck) {
-	session := game.NewGameSession(topHero, botHero, topDeck, botDeck)
+	session := sessionpkg.NewGameSession(topHero, botHero, topDeck, botDeck)
 
 	session.StartGame()
 	for {
@@ -15,7 +16,7 @@ func StartGame(topHero, botHero *game.Hero, topDeck, botDeck game.Deck) {
 			session.CheckWinner()
 		}
 
-		tui.Display(session)
+		setup.Display(session)
 
 		if session.HasWinner() {
 			return

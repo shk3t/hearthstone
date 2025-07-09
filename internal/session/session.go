@@ -1,22 +1,23 @@
-package game
+package session
 
 import (
+	"hearthstone/internal/game"
 	"hearthstone/pkg/helpers"
 )
 
 type Session struct {
-	*Game
-	Help         string
+	*game.Game
+	Hint         string // TODO extract (TUI related)
 	TurnFinished bool
-	Winner       Side
+	Winner       game.Side
 }
 
-func NewGameSession(topHero, botHero *Hero, topDeck, botDeck Deck) *Session {
+func NewGameSession(topHero, botHero *game.Hero, topDeck, botDeck game.Deck) *Session {
 	return &Session{
-		Game:         NewGame(topHero, botHero, topDeck, botDeck),
-		Help:         "",
+		Game:         game.NewGame(topHero, botHero, topDeck, botDeck),
+		Hint:         "",
 		TurnFinished: true,
-		Winner:       UnsetSide,
+		Winner:       game.UnsetSide,
 	}
 }
 
@@ -26,10 +27,10 @@ func (s *Session) StartGame() {
 
 func (s *Session) StartNextTurn() {
 	s.TurnFinished = false
-	s.Help = ""
+	s.Hint = ""
 	errs := s.Game.StartNextTurn()
 	if len(errs) > 0 {
-		s.Help = helpers.JoinErrors(errs, "\n")
+		s.Hint = helpers.JoinErrors(errs, "\n")
 	}
 }
 
@@ -38,8 +39,8 @@ func (s *Session) Cleanup() {
 }
 
 func (s *Session) CheckWinner() {
-	for i := range SidesCount {
-		side := Side(i)
+	for i := range game.SidesCount {
+		side := game.Side(i)
 		if !s.Game.Players[side].Hero.Alive {
 			s.Winner = side.Opposite()
 		}
@@ -47,5 +48,5 @@ func (s *Session) CheckWinner() {
 }
 
 func (s *Session) HasWinner() bool {
-	return s.Winner != UnsetSide
+	return s.Winner != game.UnsetSide
 }

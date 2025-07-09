@@ -7,15 +7,12 @@ import (
 )
 
 // TODO: destribute between files
-func GetCardInfo(
-	p *game.Player,
-	handIdx int,
-) (string, error) { // TODO: `p` or `player`? (also for table)
+func GetCardInfo(player *game.Player, handIdx int) (string, error) {
 	if handIdx == game.HeroIdx {
-		return cardInfo(&p.Hero.Power.Card), nil
+		return cardInfo(&player.Hero.Power.Card), nil
 	}
 
-	card, err := p.Hand.Get(handIdx)
+	card, err := player.Hand.Get(handIdx)
 	if err != nil {
 		return "", err
 	}
@@ -30,8 +27,8 @@ func GetCardInfo(
 	}
 }
 
-func GetMinionInfo(t *game.Table, idx int, side game.Side) (string, error) {
-	minion, err := t[side].Choose(idx)
+func GetMinionInfo(table *game.Table, idx int, side game.Side) (string, error) {
+	minion, err := table[side].Choose(idx)
 	if err != nil {
 		return "", err
 	}
