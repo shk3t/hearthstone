@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"fmt"
 	"hearthstone/internal/game"
 	"strings"
 )
@@ -39,4 +40,19 @@ func characterStatusString(cs *game.CharacterStatus) string {
 	}
 
 	return builder.String()
+}
+
+func characterStatusInfo(cs *game.CharacterStatus) string {
+	builder := strings.Builder{}
+
+	for _, info := range characterStatusInfoEntries {
+		if info.isActive(cs) {
+			fmt.Fprintf(&builder, "    %s: %s\n", info.name, info.description)
+		}
+	}
+
+	if builder.Len() == 0 {
+		return ""
+	}
+	return characterStatusHeader + builder.String()
 }

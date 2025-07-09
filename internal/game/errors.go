@@ -6,7 +6,7 @@ import errorpkg "hearthstone/pkg/errors"
 // In this case they become instances of `error` type.
 //
 // `BaseError` `Error()` is not supposed to be used.
-// Use your implementation instead (TODO)
+// Use your to string conversion function instead.
 type BaseError struct{}
 
 func (err BaseError) Error() string {

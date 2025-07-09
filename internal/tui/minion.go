@@ -30,3 +30,20 @@ func minionTableString(m *game.Minion, fieldWidths ...int) string {
 
 	return strings.TrimRight(str, "| ")
 }
+
+func getMinionInfo(table *game.Table, idx int, side game.Side) (string, error) {
+	minion, err := table[side].Choose(idx)
+	if err != nil {
+		return "", err
+	}
+	return minionInfo(minion), nil
+}
+
+func minionInfo(m *game.Minion) string {
+	builder := strings.Builder{}
+	fmt.Fprintln(&builder, cardInfo(&m.Card))
+	fmt.Fprintf(&builder, "Атака:    %d\n", m.Attack)
+	fmt.Fprintf(&builder, "Здоровье: %d\n", m.Health)
+	builder.WriteString(characterStatusInfo(&m.Status))
+	return strings.TrimSuffix(builder.String(), "\n")
+}

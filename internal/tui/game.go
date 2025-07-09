@@ -14,6 +14,7 @@ func gameString(g *game.Game) string {
 	fmt.Fprint(&builder, playerString(&g.Players[game.TopSide]))
 	fmt.Fprint(&builder, tableString(&g.Table))
 	fmt.Fprint(&builder, playerString(&g.Players[game.BotSide]))
+	builder.WriteString("\n")
 
 	if uiState.hint != "" {
 		fmt.Fprintf(&builder, "%s\n\n", uiState.hint)
