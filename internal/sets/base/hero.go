@@ -7,13 +7,8 @@ var Heroes = struct {
 	Priest *game.Hero
 }{
 	Mage: &game.Hero{
-		Character: game.Character{
-			Attack:    0,
-			Health:    30,
-			MaxHealth: 30,
-			Alive:     true,
-		},
-		Class: game.Classes.Mage,
+		Character: *game.NewHeroCharacter(),
+		Class:     game.Classes.Mage,
 		Power: game.Spell{
 			Card: game.Card{
 				ManaCost:    2,
@@ -28,13 +23,8 @@ var Heroes = struct {
 		},
 	},
 	Priest: &game.Hero{
-		Character: game.Character{
-			Attack:    0,
-			Health:    30,
-			MaxHealth: 30,
-			Alive:     true,
-		},
-		Class: game.Classes.Priest,
+		Character: *game.NewHeroCharacter(),
+		Class:     game.Classes.Priest,
 		Power: game.Spell{
 			Card: game.Card{
 				ManaCost:    2,

@@ -40,13 +40,8 @@ var LegacySet = struct {
 			Description: "",
 			Rarity:      game.Rarities.Base,
 		},
-		Character: game.Character{
-			Attack:    2,
-			Health:    3,
-			MaxHealth: 3,
-			Alive:     true,
-		},
-		Type: game.MinionTypes.Beast,
+		Character: *game.NewCharacter(2, 3),
+		Type:      game.MinionTypes.Beast,
 	},
 	ChillwindYeti: &game.Minion{
 		Card: game.Card{
@@ -55,12 +50,7 @@ var LegacySet = struct {
 			Description: "",
 			Rarity:      game.Rarities.Base,
 		},
-		Character: game.Character{
-			Attack:    4,
-			Health:    5,
-			MaxHealth: 5,
-			Alive:     true,
-		},
+		Character: *game.NewCharacter(4, 5),
 		Type: game.MinionTypes.No,
 	},
 }

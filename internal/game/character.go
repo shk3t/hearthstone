@@ -8,6 +8,24 @@ type Character struct {
 	Status    CharacterStatus
 }
 
+func NewCharacter(attack, health int) *Character {
+	return &Character{
+		Attack:    attack,
+		Health:    health,
+		MaxHealth: health,
+		Alive:     true,
+	}
+}
+
+func NewHeroCharacter() *Character {
+	return &Character{
+		Attack:    0,
+		Health:    30,
+		MaxHealth: 30,
+		Alive:     true,
+	}
+}
+
 func (c *Character) ExecuteAttack(target *Character) {
 	target.DealDamage(c.Attack)
 	c.DealDamage(target.Attack)
