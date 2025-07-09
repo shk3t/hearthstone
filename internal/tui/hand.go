@@ -28,21 +28,3 @@ func handString(h game.Hand) string {
 	}
 	return strings.TrimSuffix(builder.String(), "\n")
 }
-
-func minionHandString(m *game.Minion) string {
-	return fmt.Sprintf(
-		"<%d> %s %d/%d",
-		m.ManaCost,
-		m.Name,
-		m.Attack,
-		m.Health,
-	)
-}
-
-func spellString(s *game.Spell) string {
-	return fmt.Sprintf(
-		"<%d> %s",
-		s.ManaCost,
-		s.Name,
-	)
-}

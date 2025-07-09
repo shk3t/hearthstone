@@ -6,12 +6,6 @@ import (
 	"strings"
 )
 
-var sideStrings = [game.SidesCount]string{"Верхний", "Нижний"}
-
-func sideString(s game.Side) string {
-	return sideStrings[s]
-}
-
 const prompt = "> "
 
 func gameString(g *game.Game) string {
