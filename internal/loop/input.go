@@ -1,24 +1,16 @@
 package loop
 
 import (
-	"bufio"
 	sessionpkg "hearthstone/internal/session"
-	"os"
+	"hearthstone/internal/setup"
 	"strings"
 )
 
-var scanner = bufio.NewScanner(os.Stdin)
-
 func handleInput(session *sessionpkg.Session) (exit bool) {
-	var err error
-
-	if !scanner.Scan() {
+	allArgs, err := setup.Input()
+	if err != nil {
 		return true
 	}
-	input := scanner.Text()
-
-	input = strings.ToLower(input)
-	allArgs := strings.Fields(input)
 
 	var command string
 	var args []string
