@@ -11,11 +11,6 @@ func StartGame(topHero, botHero *game.Hero, topDeck, botDeck game.Deck) {
 	g.StartGame()
 
 	for {
-		if g.TurnFinished {
-			errs := g.StartNextTurn()
-			ui.Feedback(errs...)
-		}
-
 		ui.Display(g)
 
 		if err := ui.HandleInput(g); err != nil {
@@ -27,6 +22,11 @@ func StartGame(topHero, botHero *game.Hero, topDeck, botDeck game.Deck) {
 		if g.GetWinner() != game.UnsetSide {
 			ui.Display(g)
 			return
+		}
+
+		if g.TurnFinished {
+			errs := g.StartNextTurn()
+			ui.Feedback(errs...)
 		}
 	}
 }

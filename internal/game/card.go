@@ -49,3 +49,7 @@ func ToCard(p Playable) *Card {
 		panic("Invalid card type")
 	}
 }
+
+var BaseCards = struct {
+	TheCoin *Spell
+}{}

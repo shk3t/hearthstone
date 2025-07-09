@@ -25,7 +25,7 @@ func barString(head string, val, maxVal int, sym string) string {
 		"%"+strconv.Itoa(barRightAlign)+"s",
 		fmt.Sprintf(
 			"[%s%s]",
-			strings.Repeat(" ", min(maxVal-val, maxVal)),
+			strings.Repeat(" ", min(max(maxVal-val, 0), maxVal)),
 			strings.Repeat(sym, max(val, 0)),
 		),
 	)

@@ -1,7 +1,7 @@
 package game
 
 import (
-	"hearthstone/pkg/sugar"
+	"math/rand"
 )
 
 type Game struct {
@@ -15,7 +15,7 @@ func NewGame(topHero, botHero *Hero, topDeck, botDeck Deck) *Game {
 	game := &Game{
 		Table:        *NewTable(),
 		Turn:         UnsetSide,
-		TurnFinished: true,
+		TurnFinished: false,
 	}
 	game.Players = [SidesCount]Player{
 		TopSide: *NewPlayer(TopSide, topHero, topDeck, game),
@@ -33,13 +33,20 @@ func (g *Game) GetActiveArea() TableArea {
 }
 
 func (g *Game) StartGame() {
-	g.Players[TopSide].DrawCards(3)
-	g.Players[BotSide].DrawCards(3)
+	turn := Side(rand.Int() % 2)
+	firstPlayer, secondPlayer := g.Players[turn], g.Players[turn.Opposite()]
+
+	firstPlayer.DrawCards(3)
+	secondPlayer.DrawCards(4)
+	secondPlayer.Hand.refill(BaseCards.TheCoin.Copy())
+
+	g.Turn = turn.Opposite()
+	g.StartNextTurn()
 }
 
 func (g *Game) StartNextTurn() []error {
 	g.TurnFinished = false
-	g.Turn = sugar.If(g.Turn == TopSide, BotSide, TopSide)
+	g.Turn = g.Turn.Opposite()
 
 	activePlayer := g.GetActivePlayer()
 	activePlayer.IncreaseMana()
