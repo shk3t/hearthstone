@@ -3,7 +3,6 @@ package tui
 import (
 	"fmt"
 	"hearthstone/internal/game"
-	"hearthstone/internal/session"
 	"strings"
 )
 
@@ -15,31 +14,26 @@ func sideString(s game.Side) string {
 
 const prompt = "> "
 
-func sessionString(s *session.Session) string {
+func gameString(g *game.Game) string {
 	builder := strings.Builder{}
-	fmt.Fprintln(&builder, gameString(s.Game))
 
-	if s.Hint != "" {
-		fmt.Fprintf(&builder, "%s\n\n", s.Hint)
+	fmt.Fprint(&builder, playerString(&g.Players[game.TopSide]))
+	fmt.Fprint(&builder, tableString(&g.Table))
+	fmt.Fprint(&builder, playerString(&g.Players[game.BotSide]))
+
+	if uiState.hint != "" {
+		fmt.Fprintf(&builder, "%s\n\n", uiState.hint)
 	}
 
-	if s.Winner != game.UnsetSide {
+	if winner := g.GetWinner(); winner != game.UnsetSide {
 		fmt.Fprintf(
 			&builder,
 			"%s игрок одерживает ПОБЕДУ!\n",
-			strings.ToUpper(sideString(s.Winner)),
+			strings.ToUpper(sideString(winner)),
 		)
 	} else {
 		fmt.Fprint(&builder, prompt)
 	}
 
-	return builder.String()
-}
-
-func gameString(g *game.Game) string {
-	builder := strings.Builder{}
-	fmt.Fprint(&builder, playerString(&g.Players[game.TopSide]))
-	fmt.Fprint(&builder, tableString(&g.Table))
-	fmt.Fprint(&builder, playerString(&g.Players[game.BotSide]))
 	return builder.String()
 }

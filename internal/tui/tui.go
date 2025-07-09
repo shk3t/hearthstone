@@ -2,25 +2,29 @@ package tui
 
 import (
 	"bufio"
-	"errors"
-	"hearthstone/internal/session"
+	"fmt"
+	"hearthstone/internal/game"
 	"hearthstone/pkg/ui"
 	"os"
 	"strings"
 )
 
-func Display(session *session.Session) {
-	ui.UpdateFrame(sessionString(session))
+func Display(g *game.Game) {
+	ui.UpdateFrame(gameString(g))
 }
 
-func Input() ([]string, error) {
-	if !scanner.Scan() {
-		return nil, errors.New("End of input")
+func Feedback(errs ...error) {
+	builder := strings.Builder{}
+	for _, err := range errs {
+		fmt.Fprintln(&builder, tuiError(err))
 	}
-	input := scanner.Text()
-
-	input = strings.ToLower(input)
-	return strings.Fields(input), nil
+	uiState.hint = strings.TrimSuffix(builder.String(), "\n")
 }
 
 var scanner = bufio.NewScanner(os.Stdin)
+
+var uiState = struct {
+	hint string
+}{
+	hint: "",
+}

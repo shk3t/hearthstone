@@ -1,18 +1,14 @@
-package loop
+package tui
 
 import (
-	"errors"
 	"fmt"
 	"hearthstone/internal/game"
-	sessionpkg "hearthstone/internal/session"
-	"hearthstone/internal/tui"
 	"hearthstone/pkg/helpers"
-	"hearthstone/pkg/sugar"
 	"regexp"
 	"strings"
 )
 
-type doAction = func(session *sessionpkg.Session, idxes []int, sides game.Sides) error
+type doAction = func(g *game.Game, idxes []int, sides game.Sides) (string, error)
 
 type playerAction struct {
 	name        string
@@ -39,14 +35,13 @@ var Actions = struct {
 		shortcut:    "",
 		args:        nil,
 		description: "вывести краткую помощь по командам",
-		do: func(session *sessionpkg.Session, idxes []int, sides game.Sides) error {
+		do: func(g *game.Game, idxes []int, sides game.Sides) (string, error) {
 			builder := strings.Builder{}
 			fmt.Fprint(&builder, "Некорректное действие. Доступны:\n")
 			for _, action := range actionList {
 				fmt.Fprintln(&builder, action.whatis(false))
 			}
-			text := strings.TrimSuffix(builder.String(), "\n")
-			return errors.New(text)
+			return strings.TrimSuffix(builder.String(), "\n"), nil
 		},
 	},
 	Help: playerAction{
@@ -54,7 +49,7 @@ var Actions = struct {
 		shortcut:    "h",
 		args:        nil,
 		description: "вывести полную помощь по командам",
-		do: func(session *sessionpkg.Session, idxes []int, sides game.Sides) error {
+		do: func(g *game.Game, idxes []int, sides game.Sides) (string, error) {
 			builder := strings.Builder{}
 			fmt.Fprint(&builder, "Доступные действия:\n")
 			for _, action := range actionList {
@@ -65,7 +60,7 @@ var Actions = struct {
 				&builder,
 				"Чтобы указать сторону цели, используйте 't' (верх) ил 'b' (низ), например '5b'",
 			)
-			return errors.New(builder.String())
+			return builder.String(), nil
 		},
 	},
 	InfoHand: playerAction{
@@ -73,13 +68,11 @@ var Actions = struct {
 		shortcut:    "ih",
 		args:        []string{"<номер_карты>"},
 		description: "подробное описание карты в руке",
-		do: func(session *sessionpkg.Session, idxes []int, sides game.Sides) error {
+		do: func(g *game.Game, idxes []int, sides game.Sides) (string, error) {
 			if len(idxes) != 1 {
-				return NewInvalidArgumentsError("")
+				return "", NewInvalidArgumentsError()
 			}
-			info, err := tui.GetCardInfo(session.GetActivePlayer(), idxes[0])
-			// TODO use abstract getCardInfo, getMinionInfo
-			return sugar.If(err == nil, errors.New(info), err)
+			return getCardInfo(g.GetActivePlayer(), idxes[0])
 		},
 	},
 	InfoTable: playerAction{
@@ -87,14 +80,13 @@ var Actions = struct {
 		shortcut:    "it",
 		args:        []string{"<позиция_на_столе>"},
 		description: "подробное описание существа на столе",
-		do: func(session *sessionpkg.Session, idxes []int, sides game.Sides) error {
+		do: func(g *game.Game, idxes []int, sides game.Sides) (string, error) {
 			if len(idxes) == 0 {
 				idxes = append(idxes, 0)
 				sides = append(sides, game.UnsetSide)
 			}
-			sides.SetUnset(session.Turn)
-			info, err := tui.GetMinionInfo(&session.Table, idxes[0], sides[0])
-			return sugar.If(err == nil, errors.New(info), err)
+			sides.SetUnset(g.Turn)
+			return getMinionInfo(&g.Table, idxes[0], sides[0])
 		},
 	},
 	Play: playerAction{
@@ -105,9 +97,9 @@ var Actions = struct {
 			"<позиция_на_столе>/<позиции_целей_заклинания>",
 		},
 		description: "сыграть карту",
-		do: func(session *sessionpkg.Session, idxes []int, sides game.Sides) error {
+		do: func(g *game.Game, idxes []int, sides game.Sides) (string, error) {
 			if len(idxes) == 0 {
-				return NewInvalidArgumentsError("")
+				return "", NewInvalidArgumentsError()
 			} else if len(idxes) == 1 {
 				idxes = append(idxes, 0)
 				sides = append(sides, game.UnsetSide)
@@ -116,7 +108,7 @@ var Actions = struct {
 			handIdx, areaIdx := idxes[0], idxes[1]
 			spellIdxes, spellSides := idxes[1:], sides[1:]
 
-			return session.GetActivePlayer().PlayCard(handIdx, areaIdx, spellIdxes, spellSides)
+			return "", g.GetActivePlayer().PlayCard(handIdx, areaIdx, spellIdxes, spellSides)
 		},
 	},
 	Attack: playerAction{
@@ -124,14 +116,14 @@ var Actions = struct {
 		shortcut:    "a",
 		args:        []string{"<номер_союзного_персонажа>", "<номер_персонажа_противника>"},
 		description: "атаковать персонажа",
-		do: func(session *sessionpkg.Session, idxes []int, sides game.Sides) error {
+		do: func(g *game.Game, idxes []int, sides game.Sides) (string, error) {
 			if len(idxes) == 0 {
-				return NewInvalidArgumentsError("")
+				return "", NewInvalidArgumentsError()
 			} else if len(idxes) == 1 {
 				idxes = append(idxes, 0)
 			}
 			allyIdx, enemyIdx := idxes[0], idxes[1]
-			return session.GetActivePlayer().Attack(allyIdx, enemyIdx)
+			return "", g.GetActivePlayer().Attack(allyIdx, enemyIdx)
 		},
 	},
 	Power: playerAction{
@@ -139,17 +131,13 @@ var Actions = struct {
 		shortcut:    "w",
 		args:        []string{"<позиции_целей_силы_героя>"},
 		description: "использовать способность героя",
-		do: func(session *sessionpkg.Session, idxes []int, sides game.Sides) error {
+		do: func(g *game.Game, idxes []int, sides game.Sides) (string, error) {
 			if len(idxes) == 0 {
 				idxes = append(idxes, 0)
 				sides = append(sides, game.UnsetSide)
 			}
 
-			err := session.GetActivePlayer().PlayCard(game.HeroIdx, -1, idxes, sides)
-			if err != nil {
-				return err
-			}
-			return nil
+			return "", g.GetActivePlayer().PlayCard(game.HeroIdx, -1, idxes, sides)
 		},
 	},
 	End: playerAction{
@@ -157,26 +145,30 @@ var Actions = struct {
 		shortcut:    "e",
 		args:        nil,
 		description: "закончить ход",
-		do: func(session *sessionpkg.Session, idxes []int, sides game.Sides) error {
-			session.TurnFinished = true
-			return nil
+		do: func(g *game.Game, idxes []int, sides game.Sides) (string, error) {
+			g.TurnFinished = true
+			return "", nil
 		},
 	},
 }
 
-func (action *playerAction) Do(args []string, session *sessionpkg.Session) error {
+func (action *playerAction) Do(args []string, g *game.Game) string {
 	idxes, sides, errs := parseAllPositions(args)
 
 	if helpers.FirstError(errs) != nil {
-		return NewInvalidArgumentsError(action.usage(true))
+		return NewInvalidArgumentsError().Set(action.usage(true)).Error()
 	}
 
-	err := action.do(session, idxes, sides)
-	if err, ok := err.(InvalidArgumentsError); ok {
-		err.correctUsage = action.usage(true)
-		return err
+	out, err := action.do(g, idxes, sides)
+
+	switch err := err.(type) {
+	case nil:
+		return out
+	case InvalidArgumentsError:
+		return err.Set(action.usage(true)).Error()
+	default:
+		return tuiError(err)
 	}
-	return err
 }
 
 func (e playerAction) whatis(compactContent bool) string {

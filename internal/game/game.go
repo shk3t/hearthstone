@@ -5,15 +5,17 @@ import (
 )
 
 type Game struct {
-	Players [SidesCount]Player
-	Table   Table
-	Turn    Side
+	Players      [SidesCount]Player
+	Table        Table
+	Turn         Side
+	TurnFinished bool
 }
 
 func NewGame(topHero, botHero *Hero, topDeck, botDeck Deck) *Game {
 	game := &Game{
-		Table: *NewTable(),
-		Turn:  UnsetSide,
+		Table:        *NewTable(),
+		Turn:         UnsetSide,
+		TurnFinished: true,
 	}
 	game.Players = [SidesCount]Player{
 		TopSide: *NewPlayer(TopSide, topHero, topDeck, game),
@@ -30,7 +32,13 @@ func (g *Game) GetActiveArea() TableArea {
 	return g.Table[g.Turn]
 }
 
+func (g *Game) StartGame() {
+	g.Players[TopSide].DrawCards(3)
+	g.Players[BotSide].DrawCards(3)
+}
+
 func (g *Game) StartNextTurn() []error {
+	g.TurnFinished = false
 	g.Turn = sugar.If(g.Turn == TopSide, BotSide, TopSide)
 
 	activePlayer := g.GetActivePlayer()
@@ -54,9 +62,18 @@ func (g *Game) StartNextTurn() []error {
 	return errs
 }
 
-func (g *Game) StartGame() {
-	g.Players[TopSide].DrawCards(3)
-	g.Players[BotSide].DrawCards(3)
+func (g *Game) Cleanup() {
+	g.Table.CleanupDeadMinions()
+}
+
+func (g *Game) GetWinner() Side {
+	for i := range SidesCount {
+		side := Side(i)
+		if !g.Players[side].Hero.Alive {
+			return side.Opposite()
+		}
+	}
+	return UnsetSide
 }
 
 func (g *Game) getArea(side Side) TableArea {

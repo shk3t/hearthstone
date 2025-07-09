@@ -7,7 +7,7 @@ import (
 )
 
 // TODO: destribute between files
-func GetCardInfo(player *game.Player, handIdx int) (string, error) {
+func getCardInfo(player *game.Player, handIdx int) (string, error) {
 	if handIdx == game.HeroIdx {
 		return cardInfo(&player.Hero.Power.Card), nil
 	}
@@ -27,7 +27,8 @@ func GetCardInfo(player *game.Player, handIdx int) (string, error) {
 	}
 }
 
-func GetMinionInfo(table *game.Table, idx int, side game.Side) (string, error) {
+// TODO: handle string/error (tuiError)
+func getMinionInfo(table *game.Table, idx int, side game.Side) (string, error) {
 	minion, err := table[side].Choose(idx)
 	if err != nil {
 		return "", err

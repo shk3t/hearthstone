@@ -10,6 +10,9 @@ import (
 func tuiError(err error) string {
 	switch err := err.(type) {
 
+	case nil:
+		return ""
+
 	case game.CardPickError:
 		return fmt.Sprintf("Выбрана некорректная карта: %d", err.Position)
 
@@ -75,4 +78,29 @@ func tuiError(err error) string {
 	default:
 		panic(errorpkg.NewUnexpectedError(err))
 	}
+}
+
+type InvalidArgumentsError struct {
+	correctUsage string
+}
+type EndOfInputError struct {
+}
+
+func (err InvalidArgumentsError) Set(correctUsage string) InvalidArgumentsError {
+	err.correctUsage = correctUsage
+	return err
+}
+
+func NewInvalidArgumentsError() InvalidArgumentsError {
+	return InvalidArgumentsError{}
+}
+func NewEndOfInputError() EndOfInputError {
+	return EndOfInputError{}
+}
+
+func (err InvalidArgumentsError) Error() string {
+	return fmt.Sprintf("Некорректные аргументы\n%s", err.correctUsage)
+}
+func (err EndOfInputError) Error() string {
+	return "Конец ввода"
 }

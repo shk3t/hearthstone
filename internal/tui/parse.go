@@ -1,4 +1,4 @@
-package loop
+package tui
 
 import (
 	"hearthstone/internal/game"

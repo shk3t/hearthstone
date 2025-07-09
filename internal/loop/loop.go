@@ -2,32 +2,31 @@ package loop
 
 import (
 	"hearthstone/internal/game"
-	sessionpkg "hearthstone/internal/session"
-	"hearthstone/internal/setup"
+	ui "hearthstone/internal/setup"
 )
 
 func StartGame(topHero, botHero *game.Hero, topDeck, botDeck game.Deck) {
-	session := sessionpkg.NewGameSession(topHero, botHero, topDeck, botDeck)
+	g := game.NewGame(topHero, botHero, topDeck, botDeck)
 
-	session.StartGame()
+	g.StartGame()
+
 	for {
-		if session.TurnFinished && !session.HasWinner() {
-			session.StartNextTurn()
-			session.CheckWinner()
+		if g.TurnFinished {
+			errs := g.StartNextTurn()
+			ui.Feedback(errs...)
 		}
 
-		setup.Display(session)
+		ui.Display(g)
 
-		if session.HasWinner() {
+		if err := ui.HandleInput(g); err != nil {
 			return
 		}
 
-		exit := handleInput(session)
-		if exit {
+		g.Cleanup()
+
+		if g.GetWinner() != game.UnsetSide {
+			ui.Display(g)
 			return
 		}
-
-		session.Cleanup()
-		session.CheckWinner()
 	}
 }
