@@ -64,8 +64,8 @@ var Actions = struct {
 		},
 	},
 	InfoHand: playerAction{
-		name:        "info_hand",
-		shortcut:    "ih",
+		name:        "info",
+		shortcut:    "i",
 		args:        []string{"<номер_карты>"},
 		description: "подробное описание карты в руке",
 		do: func(g *game.Game, idxes []int, sides game.Sides) (string, error) {
@@ -76,8 +76,8 @@ var Actions = struct {
 		},
 	},
 	InfoTable: playerAction{
-		name:        "info_table",
-		shortcut:    "it",
+		name:        "table",
+		shortcut:    "t",
 		args:        []string{"<позиция_на_столе>"},
 		description: "подробное описание существа на столе",
 		do: func(g *game.Game, idxes []int, sides game.Sides) (string, error) {
@@ -173,7 +173,7 @@ func (action *playerAction) Do(args []string, g *game.Game) string {
 
 func (e playerAction) whatis(compactContent bool) string {
 	output := fmt.Sprintf(
-		"%10s %4s: %s",
+		"%6s %3s: %s",
 		e.name,
 		fmt.Sprintf("(%s)", e.shortcut),
 		e.description,
@@ -187,7 +187,7 @@ func (e playerAction) whatis(compactContent bool) string {
 
 func (e playerAction) usage(compactContent bool) string {
 	output := fmt.Sprintf(
-		"%10s %4s %-60s: %s",
+		"%6s %3s %-60s: %s",
 		e.name,
 		fmt.Sprintf("(%s)", e.shortcut),
 		strings.Join(e.args, " "),
