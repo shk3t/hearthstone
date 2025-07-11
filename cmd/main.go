@@ -3,8 +3,8 @@ package main
 import (
 	"hearthstone/internal/game"
 	"hearthstone/internal/loop"
-	"hearthstone/internal/sets"
 	"hearthstone/internal/sets/base"
+	"hearthstone/internal/sets/legacy"
 	"hearthstone/internal/setup"
 )
 
@@ -13,10 +13,10 @@ func main() {
 	defer setup.DeinitAll()
 
 	startingDeck := game.NewDeck(
-		sets.LegacySet.RiverCrocolisk,
-		sets.LegacySet.ChillwindYeti,
-		sets.LegacySet.Frostbolt,
-		sets.LegacySet.Fireball,
+		legacy.Neutral.RiverCrocolisk,
+		legacy.Neutral.ChillwindYeti,
+		legacy.Mage.Frostbolt,
+		legacy.Mage.Fireball,
 	)
 
 	loop.StartGame(

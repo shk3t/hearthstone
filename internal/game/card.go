@@ -12,6 +12,7 @@ type Card struct {
 	ManaCost    int
 	Name        string
 	Description string
+	Class       Class
 	Rarity      Raritiy
 }
 
