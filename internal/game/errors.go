@@ -89,7 +89,7 @@ func NewUnmatchedEffectsAndTargetsError[T any](
 ) UnmatchedEffectsAndTargetsError {
 	return UnmatchedEffectsAndTargetsError{
 		SpellName:  spell.Name,
-		EffectsLen: len(spell.TargetEffects),
+		EffectsLen: len(spell.DistinctTargetEffects),
 		TargetsLen: len(targets),
 	}
 }

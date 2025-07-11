@@ -16,9 +16,11 @@ var Heroes = struct {
 				Description: "Наносит 1 ед. урона",
 				Rarity:      game.Rarities.Base,
 			},
-			TargetSelector: game.TargetSelectorPresets.Single,
-			TargetEffect: func(target *game.Character) {
-				target.DealDamage(1)
+			Effect: game.Effect{
+				TargetSelector: game.TargetSelectorPresets.Single,
+				TargetEffect: func(target *game.Character) {
+					target.DealDamage(1)
+				},
 			},
 		},
 	},
@@ -32,11 +34,13 @@ var Heroes = struct {
 				Description: "Восстанавливает 2 ед. здоровья",
 				Rarity:      game.Rarities.Base,
 			},
-			TargetSelector: game.TargetSelectorPresets.Single,
-			TargetEffect: func(target *game.Character) {
-				target.RestoreHealth(2)
+			Effect: game.Effect{
+				TargetSelector: game.TargetSelectorPresets.Single,
+				TargetEffect: func(target *game.Character) {
+					target.RestoreHealth(2)
+				},
+				AllyIsDefaultTarget: true,
 			},
-			AllyPrimarily: true,
 		},
 	},
 }

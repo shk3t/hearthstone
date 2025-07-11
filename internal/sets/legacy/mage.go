@@ -3,8 +3,8 @@ package legacy
 import "hearthstone/internal/game"
 
 var Mage = struct {
-	Frostbolt      *game.Spell
-	Fireball       *game.Spell
+	Frostbolt *game.Spell
+	Fireball  *game.Spell
 }{
 	Frostbolt: &game.Spell{
 		Card: game.Card{
@@ -14,10 +14,12 @@ var Mage = struct {
 			Class:       game.Classes.Mage,
 			Rarity:      game.Rarities.Base,
 		},
-		TargetSelector: game.TargetSelectorPresets.Single,
-		TargetEffect: func(target *game.Character) {
-			target.DealDamage(3)
-			target.Status.SetFreeze(true)
+		Effect: game.Effect{
+			TargetSelector: game.TargetSelectorPresets.Single,
+			TargetEffect: func(target *game.Character) {
+				target.DealDamage(3)
+				target.Status.SetFreeze(true)
+			},
 		},
 	},
 	Fireball: &game.Spell{
@@ -28,9 +30,11 @@ var Mage = struct {
 			Class:       game.Classes.Mage,
 			Rarity:      game.Rarities.Base,
 		},
-		TargetSelector: game.TargetSelectorPresets.Single,
-		TargetEffect: func(target *game.Character) {
-			target.DealDamage(6)
+		Effect: game.Effect{
+			TargetSelector: game.TargetSelectorPresets.Single,
+			TargetEffect: func(target *game.Character) {
+				target.DealDamage(6)
+			},
 		},
 	},
 }

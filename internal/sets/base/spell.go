@@ -9,8 +9,10 @@ var TheCoin = &game.Spell{
 		Description: "Вы получаете 1 дополнительный кристалл маны до конца хода",
 		Rarity:      game.Rarities.Base,
 	},
-	GlobalEffect: func(player *game.Player) {
-		player.Mana++
+	Effect: game.Effect{
+		GlobalEffect: func(player *game.Player) {
+			player.Mana++
+		},
 	},
 }
 

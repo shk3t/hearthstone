@@ -151,7 +151,7 @@ func (p *Player) Attack(allyIdx, enemyIdx int) error {
 
 func (p *Player) castSpell(spell *Spell, idxes []int, sides Sides) error {
 	sides.SetUnset(
-		sugar.If(spell.AllyPrimarily, p.Side, p.Side.Opposite()),
+		sugar.If(spell.AllyIsDefaultTarget, p.Side, p.Side.Opposite()),
 	)
 
 	if spell.TargetSelector != nil {
@@ -168,14 +168,14 @@ func (p *Player) castSpell(spell *Spell, idxes []int, sides Sides) error {
 			}
 		}
 
-		if len(spell.TargetEffects) > 0 {
-			if len(spell.TargetEffects) != len(targets) {
+		if len(spell.DistinctTargetEffects) > 0 {
+			if len(spell.DistinctTargetEffects) != len(targets) {
 				panic(NewUnmatchedEffectsAndTargetsError(spell, targets))
 			}
 
 			for i, target := range targets {
 				if target != nil {
-					spell.TargetEffects[i](target)
+					spell.DistinctTargetEffects[i](target)
 				}
 			}
 		}
