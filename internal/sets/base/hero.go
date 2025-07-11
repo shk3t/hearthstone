@@ -14,6 +14,7 @@ var Heroes = struct {
 				ManaCost:    2,
 				Name:        "Вспышка огня",
 				Description: "Наносит 1 ед. урона",
+				Class:       game.Classes.Mage,
 				Rarity:      game.Rarities.Base,
 			},
 			Effect: game.Effect{
@@ -32,6 +33,7 @@ var Heroes = struct {
 				ManaCost:    2,
 				Name:        "Малое исцеление",
 				Description: "Восстанавливает 2 ед. здоровья",
+				Class:       game.Classes.Priest,
 				Rarity:      game.Rarities.Base,
 			},
 			Effect: game.Effect{

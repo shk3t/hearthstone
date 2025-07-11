@@ -7,6 +7,7 @@ var TheCoin = &game.Spell{
 		ManaCost:    0,
 		Name:        "Монетка",
 		Description: "Вы получаете 1 дополнительный кристалл маны до конца хода",
+		Class:       game.Classes.Neutral,
 		Rarity:      game.Rarities.Base,
 	},
 	Effect: game.Effect{
