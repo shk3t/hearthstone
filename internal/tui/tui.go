@@ -27,14 +27,30 @@ func HandleInput(g *game.Game) error {
 		command, args = allArgs[0], allArgs[1:]
 	}
 
+	if uiState.nextAction != nil {
+		// TODO wrap with arg parsing (maybe wrap as an extra action?)
+		err := uiState.nextAction.Do(args)
+
+		if err == nil {
+			uiState.nextAction.OnSuccess()
+		} else {
+			uiState.nextAction.OnFail()
+			uiState.hint = tuiError(err)
+		}
+
+		uiState.nextAction = nil
+		return nil
+	}
+
 	for _, action := range actionList {
 		if strings.HasPrefix(command, action.shortcut) || command == action.name {
-			uiState.hint = action.Do(args, g)
+			uiState.hint, uiState.nextAction = action.Do(args, g)
+			// TODO: set hint for nextAction somehow
 			return nil
 		}
 	}
 
-	uiState.hint = Actions.ShortHelp.Do(args, g)
+	uiState.hint, _ = Actions.ShortHelp.Do(args, g)
 	return nil
 }
 
@@ -47,7 +63,8 @@ func Feedback(errs ...error) {
 }
 
 var uiState = struct {
-	hint string
+	hint       string
+	nextAction *game.NextAction
 }{
 	hint: "",
 }

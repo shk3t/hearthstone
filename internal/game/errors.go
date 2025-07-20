@@ -41,16 +41,10 @@ type EmptyDeckError struct {
 	BaseError
 	Fatigue int
 }
-type UnmatchedEffectsAndTargetsError struct {
+type UnmatchedTargetNumberError struct {
 	BaseError
-	SpellName  string
-	EffectsLen int
-	TargetsLen int
-}
-type InvalidTargettingError struct {
-	BaseError
-	Speicified int
-	Required   int
+	Specified int
+	Required  int
 }
 type UsedHeroPowerError struct {
 	BaseError
@@ -83,20 +77,10 @@ func NewFullTableAreaError() FullTableAreaError {
 func NewEmptyDeckError() EmptyDeckError {
 	return EmptyDeckError{}
 }
-func NewUnmatchedEffectsAndTargetsError[T any](
-	spell *Spell,
-	targets []T,
-) UnmatchedEffectsAndTargetsError {
-	return UnmatchedEffectsAndTargetsError{
-		SpellName:  spell.Name,
-		EffectsLen: len(spell.DistinctTargetEffects),
-		TargetsLen: len(targets),
-	}
-}
-func NewInvalidTargettingError(specified, required int) InvalidTargettingError {
-	return InvalidTargettingError{
-		Speicified: specified,
-		Required:   required,
+func NewUnmatchedTargetNumberError(specified, required int) UnmatchedTargetNumberError {
+	return UnmatchedTargetNumberError{
+		Specified: specified,
+		Required:  required,
 	}
 }
 func NewUsedHeroPowerError() UsedHeroPowerError {

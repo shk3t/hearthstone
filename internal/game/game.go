@@ -18,8 +18,8 @@ func NewGame(topHero, botHero *Hero, topDeck, botDeck Deck) *Game {
 		TurnFinished: false,
 	}
 	game.Players = [SidesCount]Player{
-		TopSide: *NewPlayer(TopSide, topHero, topDeck, game),
-		BotSide: *NewPlayer(BotSide, botHero, botDeck, game),
+		TopSide: *newPlayer(TopSide, topHero, topDeck, game),
+		BotSide: *newPlayer(BotSide, botHero, botDeck, game),
 	}
 	return game
 }
@@ -36,8 +36,8 @@ func (g *Game) StartGame() {
 	turn := Side(rand.Int() % 2)
 	firstPlayer, secondPlayer := g.Players[turn], g.Players[turn.Opposite()]
 
-	firstPlayer.DrawCards(3)
-	secondPlayer.DrawCards(4)
+	firstPlayer.drawCards(3)
+	secondPlayer.drawCards(4)
 	secondPlayer.Hand.refill(BaseCards.TheCoin.Copy())
 
 	g.Turn = turn.Opposite()
@@ -49,10 +49,10 @@ func (g *Game) StartNextTurn() []error {
 	g.Turn = g.Turn.Opposite()
 
 	activePlayer := g.GetActivePlayer()
-	activePlayer.IncreaseMana()
-	activePlayer.RestoreMana()
+	activePlayer.increaseMana()
+	activePlayer.restoreMana()
 	activePlayer.Hero.PowerIsUsed = false
-	errs := activePlayer.DrawCards(1)
+	errs := activePlayer.drawCards(1)
 
 	activeArea := g.GetActiveArea()
 	statuses := []*CharacterStatus{&activePlayer.Hero.Status}

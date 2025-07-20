@@ -3,7 +3,8 @@ package game
 type Minion struct {
 	Card
 	Character
-	Type MinionType
+	Type      MinionType
+	Battlecry *Effect
 }
 
 type MinionType string

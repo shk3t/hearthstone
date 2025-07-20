@@ -2,7 +2,7 @@ package game
 
 type Hero struct {
 	Character
-	Class       Class
+	Class       class
 	Weapon      *Weapon
 	Power       Spell
 	PowerIsUsed bool

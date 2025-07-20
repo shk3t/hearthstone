@@ -1,12 +1,12 @@
 package game
 
-type TargetEffect func(target *Character)
-type GlobalEffect func(player *Player)
+type targetEffect func(target *Character)
+type globalEffect func(player *Player)
 
 type Effect struct {
-	TargetSelector        TargetSelector
-	TargetEffect          TargetEffect
-	DistinctTargetEffects []TargetEffect
-	GlobalEffect          GlobalEffect
+	TargetSelector        targetSelector
+	TargetEffect          targetEffect
+	DistinctTargetEffects []targetEffect
+	GlobalEffect          globalEffect
 	AllyIsDefaultTarget   bool
 }

@@ -17,12 +17,80 @@ type Player struct {
 	deck    Deck
 }
 
-func NewPlayer(side Side, hero *Hero, deck Deck, game *Game) *Player {
+func (p *Player) PlayCard(
+	handIdx int,
+	areaIdx int,
+	spellIdxes []int, spellSides []Side,
+) (*NextAction, error) {
+	var card Playable
+	var next *NextAction
+	var err error
+	heroPowerUse := handIdx == HeroIdx
+
+	if heroPowerUse {
+		if p.Hero.PowerIsUsed {
+			return nil, NewUsedHeroPowerError()
+		}
+		card = &p.Hero.Power
+	} else {
+		card, err = p.Hand.Get(handIdx)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	manaCost := ToCard(card).ManaCost
+	if !p.haveEnoughMana(manaCost) {
+		return nil, NewNotEnoughManaError(p.Mana, manaCost)
+	}
+
+	switch card := card.(type) {
+	case *Minion:
+		next, err = p.playMinion(card, handIdx, areaIdx)
+	case *Spell:
+		err = p.playEffect(&card.Effect, spellIdxes, spellSides)
+	default:
+		panic("Invalid card type")
+	}
+	if next != nil || err != nil {
+		return next, err
+	}
+
+	if heroPowerUse {
+		p.Hero.PowerIsUsed = true
+	}
+	p.Hand.discard(handIdx)
+	_ = p.spendMana(manaCost)
+	return nil, nil
+}
+
+func (p *Player) Attack(allyIdx, enemyIdx int) error {
+	allyCharacter, err := p.Game.getCharacter(allyIdx, p.Side)
+	if err != nil {
+		return err
+	}
+	enemyCharacter, err := p.Game.getCharacter(enemyIdx, p.Side.Opposite())
+	if err != nil {
+		return err
+	}
+
+	if allyCharacter.Status.IsSleep() || allyCharacter.Status.IsFreeze() {
+		return NewUnavailableMinionAttackError()
+	}
+
+	allyCharacter.ExecuteAttack(enemyCharacter)
+
+	allyCharacter.Status.SetSleep(true)
+
+	return nil
+}
+
+func newPlayer(side Side, hero *Hero, deck Deck, game *Game) *Player {
 	return &Player{
 		Game:    game,
 		Side:    side,
 		Hero:    hero,
-		Hand:    NewHand(),
+		Hand:    newHand(),
 		Mana:    0,
 		MaxMana: 0,
 		fatigue: 0,
@@ -30,30 +98,30 @@ func NewPlayer(side Side, hero *Hero, deck Deck, game *Game) *Player {
 	}
 }
 
-func (p *Player) IncreaseMana() {
+func (p *Player) increaseMana() {
 	p.MaxMana++
 }
 
-func (p *Player) RestoreMana() {
+func (p *Player) restoreMana() {
 	p.Mana = p.MaxMana
 }
 
-func (p *Player) HaveEnoughMana(value int) bool {
+func (p *Player) haveEnoughMana(value int) bool {
 	if p.Mana-value < 0 && !config.Env.UnlimitedMana {
 		return false
 	}
 	return true
 }
 
-func (p *Player) SpendMana(value int) error {
-	if !p.HaveEnoughMana(value) {
+func (p *Player) spendMana(value int) error {
+	if !p.haveEnoughMana(value) {
 		return NewNotEnoughManaError(p.Mana, value)
 	}
 	p.Mana = max(0, p.Mana-value)
 	return nil
 }
 
-func (p *Player) DrawCards(number int) []error {
+func (p *Player) drawCards(number int) []error {
 	errs := make([]error, 0, 4)
 
 	for range number {
@@ -79,110 +147,69 @@ func (p *Player) DrawCards(number int) []error {
 	return errs
 }
 
-func (p *Player) PlayCard(
-	handIdx int,
-	areaIdx int,
-	spellIdxes []int, spellSides []Side,
-) error {
-	var card Playable
-	var err error
-	heroPowerUse := handIdx == HeroIdx
-
-	if heroPowerUse {
-		if p.Hero.PowerIsUsed {
-			return NewUsedHeroPowerError()
+func (p *Player) playMinion(minion *Minion, handIdx, areaIdx int) (*NextAction, error) {
+	area := p.Game.getArea(p.Side)
+	err := area.place(areaIdx, minion)
+	if err == nil {
+		minion.Status.SetSleep(true)
+	}
+	if minion.Battlecry != nil {
+		if minion.Battlecry.TargetSelector != nil {
+			return &NextAction{
+				Do: func(idxes []int, sides Sides) error {
+					return p.playEffect(minion.Battlecry, idxes, sides)
+				},
+				OnSuccess: func() {
+					p.Hand.discard(handIdx)
+					_ = p.spendMana(minion.ManaCost)
+				},
+				OnFail: func() {
+					area.remove(areaIdx)
+				},
+			}, nil
 		}
-		card = &p.Hero.Power
-	} else {
-		card, err = p.Hand.Get(handIdx)
-		if err != nil {
-			return err
-		}
+		p.playEffect(minion.Battlecry, nil, nil)
 	}
 
-	manaCost := ToCard(card).ManaCost
-	if !p.HaveEnoughMana(manaCost) {
-		return NewNotEnoughManaError(p.Mana, manaCost)
-	}
-
-	switch card := card.(type) {
-	case *Minion:
-		err = p.Game.getArea(p.Side).place(areaIdx, card)
-		if err == nil {
-			card.Status.SetSleep(true)
-		}
-	case *Spell:
-		err = p.castSpell(card, spellIdxes, spellSides)
-		if heroPowerUse && err == nil {
-			p.Hero.PowerIsUsed = true
-		}
-	default:
-		panic("Invalid card type")
-	}
-	if err != nil {
-		return err
-	}
-
-	p.Hand.discard(handIdx)
-	_ = p.SpendMana(manaCost)
-	return nil
+	return nil, nil
 }
 
-func (p *Player) Attack(allyIdx, enemyIdx int) error {
-	allyCharacter, err := p.Game.getCharacter(allyIdx, p.Side)
-	if err != nil {
-		return err
-	}
-	enemyCharacter, err := p.Game.getCharacter(enemyIdx, p.Side.Opposite())
-	if err != nil {
-		return err
-	}
-
-	if allyCharacter.Status.IsSleep() || allyCharacter.Status.IsFreeze() {
-		return NewUnavailableMinionAttackError()
-	}
-
-	allyCharacter.ExecuteAttack(enemyCharacter)
-
-	allyCharacter.Status.SetSleep(true)
-
-	return nil
-}
-
-func (p *Player) castSpell(spell *Spell, idxes []int, sides Sides) error {
+func (p *Player) playEffect(effect *Effect, idxes []int, sides Sides) error {
 	sides.SetUnset(
-		sugar.If(spell.AllyIsDefaultTarget, p.Side, p.Side.Opposite()),
+		sugar.If(effect.AllyIsDefaultTarget, p.Side, p.Side.Opposite()),
 	)
 
-	if spell.TargetSelector != nil {
-		targets, err := spell.TargetSelector(p.Game, idxes, sides)
+	if effect.TargetSelector != nil {
+		targets, err := effect.TargetSelector(p.Game, idxes, sides)
 		if err != nil {
 			return err
 		}
 
-		if spell.TargetEffect != nil {
+		if effect.TargetEffect != nil {
 			for _, target := range targets {
 				if target != nil {
-					spell.TargetEffect(target)
+					effect.TargetEffect(target)
 				}
 			}
 		}
 
-		if len(spell.DistinctTargetEffects) > 0 {
-			if len(spell.DistinctTargetEffects) != len(targets) {
-				panic(NewUnmatchedEffectsAndTargetsError(spell, targets))
+		if len(effect.DistinctTargetEffects) > 0 {
+			effectsLen := len(effect.DistinctTargetEffects)
+			targetsLen := len(targets)
+			if effectsLen != targetsLen {
+				panic(NewUnmatchedTargetNumberError(effectsLen, targetsLen))
 			}
 
 			for i, target := range targets {
 				if target != nil {
-					spell.DistinctTargetEffects[i](target)
+					effect.DistinctTargetEffects[i](target)
 				}
 			}
 		}
 	}
 
-	if spell.GlobalEffect != nil {
-		spell.GlobalEffect(p)
+	if effect.GlobalEffect != nil {
+		effect.GlobalEffect(p)
 	}
 
 	return nil

@@ -1,7 +1,7 @@
 package game
 
 // Len of idxes and sides always must be equal
-type TargetSelector func(game *Game, idxes []int, sides Sides) (targets []*Character, err error)
+type targetSelector func(game *Game, idxes []int, sides Sides) (targets []*Character, err error)
 
 var TargetSelectorPresets = struct {
 	// EnemyHero            TargetSelector
@@ -26,13 +26,13 @@ var TargetSelectorPresets = struct {
 	// SingleMinion         TargetSelector
 	// MultipleMinions      TargetSelector
 	// AllMinions           TargetSelector
-	Single TargetSelector
+	Single targetSelector
 	// Multiple             TargetSelector
 	// All                  TargetSelector
 }{
 	Single: func(g *Game, idxes []int, sides Sides) ([]*Character, error) {
 		if len(idxes) == 0 {
-			return nil, NewInvalidTargettingError(0, 1)
+			return nil, NewUnmatchedTargetNumberError(0, 1)
 		}
 
 		target, err := g.getCharacter(idxes[0], sides[0])

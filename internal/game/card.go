@@ -12,27 +12,9 @@ type Card struct {
 	ManaCost    int
 	Name        string
 	Description string
-	Class       Class
-	Rarity      Raritiy
+	Class       class
+	Rarity      raritiy
 }
-
-type Class string
-
-var Classes = struct {
-	Neutral Class
-	Mage    Class
-	Priest  Class
-}{"Нейтрал", "Маг", "Жрец"}
-
-type Raritiy string
-
-var Rarities = struct {
-	Base      Raritiy
-	Common    Raritiy
-	Rare      Raritiy
-	Epic      Raritiy
-	Legendary Raritiy
-}{"Базовая", "Обычная", "Редкая", "Эпическая", "Легендарная"}
 
 func (c *Card) Play() {
 	panic(errorpkg.NewUnusableFeatureError())
@@ -54,3 +36,21 @@ func ToCard(p Playable) *Card {
 var BaseCards = struct {
 	TheCoin *Spell
 }{}
+
+var Classes = struct {
+	Neutral class
+	Mage    class
+	Priest  class
+}{"Нейтрал", "Маг", "Жрец"}
+
+var Rarities = struct {
+	Base      raritiy
+	Common    raritiy
+	Rare      raritiy
+	Epic      raritiy
+	Legendary raritiy
+}{"Базовая", "Обычная", "Редкая", "Эпическая", "Легендарная"}
+
+type class string
+
+type raritiy string

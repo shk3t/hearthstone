@@ -57,16 +57,10 @@ func tuiError(err error) string {
 		}
 		return "Пустая колода"
 
-	case game.UnmatchedEffectsAndTargetsError:
+	case game.UnmatchedTargetNumberError:
 		return fmt.Sprintf(
-			"Число эффектов и целей не соответствует для \"%s\".\nЭффектов: %d, целей: %d",
-			err.SpellName, err.EffectsLen, err.TargetsLen,
-		)
-
-	case game.InvalidTargettingError:
-		return fmt.Sprintf(
-			"Некорректный выбор цели.\nУказано целей: %d, требуется: %d",
-			err.Speicified, err.Required,
+			"Несоответствующее число целей.\nУказано: %d, требуется: %d",
+			err.Specified, err.Required,
 		)
 
 	case game.UsedHeroPowerError:

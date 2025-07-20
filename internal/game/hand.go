@@ -9,10 +9,6 @@ type Hand containers.Shrice[Playable]
 
 const HandCap = 10
 
-func NewHand() Hand {
-	return Hand(containers.NewShrice[Playable](HandCap))
-}
-
 func (h Hand) Len() int {
 	return containers.Shrice[Playable](h).Len()
 }
@@ -31,6 +27,10 @@ func (h Hand) Get(idx int) (Playable, error) {
 	default:
 		panic(errorpkg.NewUnexpectedError(err))
 	}
+}
+
+func newHand() Hand {
+	return Hand(containers.NewShrice[Playable](HandCap))
 }
 
 func (h Hand) discard(idx int) {

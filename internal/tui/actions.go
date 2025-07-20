@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-type doAction = func(g *game.Game, idxes []int, sides game.Sides) (string, error)
+type doAction = func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error)
 
 type playerAction struct {
 	name        string
@@ -35,13 +35,13 @@ var Actions = struct {
 		shortcut:    "",
 		args:        nil,
 		description: "вывести краткую помощь по командам",
-		do: func(g *game.Game, idxes []int, sides game.Sides) (string, error) {
+		do: func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
 			builder := strings.Builder{}
 			fmt.Fprint(&builder, "Некорректное действие. Доступны:\n")
 			for _, action := range actionList {
 				fmt.Fprintln(&builder, action.whatis(false))
 			}
-			return strings.TrimSuffix(builder.String(), "\n"), nil
+			return strings.TrimSuffix(builder.String(), "\n"), nil, nil
 		},
 	},
 	Help: playerAction{
@@ -49,7 +49,7 @@ var Actions = struct {
 		shortcut:    "h",
 		args:        nil,
 		description: "вывести полную помощь по командам",
-		do: func(g *game.Game, idxes []int, sides game.Sides) (string, error) {
+		do: func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
 			builder := strings.Builder{}
 			fmt.Fprint(&builder, "Доступные действия:\n")
 			for _, action := range actionList {
@@ -60,7 +60,7 @@ var Actions = struct {
 				&builder,
 				"Чтобы указать сторону цели, используйте 't' (верх) ил 'b' (низ), например '5b'",
 			)
-			return builder.String(), nil
+			return builder.String(), nil, nil
 		},
 	},
 	InfoHand: playerAction{
@@ -68,11 +68,12 @@ var Actions = struct {
 		shortcut:    "i",
 		args:        []string{"<номер_карты>"},
 		description: "подробное описание карты в руке",
-		do: func(g *game.Game, idxes []int, sides game.Sides) (string, error) {
+		do: func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
 			if len(idxes) != 1 {
-				return "", NewInvalidArgumentsError()
+				return "", nil, NewInvalidArgumentsError()
 			}
-			return getCardInfo(g.GetActivePlayer(), idxes[0])
+			out, err = getCardInfo(g.GetActivePlayer(), idxes[0])
+			return out, nil, err
 		},
 	},
 	InfoTable: playerAction{
@@ -80,13 +81,14 @@ var Actions = struct {
 		shortcut:    "t",
 		args:        []string{"<позиция_на_столе>"},
 		description: "подробное описание существа на столе",
-		do: func(g *game.Game, idxes []int, sides game.Sides) (string, error) {
+		do: func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
 			if len(idxes) == 0 {
 				idxes = append(idxes, 0)
 				sides = append(sides, game.UnsetSide)
 			}
 			sides.SetUnset(g.Turn)
-			return getMinionInfo(&g.Table, idxes[0], sides[0])
+			out, err = getMinionInfo(&g.Table, idxes[0], sides[0])
+			return out, nil, err
 		},
 	},
 	Play: playerAction{
@@ -97,9 +99,9 @@ var Actions = struct {
 			"<позиция_на_столе>/<позиции_целей_заклинания>",
 		},
 		description: "сыграть карту",
-		do: func(g *game.Game, idxes []int, sides game.Sides) (string, error) {
+		do: func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
 			if len(idxes) == 0 {
-				return "", NewInvalidArgumentsError()
+				return "", nil, NewInvalidArgumentsError()
 			} else if len(idxes) == 1 {
 				idxes = append(idxes, 0)
 				sides = append(sides, game.UnsetSide)
@@ -108,7 +110,8 @@ var Actions = struct {
 			handIdx, areaIdx := idxes[0], idxes[1]
 			spellIdxes, spellSides := idxes[1:], sides[1:]
 
-			return "", g.GetActivePlayer().PlayCard(handIdx, areaIdx, spellIdxes, spellSides)
+			next, err = g.GetActivePlayer().PlayCard(handIdx, areaIdx, spellIdxes, spellSides)
+			return "", next, err
 		},
 	},
 	Attack: playerAction{
@@ -116,14 +119,14 @@ var Actions = struct {
 		shortcut:    "a",
 		args:        []string{"<номер_союзного_персонажа>", "<номер_персонажа_противника>"},
 		description: "атаковать персонажа",
-		do: func(g *game.Game, idxes []int, sides game.Sides) (string, error) {
+		do: func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
 			if len(idxes) == 0 {
-				return "", NewInvalidArgumentsError()
+				return "", nil, NewInvalidArgumentsError()
 			} else if len(idxes) == 1 {
 				idxes = append(idxes, 0)
 			}
 			allyIdx, enemyIdx := idxes[0], idxes[1]
-			return "", g.GetActivePlayer().Attack(allyIdx, enemyIdx)
+			return "", nil, g.GetActivePlayer().Attack(allyIdx, enemyIdx)
 		},
 	},
 	Power: playerAction{
@@ -131,13 +134,14 @@ var Actions = struct {
 		shortcut:    "w",
 		args:        []string{"<позиции_целей_силы_героя>"},
 		description: "использовать способность героя",
-		do: func(g *game.Game, idxes []int, sides game.Sides) (string, error) {
+		do: func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
 			if len(idxes) == 0 {
 				idxes = append(idxes, 0)
 				sides = append(sides, game.UnsetSide)
 			}
 
-			return "", g.GetActivePlayer().PlayCard(game.HeroIdx, -1, idxes, sides)
+			next, err = g.GetActivePlayer().PlayCard(game.HeroIdx, -1, idxes, sides)
+			return "", next, err
 		},
 	},
 	End: playerAction{
@@ -145,29 +149,29 @@ var Actions = struct {
 		shortcut:    "e",
 		args:        nil,
 		description: "закончить ход",
-		do: func(g *game.Game, idxes []int, sides game.Sides) (string, error) {
+		do: func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
 			g.TurnFinished = true
-			return "", nil
+			return "", nil, nil
 		},
 	},
 }
 
-func (action *playerAction) Do(args []string, g *game.Game) string {
+func (action *playerAction) Do(args []string, g *game.Game) (out string, next *game.NextAction) {
 	idxes, sides, errs := parseAllPositions(args)
 
 	if helpers.FirstError(errs) != nil {
-		return NewInvalidArgumentsError().Set(action.usage(true)).Error()
+		return NewInvalidArgumentsError().Set(action.usage(true)).Error(), nil
 	}
 
-	out, err := action.do(g, idxes, sides)
+	out, next, err := action.do(g, idxes, sides)
 
 	switch err := err.(type) {
 	case nil:
-		return out
+		return out, next
 	case InvalidArgumentsError:
-		return err.Set(action.usage(true)).Error()
+		return err.Set(action.usage(true)).Error(), nil
 	default:
-		return tuiError(err)
+		return tuiError(err), nil
 	}
 }
 

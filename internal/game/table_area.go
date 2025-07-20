@@ -22,7 +22,6 @@ func (a TableArea) Choose(idx int) (*Minion, error) {
 	}
 }
 
-
 func newTableArea(side Side) TableArea {
 	return TableArea{
 		Minions: containers.NewShrice[*Minion](areaSize),
@@ -45,6 +44,10 @@ func (a TableArea) place(idx int, minion *Minion) error {
 	default:
 		panic(errorpkg.NewUnexpectedError(err))
 	}
+}
+
+func (a TableArea) remove(idx int) {
+	a.Minions.Pop(idx)
 }
 
 func (a TableArea) cleanupDeadMinions() {
