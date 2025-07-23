@@ -15,6 +15,7 @@ func main() {
 	startingDeck := game.NewDeck(
 		legacy.Neutral.RiverCrocolisk,
 		legacy.Neutral.ChillwindYeti,
+		legacy.Neutral.ElvenArcher,
 		legacy.Mage.Frostbolt,
 		legacy.Mage.Fireball,
 	)

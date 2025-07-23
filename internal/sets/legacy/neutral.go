@@ -15,7 +15,7 @@ var Neutral = struct {
 			Class:       game.Classes.Neutral,
 			Rarity:      game.Rarities.Base,
 		},
-		Character: *game.NewCharacter(2, 3),
+		Character: *game.NewCharacter(1, 1),
 		Type:      game.MinionTypes.No,
 		Battlecry: &game.Effect{
 			TargetSelector: game.TargetSelectorPresets.Single,

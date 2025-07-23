@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"hearthstone/internal/game"
+	"hearthstone/pkg/helpers"
 	"hearthstone/pkg/ui"
 	"os"
 	"strings"
@@ -27,30 +28,27 @@ func HandleInput(g *game.Game) error {
 		command, args = allArgs[0], allArgs[1:]
 	}
 
-	if uiState.nextAction != nil {
-		// TODO wrap with arg parsing (maybe wrap as an extra action?)
-		err := uiState.nextAction.Do(args)
-
-		if err == nil {
-			uiState.nextAction.OnSuccess()
+	if state.nextAction != nil {
+		if actions.cancel.matches(command) {
+			state.nextAction.rollback()
+			state.hint, state.nextAction = helpers.Capitalize(actions.cancel.description), nil
 		} else {
-			uiState.nextAction.OnFail()
-			uiState.hint = tuiError(err)
+			state.hint, state.nextAction = state.nextAction.wrappedDo(allArgs, g)
 		}
-
-		uiState.nextAction = nil
 		return nil
 	}
 
 	for _, action := range actionList {
-		if strings.HasPrefix(command, action.shortcut) || command == action.name {
-			uiState.hint, uiState.nextAction = action.Do(args, g)
-			// TODO: set hint for nextAction somehow
+		if action.matches(command) {
+			state.hint, state.nextAction = action.wrappedDo(args, g)
+			if state.nextAction != nil {
+				state.hint = nextActionHint
+			}
 			return nil
 		}
 	}
 
-	uiState.hint, _ = Actions.ShortHelp.Do(args, g)
+	state.hint, _ = actions.shortHelp.wrappedDo(args, g)
 	return nil
 }
 
@@ -59,14 +57,7 @@ func Feedback(errs ...error) {
 	for _, err := range errs {
 		fmt.Fprintln(&builder, tuiError(err))
 	}
-	uiState.hint = strings.TrimSuffix(builder.String(), "\n")
-}
-
-var uiState = struct {
-	hint       string
-	nextAction *game.NextAction
-}{
-	hint: "",
+	state.hint = strings.TrimSuffix(builder.String(), "\n")
 }
 
 var scanner = bufio.NewScanner(os.Stdin)

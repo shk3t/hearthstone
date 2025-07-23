@@ -93,7 +93,10 @@ func NewEndOfInputError() EndOfInputError {
 }
 
 func (err InvalidArgumentsError) Error() string {
-	return fmt.Sprintf("Некорректные аргументы\n%s", err.correctUsage)
+	return strings.TrimSuffix(
+		"Некорректные аргументы\n"+err.correctUsage,
+		"\n",
+	)
 }
 func (err EndOfInputError) Error() string {
 	return "Конец ввода"

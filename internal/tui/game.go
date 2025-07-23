@@ -16,8 +16,8 @@ func gameString(g *game.Game) string {
 	fmt.Fprint(&builder, playerString(&g.Players[game.BotSide]))
 	builder.WriteString("\n")
 
-	if uiState.hint != "" {
-		fmt.Fprintf(&builder, "%s\n\n", uiState.hint)
+	if state.hint != "" {
+		fmt.Fprintf(&builder, "%s\n\n", state.hint)
 	}
 
 	if winner := g.GetWinner(); winner != game.UnsetSide {

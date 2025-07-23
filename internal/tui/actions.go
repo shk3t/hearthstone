@@ -20,17 +20,18 @@ type playerAction struct {
 
 var actionList []playerAction
 
-var Actions = struct {
-	ShortHelp playerAction
-	Help      playerAction
-	InfoHand  playerAction
-	InfoTable playerAction
-	Play      playerAction
-	Attack    playerAction
-	Power     playerAction
-	End       playerAction
+var actions = struct {
+	shortHelp playerAction
+	help      playerAction
+	infoHand  playerAction
+	infoTable playerAction
+	play      playerAction
+	attack    playerAction
+	power     playerAction
+	end       playerAction
+	cancel    playerAction
 }{
-	ShortHelp: playerAction{
+	shortHelp: playerAction{
 		name:        "",
 		shortcut:    "",
 		args:        nil,
@@ -44,7 +45,7 @@ var Actions = struct {
 			return strings.TrimSuffix(builder.String(), "\n"), nil, nil
 		},
 	},
-	Help: playerAction{
+	help: playerAction{
 		name:        "help",
 		shortcut:    "h",
 		args:        nil,
@@ -63,7 +64,7 @@ var Actions = struct {
 			return builder.String(), nil, nil
 		},
 	},
-	InfoHand: playerAction{
+	infoHand: playerAction{
 		name:        "info",
 		shortcut:    "i",
 		args:        []string{"<номер_карты>"},
@@ -76,7 +77,7 @@ var Actions = struct {
 			return out, nil, err
 		},
 	},
-	InfoTable: playerAction{
+	infoTable: playerAction{
 		name:        "table",
 		shortcut:    "t",
 		args:        []string{"<позиция_на_столе>"},
@@ -91,7 +92,7 @@ var Actions = struct {
 			return out, nil, err
 		},
 	},
-	Play: playerAction{
+	play: playerAction{
 		name:     "play",
 		shortcut: "p",
 		args: []string{
@@ -114,7 +115,7 @@ var Actions = struct {
 			return "", next, err
 		},
 	},
-	Attack: playerAction{
+	attack: playerAction{
 		name:        "attack",
 		shortcut:    "a",
 		args:        []string{"<номер_союзного_персонажа>", "<номер_персонажа_противника>"},
@@ -129,7 +130,7 @@ var Actions = struct {
 			return "", nil, g.GetActivePlayer().Attack(allyIdx, enemyIdx)
 		},
 	},
-	Power: playerAction{
+	power: playerAction{
 		name:        "power",
 		shortcut:    "w",
 		args:        []string{"<позиции_целей_силы_героя>"},
@@ -144,7 +145,7 @@ var Actions = struct {
 			return "", next, err
 		},
 	},
-	End: playerAction{
+	end: playerAction{
 		name:        "end",
 		shortcut:    "e",
 		args:        nil,
@@ -154,33 +155,46 @@ var Actions = struct {
 			return "", nil, nil
 		},
 	},
+	cancel: playerAction{
+		name:        "cancel",
+		shortcut:    "c",
+		args:        nil,
+		description: "отмена действия",
+		do:          doNothing,
+	},
 }
 
-func (action *playerAction) Do(args []string, g *game.Game) (out string, next *game.NextAction) {
+var doNothing doAction = func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
+	return "", nil, nil
+}
+
+func (a *playerAction) wrappedDo(
+	args []string, g *game.Game,
+) (out string, nextPa *nextPlayerAction) {
 	idxes, sides, errs := parseAllPositions(args)
 
 	if helpers.FirstError(errs) != nil {
-		return NewInvalidArgumentsError().Set(action.usage(true)).Error(), nil
+		return NewInvalidArgumentsError().Set(a.usage(true)).Error(), nil
 	}
 
-	out, next, err := action.do(g, idxes, sides)
+	out, next, err := a.do(g, idxes, sides)
 
 	switch err := err.(type) {
 	case nil:
-		return out, next
+		return out, newNextPlayerAction(next)
 	case InvalidArgumentsError:
-		return err.Set(action.usage(true)).Error(), nil
+		return err.Set(a.usage(true)).Error(), nil
 	default:
 		return tuiError(err), nil
 	}
 }
 
-func (e playerAction) whatis(compactContent bool) string {
+func (a *playerAction) whatis(compactContent bool) string {
 	output := fmt.Sprintf(
 		"%6s %3s: %s",
-		e.name,
-		fmt.Sprintf("(%s)", e.shortcut),
-		e.description,
+		a.name,
+		fmt.Sprintf("(%s)", a.shortcut),
+		a.description,
 	)
 	if compactContent {
 		output = multipleSpaceRegex.ReplaceAllString(output, " ")
@@ -189,13 +203,13 @@ func (e playerAction) whatis(compactContent bool) string {
 	return output
 }
 
-func (e playerAction) usage(compactContent bool) string {
+func (a *playerAction) usage(compactContent bool) string {
 	output := fmt.Sprintf(
 		"%6s %3s %-60s: %s",
-		e.name,
-		fmt.Sprintf("(%s)", e.shortcut),
-		strings.Join(e.args, " "),
-		e.description,
+		a.name,
+		fmt.Sprintf("(%s)", a.shortcut),
+		strings.Join(a.args, " "),
+		a.description,
 	)
 	if compactContent {
 		output = multipleSpaceRegex.ReplaceAllString(output, " ")
@@ -207,14 +221,74 @@ func (e playerAction) usage(compactContent bool) string {
 
 var multipleSpaceRegex = regexp.MustCompile(" +")
 
+func (a *playerAction) matches(command string) bool {
+	return strings.HasPrefix(command, a.shortcut) || command == a.name
+}
+
+type nextPlayerAction struct {
+	playerAction
+	rollback func()
+}
+
+func newNextPlayerAction(nextAction *game.NextAction) *nextPlayerAction {
+	if nextAction == nil {
+		return nil
+	}
+
+	do := func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
+		err = nextAction.Do(idxes, sides)
+
+		if err != nil {
+			nextAction.OnFail()
+			return "", nil, err
+		}
+
+		nextAction.OnSuccess()
+		return "", nil, nil
+	}
+
+	return &nextPlayerAction{
+		playerAction: playerAction{do: do},
+		rollback:     nextAction.OnFail,
+	}
+}
+
+func (na *nextPlayerAction) wrappedDo(
+	args []string, g *game.Game,
+) (out string, nextPa *nextPlayerAction) {
+	idxes, sides, errs := parseAllPositions(args)
+
+	if helpers.FirstError(errs) != nil {
+		na.rollback()
+		return appendCancelDescription(NewInvalidArgumentsError().Error()), nil
+	}
+
+	out, next, err := na.do(g, idxes, sides)
+
+	switch err := err.(type) {
+	case nil:
+		return out, newNextPlayerAction(next)
+	default:
+		return appendCancelDescription(tuiError(err)), nil
+	}
+}
+
+func appendCancelDescription(str string) string {
+	return strings.TrimPrefix(
+		str+"\n"+helpers.Capitalize(actions.cancel.description),
+		"\n",
+	)
+}
+
 func init() {
 	actionList = []playerAction{
-		Actions.Help,
-		Actions.InfoHand,
-		Actions.InfoTable,
-		Actions.Play,
-		Actions.Attack,
-		Actions.Power,
-		Actions.End,
+		actions.help,
+		actions.infoHand,
+		actions.infoTable,
+		actions.play,
+		actions.attack,
+		actions.power,
+		actions.end,
+		actions.cancel,
 	}
 }
