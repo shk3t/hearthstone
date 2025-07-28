@@ -1,7 +1,7 @@
-package containers
+package container
 
 import (
-	errorpkg "hearthstone/pkg/errors"
+	errpkg "hearthstone/pkg/error"
 )
 
 // Shrinking slice.
@@ -31,7 +31,7 @@ func (s Shrice[T]) Cap() int {
 func (s Shrice[T]) Get(idx int) (T, error) {
 	var null T
 	if idx < 0 || s.Cap() <= idx || s[idx] == null {
-		return null, errorpkg.NewIndexError(idx)
+		return null, errpkg.NewIndexError(idx)
 	}
 	return s[idx], nil
 }
@@ -39,11 +39,11 @@ func (s Shrice[T]) Get(idx int) (T, error) {
 func (s Shrice[T]) Insert(idx int, value T) error {
 	var null T
 	if idx < 0 || s.Cap() <= idx {
-		return errorpkg.NewIndexError(idx)
+		return errpkg.NewIndexError(idx)
 	}
 	sLen := s.Len()
 	if s.Cap() == sLen {
-		return errorpkg.NewFullError()
+		return errpkg.NewFullError()
 	}
 
 	if s[idx] != null {
@@ -66,7 +66,7 @@ func (s Shrice[T]) PushBack(values ...T) error {
 	vLen := len(values)
 
 	if sCap-sLen < vLen {
-		return errorpkg.NewNotEnoughSpaceError(sCap-sLen, vLen)
+		return errpkg.NewNotEnoughSpaceError(sCap-sLen, vLen)
 	}
 
 	for i := range vLen {
@@ -78,7 +78,7 @@ func (s Shrice[T]) PushBack(values ...T) error {
 func (s Shrice[T]) Pop(idx int) (T, error) {
 	var null T
 	if idx < 0 || s.Cap() <= idx || s[idx] == null {
-		return null, errorpkg.NewIndexError(idx)
+		return null, errpkg.NewIndexError(idx)
 	}
 
 	value := s[idx]
@@ -92,7 +92,7 @@ func (s Shrice[T]) PopBack() (T, error) {
 	idx := s.Len() - 1
 
 	if idx < 0 {
-		return null, errorpkg.NewEmptyError()
+		return null, errpkg.NewEmptyError()
 	}
 
 	value := s[idx]

@@ -3,7 +3,7 @@ package tui
 import (
 	"fmt"
 	"hearthstone/internal/game"
-	errorpkg "hearthstone/pkg/errors"
+	errpkg "hearthstone/pkg/error"
 	"strings"
 )
 
@@ -70,7 +70,7 @@ func tuiError(err error) string {
 		return "Это существо сможет атаковать только в следующем ходу"
 
 	default:
-		panic(errorpkg.NewUnexpectedError(err))
+		panic(errpkg.NewUnexpectedError(err))
 	}
 }
 

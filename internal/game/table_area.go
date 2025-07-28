@@ -1,30 +1,30 @@
 package game
 
 import (
-	"hearthstone/pkg/containers"
-	errorpkg "hearthstone/pkg/errors"
+	"hearthstone/pkg/container"
+	errpkg "hearthstone/pkg/error"
 )
 
 type TableArea struct {
-	Minions containers.Shrice[*Minion]
+	Minions container.Shrice[*Minion]
 	Side    Side
 }
 
 func (a TableArea) Choose(idx int) (*Minion, error) {
 	card, err := a.Minions.Get(idx)
 	switch err.(type) {
-	case errorpkg.IndexError:
+	case errpkg.IndexError:
 		return nil, NewInvalidTableAreaPositionError(idx, a.Side)
 	case nil:
 		return card, nil
 	default:
-		panic(errorpkg.NewUnexpectedError(err))
+		panic(errpkg.NewUnexpectedError(err))
 	}
 }
 
 func newTableArea(side Side) TableArea {
 	return TableArea{
-		Minions: containers.NewShrice[*Minion](areaSize),
+		Minions: container.NewShrice[*Minion](areaSize),
 		Side:    side,
 	}
 }
@@ -35,14 +35,14 @@ func (a TableArea) place(idx int, minion *Minion) error {
 	idx = min(idx, areaSize-1)
 	err := a.Minions.Insert(idx, minion)
 	switch err.(type) {
-	case errorpkg.IndexError:
+	case errpkg.IndexError:
 		return NewInvalidTableAreaPositionError(idx, UnsetSide)
-	case errorpkg.FullError:
+	case errpkg.FullError:
 		return NewFullTableAreaError()
 	case nil:
 		return nil
 	default:
-		panic(errorpkg.NewUnexpectedError(err))
+		panic(errpkg.NewUnexpectedError(err))
 	}
 }
 

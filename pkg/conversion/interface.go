@@ -1,4 +1,4 @@
-package conversions
+package conversion
 
 func TrueNilInterfaceSlice[S any, I any](input []*S) []I {
 	output := make([]I, len(input))

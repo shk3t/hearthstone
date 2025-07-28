@@ -3,7 +3,7 @@ package tui
 import (
 	"fmt"
 	"hearthstone/internal/game"
-	"hearthstone/pkg/helpers"
+	"hearthstone/pkg/helper"
 	"regexp"
 	"strings"
 )
@@ -173,7 +173,7 @@ func (a *playerAction) wrappedDo(
 ) (out string, nextPa *nextPlayerAction) {
 	idxes, sides, errs := parseAllPositions(args)
 
-	if helpers.FirstError(errs) != nil {
+	if helper.FirstError(errs) != nil {
 		return NewInvalidArgumentsError().Set(a.usage(true)).Error(), nil
 	}
 
@@ -258,7 +258,7 @@ func (na *nextPlayerAction) wrappedDo(
 ) (out string, nextPa *nextPlayerAction) {
 	idxes, sides, errs := parseAllPositions(args)
 
-	if helpers.FirstError(errs) != nil {
+	if helper.FirstError(errs) != nil {
 		na.rollback()
 		return appendCancelDescription(NewInvalidArgumentsError().Error()), nil
 	}
@@ -275,7 +275,7 @@ func (na *nextPlayerAction) wrappedDo(
 
 func appendCancelDescription(str string) string {
 	return strings.TrimPrefix(
-		str+"\n"+helpers.Capitalize(actions.cancel.description),
+		str+"\n"+helper.Capitalize(actions.cancel.description),
 		"\n",
 	)
 }

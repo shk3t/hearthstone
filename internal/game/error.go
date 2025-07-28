@@ -1,6 +1,6 @@
 package game
 
-import errorpkg "hearthstone/pkg/errors"
+import errpkg "hearthstone/pkg/error"
 
 // All game errors have to embed this structure.
 // In this case they become instances of `error` type.
@@ -10,7 +10,7 @@ import errorpkg "hearthstone/pkg/errors"
 type BaseError struct{}
 
 func (err BaseError) Error() string {
-	panic(errorpkg.NewUnusableFeatureError())
+	panic(errpkg.NewUnusableFeatureError())
 }
 
 type CardPickError struct {

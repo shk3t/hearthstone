@@ -2,7 +2,7 @@ package setup
 
 import (
 	"hearthstone/internal/config"
-	"hearthstone/pkg/helpers"
+	"hearthstone/pkg/helper"
 	"hearthstone/pkg/log"
 	"os"
 )
@@ -20,7 +20,7 @@ func deinitAll() {
 	log.Deinit()
 }
 
-var initializer = helpers.NewInitializer(
+var initializer = helper.NewInitializer(
 	func(args ...any) error {
 		return initAll()
 	},

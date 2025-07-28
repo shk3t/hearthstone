@@ -1,8 +1,8 @@
-package errors
+package error
 
 import (
 	"fmt"
-	"hearthstone/pkg/helpers"
+	"hearthstone/pkg/helper"
 )
 
 type NotImplementedError struct {
@@ -26,8 +26,8 @@ func NewUnusableFeatureError() UnusableFeatureError {
 func (err NotImplementedError) Error() string {
 	return fmt.Sprintf(
 		"%s %s not implemented",
-		helpers.Capitalize(err.feature),
-		helpers.BeForm(err.feature),
+		helper.Capitalize(err.feature),
+		helper.BeForm(err.feature),
 	)
 }
 func (err UnexpectedError) Error() string {

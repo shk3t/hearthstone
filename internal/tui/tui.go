@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"hearthstone/internal/game"
-	"hearthstone/pkg/helpers"
+	"hearthstone/pkg/helper"
 	"hearthstone/pkg/ui"
 	"os"
 	"strings"
@@ -31,7 +31,7 @@ func HandleInput(g *game.Game) error {
 	if state.nextAction != nil {
 		if actions.cancel.matches(command) {
 			state.nextAction.rollback()
-			state.hint, state.nextAction = helpers.Capitalize(actions.cancel.description), nil
+			state.hint, state.nextAction = helper.Capitalize(actions.cancel.description), nil
 		} else {
 			state.hint, state.nextAction = state.nextAction.wrappedDo(allArgs, g)
 		}

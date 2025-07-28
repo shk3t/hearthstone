@@ -1,7 +1,7 @@
 package game
 
 import (
-	errorpkg "hearthstone/pkg/errors"
+	errpkg "hearthstone/pkg/error"
 )
 
 type Playable interface {
@@ -17,7 +17,7 @@ type Card struct {
 }
 
 func (c *Card) Play() {
-	panic(errorpkg.NewUnusableFeatureError())
+	panic(errpkg.NewUnusableFeatureError())
 }
 
 func ToCard(p Playable) *Card {

@@ -2,7 +2,7 @@ package game
 
 import (
 	"hearthstone/internal/config"
-	errorpkg "hearthstone/pkg/errors"
+	errpkg "hearthstone/pkg/error"
 	"hearthstone/pkg/sugar"
 )
 
@@ -140,7 +140,7 @@ func (p *Player) drawCards(number int) []error {
 				errs = append(errs, err)
 			}
 		default:
-			panic(errorpkg.NewUnexpectedError(err))
+			panic(errpkg.NewUnexpectedError(err))
 		}
 	}
 
