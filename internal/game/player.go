@@ -2,7 +2,7 @@ package game
 
 import (
 	"hearthstone/internal/config"
-	errpkg "hearthstone/pkg/error"
+	errpkg "hearthstone/pkg/errors"
 	"hearthstone/pkg/sugar"
 )
 

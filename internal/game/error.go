@@ -1,6 +1,6 @@
 package game
 
-import errpkg "hearthstone/pkg/error"
+import errpkg "hearthstone/pkg/errors"
 
 // All game errors have to embed this structure.
 // In this case they become instances of `error` type.

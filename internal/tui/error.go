@@ -3,7 +3,7 @@ package tui
 import (
 	"fmt"
 	"hearthstone/internal/game"
-	errpkg "hearthstone/pkg/error"
+	errpkg "hearthstone/pkg/errors"
 	"strings"
 )
 

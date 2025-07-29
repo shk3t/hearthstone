@@ -2,7 +2,7 @@ package game
 
 import (
 	"hearthstone/pkg/container"
-	errpkg "hearthstone/pkg/error"
+	errpkg "hearthstone/pkg/errors"
 )
 
 type TableArea struct {

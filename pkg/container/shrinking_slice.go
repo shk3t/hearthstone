@@ -1,7 +1,7 @@
 package container
 
 import (
-	errpkg "hearthstone/pkg/error"
+	errpkg "hearthstone/pkg/errors"
 )
 
 // Shrinking slice.

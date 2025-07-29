@@ -1,10 +1,10 @@
 package game
 
 import (
-	errpkg "hearthstone/pkg/error"
+	errpkg "hearthstone/pkg/errors"
 )
 
-type Playable interface {
+type Playable interface {  // TODO: Can I replace this with generics?
 	Play()
 }
 
