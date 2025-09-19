@@ -16,6 +16,17 @@ func (s Side) Opposite() Side {
 	return s ^ 1
 }
 
+func (s Side) String() string {
+	switch s {
+	case TopSide:
+		return "Верхний"
+	case BotSide:
+		return "Нижний"
+	default:
+		return ""
+	}
+}
+
 func (ss Sides) SetUnset(toSide Side) {
 	for i := range ss {
 		if ss[i] == UnsetSide {

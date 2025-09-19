@@ -24,7 +24,7 @@ func gameString(g *game.Game) string {
 		fmt.Fprintf(
 			&builder,
 			"%s игрок одерживает ПОБЕДУ!\n",
-			strings.ToUpper(sideString(winner)),
+			strings.ToUpper(winner.String()),
 		)
 	} else {
 		fmt.Fprint(&builder, prompt)

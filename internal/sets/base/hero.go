@@ -8,14 +8,14 @@ var Heroes = struct {
 }{
 	Mage: &game.Hero{
 		Character: *game.NewHeroCharacter(),
-		Class:     game.Classes.Mage,
+		Class:     game.MageClass,
 		Power: game.Spell{
 			Card: game.Card{
 				ManaCost:    2,
 				Name:        "Вспышка огня",
 				Description: "Наносит 1 ед. урона",
-				Class:       game.Classes.Mage,
-				Rarity:      game.Rarities.Base,
+				Class:       game.MageClass,
+				Rarity:      game.BaseRarity,
 			},
 			Effect: game.Effect{
 				TargetSelector: game.TargetSelectorPresets.Single,
@@ -27,14 +27,14 @@ var Heroes = struct {
 	},
 	Priest: &game.Hero{
 		Character: *game.NewHeroCharacter(),
-		Class:     game.Classes.Priest,
+		Class:     game.PriestClass,
 		Power: game.Spell{
 			Card: game.Card{
 				ManaCost:    2,
 				Name:        "Малое исцеление",
 				Description: "Восстанавливает 2 ед. здоровья",
-				Class:       game.Classes.Priest,
-				Rarity:      game.Rarities.Base,
+				Class:       game.PriestClass,
+				Rarity:      game.BaseRarity,
 			},
 			Effect: game.Effect{
 				TargetSelector: game.TargetSelectorPresets.Single,

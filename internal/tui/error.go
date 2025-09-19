@@ -40,7 +40,7 @@ func tuiError(err error) string {
 			return fmt.Sprintf("Некорректная позиция на столе: %d", err.Position)
 		}
 
-		sideText := strings.ToLower(sideString(err.Side))
+		sideText := strings.ToLower(err.Side.String())
 		sideText = strings.Replace(sideText, "ий", "ей", 1)
 		return fmt.Sprintf(
 			"Некорректная позиция на %s части стола: %d",

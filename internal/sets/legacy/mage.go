@@ -11,8 +11,8 @@ var Mage = struct {
 			ManaCost:    2,
 			Name:        "Ледяная стрела",
 			Description: "Наносит 3 ед. урона персонажу и замораживает его",
-			Class:       game.Classes.Mage,
-			Rarity:      game.Rarities.Base,
+			Class:       game.MageClass,
+			Rarity:      game.BaseRarity,
 		},
 		Effect: game.Effect{
 			TargetSelector: game.TargetSelectorPresets.Single,
@@ -27,8 +27,8 @@ var Mage = struct {
 			ManaCost:    4,
 			Name:        "Огненный шар",
 			Description: "Наносит 6 ед. урона",
-			Class:       game.Classes.Mage,
-			Rarity:      game.Rarities.Base,
+			Class:       game.MageClass,
+			Rarity:      game.BaseRarity,
 		},
 		Effect: game.Effect{
 			TargetSelector: game.TargetSelectorPresets.Single,

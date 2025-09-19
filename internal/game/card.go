@@ -4,7 +4,7 @@ import (
 	errpkg "hearthstone/pkg/errors"
 )
 
-type Playable interface {  // TODO: Can I replace this with generics?
+type Playable interface { // TODO: Can I replace this with generics?
 	Play()
 }
 
@@ -13,7 +13,7 @@ type Card struct {
 	Name        string
 	Description string
 	Class       class
-	Rarity      raritiy
+	Rarity      rarity
 }
 
 func (c *Card) Play() {
@@ -37,20 +37,50 @@ var BaseCards = struct {
 	TheCoin *Spell
 }{}
 
-var Classes = struct {
-	Neutral class
-	Mage    class
-	Priest  class
-}{"Нейтрал", "Маг", "Жрец"}
+type class int
 
-var Rarities = struct {
-	Base      raritiy
-	Common    raritiy
-	Rare      raritiy
-	Epic      raritiy
-	Legendary raritiy
-}{"Базовая", "Обычная", "Редкая", "Эпическая", "Легендарная"}
+const (
+	NeutralClass class = iota
+	MageClass
+	PriestClass
+)
 
-type class string
+func (c class) String() string {
+	switch c {
+	case NeutralClass:
+		return "Нейтрал"
+	case MageClass:
+		return "Маг"
+	case PriestClass:
+		return "Жрец"
+	default:
+		return ""
+	}
+}
 
-type raritiy string
+type rarity int
+
+const (
+	BaseRarity rarity = iota
+	CommonRarity
+	RareRarity
+	EpicRarity
+	LegendaryRarity
+)
+
+func (r rarity) String() string {
+	switch r {
+	case BaseRarity:
+		return "Базовая"
+	case CommonRarity:
+		return "Обычная"
+	case RareRarity:
+		return "Редкая"
+	case EpicRarity:
+		return "Эпическая"
+	case LegendaryRarity:
+		return "Легендарная"
+	default:
+		return ""
+	}
+}
