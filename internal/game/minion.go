@@ -3,19 +3,38 @@ package game
 type Minion struct {
 	Card
 	Character
-	Type      MinionType
+	Type      minionType
 	Battlecry *Effect
 }
 
-type MinionType string
+type minionType int
 
-var MinionTypes = struct {
-	No     MinionType
-	Beast  MinionType
-	Mech   MinionType
-	Pirate MinionType
-	Murloc MinionType
-}{"Нет", "Зверь", "Механизм", "Пират", "Мурлок"}
+
+
+const (
+	NoMinionType minionType = iota
+	BeastMinionType
+	MechMinionType
+	PirateMinionType
+	MurlocMinionType
+)
+
+func (mt minionType) String() string {
+	switch mt {
+	case NoMinionType:
+		return "Нет"
+	case BeastMinionType:
+		return "Зверь"
+	case MechMinionType:
+		return "Механизм"
+	case PirateMinionType:
+		return "Пират"
+	case MurlocMinionType:
+		return "Мурлок"
+	default:
+		return ""
+	}
+}
 
 func (m *Minion) Copy() *Minion {
 	minionCopy := *m

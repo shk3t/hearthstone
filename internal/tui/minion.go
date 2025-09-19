@@ -44,7 +44,7 @@ func minionInfo(m *game.Minion) string {
 	fmt.Fprintln(&builder, cardInfo(&m.Card))
 	fmt.Fprintf(&builder, "Атака:    %d\n", m.Attack)
 	fmt.Fprintf(&builder, "Здоровье: %d\n", m.Health)
-	if m.Type != game.MinionTypes.No {
+	if m.Type != game.NoMinionType {
 		fmt.Fprintf(&builder, "Тип:      %s\n", m.Type)
 	}
 	builder.WriteString(characterStatusInfo(&m.Status))

@@ -16,7 +16,7 @@ var Neutral = struct {
 			Rarity:      game.BaseRarity,
 		},
 		Character: *game.NewCharacter(1, 1),
-		Type:      game.MinionTypes.No,
+		Type:      game.NoMinionType,
 		Battlecry: &game.Effect{
 			TargetSelector: game.TargetSelectorPresets.Single,
 			TargetEffect: func(target *game.Character) {
@@ -33,7 +33,7 @@ var Neutral = struct {
 			Rarity:      game.BaseRarity,
 		},
 		Character: *game.NewCharacter(2, 3),
-		Type:      game.MinionTypes.Beast,
+		Type:      game.BeastMinionType,
 	},
 	ChillwindYeti: &game.Minion{
 		Card: game.Card{
@@ -44,6 +44,6 @@ var Neutral = struct {
 			Rarity:      game.BaseRarity,
 		},
 		Character: *game.NewCharacter(4, 5),
-		Type:      game.MinionTypes.No,
+		Type:      game.NoMinionType,
 	},
 }

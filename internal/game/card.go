@@ -4,7 +4,7 @@ import (
 	errpkg "hearthstone/pkg/errors"
 )
 
-type Playable interface { // TODO: Can I replace this with generics?
+type Playable interface {
 	Play()
 }
 
