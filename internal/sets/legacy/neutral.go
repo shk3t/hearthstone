@@ -4,6 +4,7 @@ import "hearthstone/internal/game"
 
 var Neutral = struct {
 	ElvenArcher    *game.Minion
+	LootHoarder    *game.Minion
 	RiverCrocolisk *game.Minion
 	ChillwindYeti  *game.Minion
 }{
@@ -21,6 +22,22 @@ var Neutral = struct {
 			TargetSelector: game.TargetSelectorPresets.Single,
 			TargetEffect: func(target *game.Character) {
 				target.DealDamage(1)
+			},
+		},
+	},
+	LootHoarder: &game.Minion{
+		Card: game.Card{
+			ManaCost:    2,
+			Name:        "Собиратель сокровищ",
+			Description: "ПРЕДСМЕРТНЫЙ ХРИП: вы берете карту.",
+			Class:       game.NeutralClass,
+			Rarity:      game.CommonRarity,
+		},
+		Character: *game.NewCharacter(2, 1),
+		Type:      game.NoMinionType,
+		Deathrattle: &game.Effect{
+			GlobalEffect: func(player *game.Player) {
+				player.DrawCards(1)
 			},
 		},
 	},

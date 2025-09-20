@@ -3,13 +3,12 @@ package game
 type Minion struct {
 	Card
 	Character
-	Type      minionType
-	Battlecry *Effect
+	Type        minionType
+	Battlecry   *Effect
+	Deathrattle *Effect
 }
 
 type minionType int
-
-
 
 const (
 	NoMinionType minionType = iota

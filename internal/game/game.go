@@ -36,8 +36,8 @@ func (g *Game) StartGame() {
 	turn := Side(rand.Int() % 2)
 	firstPlayer, secondPlayer := g.Players[turn], g.Players[turn.Opposite()]
 
-	firstPlayer.drawCards(3)
-	secondPlayer.drawCards(4)
+	firstPlayer.DrawCards(3)
+	secondPlayer.DrawCards(4)
 	secondPlayer.Hand.refill(BaseCards.TheCoin.Copy())
 
 	g.Turn = turn.Opposite()
@@ -52,7 +52,7 @@ func (g *Game) StartNextTurn() []error {
 	activePlayer.increaseMana()
 	activePlayer.restoreMana()
 	activePlayer.Hero.PowerIsUsed = false
-	errs := activePlayer.drawCards(1)
+	errs := activePlayer.DrawCards(1)
 
 	activeArea := g.GetActiveArea()
 	statuses := []*CharacterStatus{&activePlayer.Hero.Status}
@@ -70,7 +70,16 @@ func (g *Game) StartNextTurn() []error {
 }
 
 func (g *Game) Cleanup() {
-	g.Table.CleanupDeadMinions()
+	for i := range SidesCount {
+		side := Side(i)
+		deadMinions := g.Table[side].cleanupDeadMinions()
+		for _, minion := range deadMinions {
+			if minion.Deathrattle != nil {
+				player := g.Players[side]
+				player.playEffect(minion.Deathrattle, nil, nil)
+			}
+		}
+	}
 }
 
 func (g *Game) GetWinner() Side {

@@ -16,6 +16,7 @@ func main() {
 		legacy.Neutral.RiverCrocolisk,
 		legacy.Neutral.ChillwindYeti,
 		legacy.Neutral.ElvenArcher,
+		legacy.Neutral.LootHoarder,
 		legacy.Mage.Frostbolt,
 		legacy.Mage.Fireball,
 	)

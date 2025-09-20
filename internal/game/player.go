@@ -17,6 +17,10 @@ type Player struct {
 	deck    Deck
 }
 
+func (p *Player) GetOpponent() *Player {
+	return &p.Game.Players[p.Side.Opposite()]
+}
+
 func (p *Player) PlayCard(
 	handIdx int,
 	areaIdx int,
@@ -121,7 +125,7 @@ func (p *Player) spendMana(value int) error {
 	return nil
 }
 
-func (p *Player) drawCards(number int) []error {
+func (p *Player) DrawCards(number int) []error {
 	errs := make([]error, 0, 4)
 
 	for range number {
