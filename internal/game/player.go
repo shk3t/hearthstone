@@ -1,7 +1,6 @@
 package game
 
 import (
-	"errors"
 	"hearthstone/internal/config"
 	errpkg "hearthstone/pkg/errors"
 )
@@ -15,6 +14,23 @@ type Player struct {
 	MaxMana int
 	fatigue int
 	deck    Deck
+}
+
+func newPlayer(side Side, hero *Hero, deck Deck, game *Game) *Player {
+	return &Player{
+		Game:    game,
+		Side:    side,
+		Hero:    hero,
+		Hand:    newHand(),
+		Mana:    0,
+		MaxMana: 0,
+		fatigue: 0,
+		deck:    deck,
+	}
+}
+
+func (p *Player) GetArea() TableArea {
+	return p.Game.Table[p.Side]
 }
 
 func (p *Player) GetOpponent() *Player {
@@ -50,9 +66,9 @@ func (p *Player) PlayCard(
 
 	switch card := card.(type) {
 	case *Minion:
-		next, err = p.playMinion(card, handIdx, areaIdx)
+		next, err = card.Play(p, handIdx, areaIdx)
 	case *Spell:
-		err = card.Effect.Play(p, spellIdxes, spellSides)
+		err = card.Play(p, spellIdxes, spellSides)
 	default:
 		panic("Invalid card type")
 	}
@@ -89,42 +105,6 @@ func (p *Player) Attack(allyIdx, enemyIdx int) error {
 	return nil
 }
 
-func newPlayer(side Side, hero *Hero, deck Deck, game *Game) *Player {
-	return &Player{
-		Game:    game,
-		Side:    side,
-		Hero:    hero,
-		Hand:    newHand(),
-		Mana:    0,
-		MaxMana: 0,
-		fatigue: 0,
-		deck:    deck,
-	}
-}
-
-func (p *Player) increaseMana() {
-	p.MaxMana++
-}
-
-func (p *Player) restoreMana() {
-	p.Mana = p.MaxMana
-}
-
-func (p *Player) haveEnoughMana(value int) bool {
-	if p.Mana-value < 0 && !config.Env.UnlimitedMana {
-		return false
-	}
-	return true
-}
-
-func (p *Player) spendMana(value int) error {
-	if !p.haveEnoughMana(value) {
-		return NewNotEnoughManaError(p.Mana, value)
-	}
-	p.Mana = max(0, p.Mana-value)
-	return nil
-}
-
 func (p *Player) DrawCards(number int) []error {
 	errs := make([]error, 0, 4)
 
@@ -151,30 +131,25 @@ func (p *Player) DrawCards(number int) []error {
 	return errs
 }
 
-// TODO: use card's Play method (for interface)
-func (p *Player) playMinion(minion *Minion, handIdx, areaIdx int) (*NextAction, error) {
-	area := p.Game.getArea(p.Side)
-	err := area.place(areaIdx, minion)
-	if err == nil {
-		minion.Status.SetSleep(true)
+func (p *Player) increaseMana() {
+	p.MaxMana++
+}
+
+func (p *Player) restoreMana() {
+	p.Mana = p.MaxMana
+}
+
+func (p *Player) haveEnoughMana(value int) bool {
+	if p.Mana-value < 0 && !config.Env.UnlimitedMana {
+		return false
 	}
+	return true
+}
 
-	err = minion.Battlecry.Play(p, nil, nil)
-
-	if err != nil && errors.As(err, new(UnmatchedTargetNumberError)) {
-		return &NextAction{
-			Do: func(idxes []int, sides Sides) error {
-				return minion.Battlecry.Play(p, idxes, sides)
-			},
-			OnSuccess: func() {
-				p.Hand.discard(handIdx)
-				_ = p.spendMana(minion.ManaCost)
-			},
-			OnFail: func() {
-				area.remove(areaIdx)
-			},
-		}, nil
+func (p *Player) spendMana(value int) error {
+	if !p.haveEnoughMana(value) {
+		return NewNotEnoughManaError(p.Mana, value)
 	}
-
-	return nil, err
+	p.Mana = max(0, p.Mana-value)
+	return nil
 }

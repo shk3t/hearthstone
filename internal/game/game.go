@@ -92,19 +92,11 @@ func (g *Game) GetWinner() Side {
 	return UnsetSide
 }
 
-func (g *Game) getArea(side Side) TableArea {
-	return g.Table[side]
-}
-
-func (g *Game) getHero(side Side) *Hero {
-	return g.Players[side].Hero
-}
-
 func (g *Game) getCharacter(idx int, side Side) (*Character, error) {
 	if idx == HeroIdx {
-		return &g.getHero(side).Character, nil
+		return &g.Players[side].Hero.Character, nil
 	} else {
-		minion, err := g.getArea(side).Choose(idx)
+		minion, err := g.Table[side].Choose(idx)
 		if err != nil {
 			return nil, err
 		}

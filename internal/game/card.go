@@ -5,7 +5,7 @@ import (
 )
 
 type CardLike interface {
-	PlayCard()
+	cardMethod()
 }
 
 type Card struct {
@@ -16,18 +16,18 @@ type Card struct {
 	Rarity      rarity
 }
 
-func (c *Card) PlayCard() {
+func (c *Card) cardMethod() {
 	panic(errpkg.NewUnusableFeatureError())
 }
 
-func ToCard(p CardLike) *Card {
-	switch card := p.(type) {
+func ToCard(c CardLike) *Card {
+	switch card := c.(type) {
 	case *Card:
 		return card
 	case *Minion:
 		return &card.Card
-	// case *Spell:
-	// 	return &card.Card
+	case *Spell:
+		return &card.Card
 	default:
 		panic("Invalid card type")
 	}
