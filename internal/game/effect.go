@@ -6,15 +6,15 @@ type targetEffectFunc func(target *Character)
 type globalEffectFunc func(player *Player)
 
 type Effect interface {
-	Play(player *Player, idxes []int, sides Sides) error
+	Play(owner *Player, idxes []int, sides Sides) error
 }
 
 type GlobalEffect struct {
 	Func globalEffectFunc
 }
 
-func (e *GlobalEffect) Play(player *Player, idxes []int, sides Sides) error {
-	e.Func(player)
+func (e GlobalEffect) Play(owner *Player, idxes []int, sides Sides) error {
+	e.Func(owner)
 	return nil
 }
 
@@ -24,12 +24,12 @@ type TargetEffect struct {
 	AllyIsDefaultTarget bool
 }
 
-func (e *TargetEffect) Play(player *Player, idxes []int, sides Sides) error {
+func (e TargetEffect) Play(owner *Player, idxes []int, sides Sides) error {
 	sides.SetUnset(
-		sugar.If(e.AllyIsDefaultTarget, player.Side, player.Side.Opposite()),
+		sugar.If(e.AllyIsDefaultTarget, owner.Side, owner.Side.Opposite()),
 	)
 
-	targets, err := e.Selector(player.Game, idxes, sides)
+	targets, err := e.Selector(owner.Game, idxes, sides)
 	if err != nil {
 		return err
 	}
@@ -49,12 +49,12 @@ type DistinctTargetEffect struct {
 	AllyIsDefaultTarget bool
 }
 
-func (e *DistinctTargetEffect) Play(player *Player, idxes []int, sides Sides) error {
+func (e DistinctTargetEffect) Play(owner *Player, idxes []int, sides Sides) error {
 	sides.SetUnset(
-		sugar.If(e.AllyIsDefaultTarget, player.Side, player.Side.Opposite()),
+		sugar.If(e.AllyIsDefaultTarget, owner.Side, owner.Side.Opposite()),
 	)
 
-	targets, err := e.Selector(player.Game, idxes, sides)
+	targets, err := e.Selector(owner.Game, idxes, sides)
 	if err != nil {
 		return err
 	}
@@ -74,11 +74,8 @@ func (e *DistinctTargetEffect) Play(player *Player, idxes []int, sides Sides) er
 	return nil
 }
 
+// TODO: apply buffs for new minions
 type PassiveAbility struct {
-	InFunc  *globalEffectFunc
-	OutFunc *globalEffectFunc
-}
-
-func (e *PassiveAbility) Play(player *Player, idxes []int, sides Sides) error {
-	return nil
+	InEffect  Effect
+	OutEffect Effect
 }

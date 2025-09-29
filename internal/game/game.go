@@ -38,7 +38,7 @@ func (g *Game) StartGame() {
 
 	firstPlayer.DrawCards(3)
 	secondPlayer.DrawCards(4)
-	secondPlayer.Hand.refill(BaseCards.TheCoin.Copy())
+	secondPlayer.Hand.refill(BaseCards.TheCoin)
 
 	g.Turn = turn.Opposite()
 	g.StartNextTurn()
@@ -72,12 +72,10 @@ func (g *Game) StartNextTurn() []error {
 func (g *Game) Cleanup() {
 	for i := range SidesCount {
 		side := Side(i)
+		owner := g.Players[side]
 		deadMinions := g.Table[side].cleanupDeadMinions()
 		for _, minion := range deadMinions {
-			if minion.Deathrattle != nil {
-				player := g.Players[side]
-				minion.Deathrattle.Play(&player, nil, nil)
-			}
+			minion.Destroy(&owner)
 		}
 	}
 }

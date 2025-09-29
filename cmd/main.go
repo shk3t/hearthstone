@@ -13,13 +13,14 @@ func main() {
 	defer setup.DeinitAll()
 
 	startingDeck := game.NewDeck(
-		legacy.Neutral.RiverCrocolisk,
+		legacy.Neutral.RaidLeader,
+		// legacy.Neutral.RiverCrocolisk,
 		legacy.Neutral.ChillwindYeti,
 		legacy.Neutral.ElvenArcher,
 		legacy.Neutral.LootHoarder,
 		legacy.Neutral.ColdlightOracle,
-		legacy.Mage.Frostbolt,
-		legacy.Mage.Fireball,
+		// legacy.Mage.Frostbolt,
+		// legacy.Mage.Fireball,
 	)
 
 	loop.StartGame(

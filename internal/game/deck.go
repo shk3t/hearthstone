@@ -5,25 +5,25 @@ import (
 	errpkg "hearthstone/pkg/errors"
 )
 
-type Deck container.Shrice[CardLike]
+type Deck container.Shrice[Cardlike]
 
-func NewDeck(cards ...CardLike) Deck {
-	container := container.NewShrice[CardLike](deckSize)
+func NewDeck(cards ...Cardlike) Deck {
+	container := container.NewShrice[Cardlike](deckSize)
 	container.PushBack(cards...)
 	return Deck(container)
 }
 
 func (d Deck) Copy() Deck {
-	newContainer := container.NewShrice[CardLike](deckSize)
-	dLen := container.Shrice[CardLike](d).Len()
+	newContainer := container.NewShrice[Cardlike](deckSize)
+	dLen := container.Shrice[Cardlike](d).Len()
 	for i := 0; i < dLen; i++ {
 		switch card := d[i].(type) {
-		case *Minion:
-			newContainer[i] = card.Copy()
-		case *Spell:
-			newContainer[i] = card.Copy()
-		case *Weapon:
-			newContainer[i] = card.Copy()
+		case Minion:
+			newContainer[i] = card
+		case Spell:
+			newContainer[i] = card
+		case Weapon:
+			newContainer[i] = card
 		default:
 			panic("Unexpected card type")
 		}
@@ -33,8 +33,8 @@ func (d Deck) Copy() Deck {
 
 const deckSize = 30
 
-func (d Deck) takeTop() (CardLike, error) {
-	card, err := container.Shrice[CardLike](d).PopBack()
+func (d Deck) takeTop() (Cardlike, error) {
+	card, err := container.Shrice[Cardlike](d).PopBack()
 	switch err.(type) {
 	case errpkg.EmptyError:
 		return nil, NewEmptyDeckError()

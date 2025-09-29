@@ -3,13 +3,14 @@ package legacy
 import "hearthstone/internal/game"
 
 var Neutral = struct {
-	ElvenArcher     *game.Minion
-	LootHoarder     *game.Minion
-	RiverCrocolisk  *game.Minion
-	ColdlightOracle *game.Minion
-	ChillwindYeti   *game.Minion
+	ElvenArcher     game.Minion
+	LootHoarder     game.Minion
+	RiverCrocolisk  game.Minion
+	ColdlightOracle game.Minion
+	RaidLeader      game.Minion
+	ChillwindYeti   game.Minion
 }{
-	ElvenArcher: &game.Minion{
+	ElvenArcher: game.Minion{
 		Card: game.Card{
 			ManaCost:    1,
 			Name:        "Эльфийская лучница",
@@ -19,14 +20,14 @@ var Neutral = struct {
 		},
 		Character: *game.NewCharacter(1, 1),
 		Type:      game.NoMinionType,
-		Battlecry: &game.TargetEffect{
+		Battlecry: game.TargetEffect{
 			Selector: game.TargetSelectorPresets.Single,
 			Func: func(target *game.Character) {
 				target.DealDamage(1)
 			},
 		},
 	},
-	LootHoarder: &game.Minion{
+	LootHoarder: game.Minion{
 		Card: game.Card{
 			ManaCost:    2,
 			Name:        "Собиратель сокровищ",
@@ -36,13 +37,13 @@ var Neutral = struct {
 		},
 		Character: *game.NewCharacter(2, 1),
 		Type:      game.NoMinionType,
-		Deathrattle: &game.GlobalEffect{
+		Deathrattle: game.GlobalEffect{
 			Func: func(player *game.Player) {
 				player.DrawCards(1)
 			},
 		},
 	},
-	RiverCrocolisk: &game.Minion{
+	RiverCrocolisk: game.Minion{
 		Card: game.Card{
 			ManaCost:    2,
 			Name:        "Речной кроколиск",
@@ -53,7 +54,7 @@ var Neutral = struct {
 		Character: *game.NewCharacter(2, 3),
 		Type:      game.BeastMinionType,
 	},
-	ColdlightOracle: &game.Minion{
+	ColdlightOracle: game.Minion{
 		Card: game.Card{
 			ManaCost:    3,
 			Name:        "Вайш'ирский оракул",
@@ -63,14 +64,39 @@ var Neutral = struct {
 		},
 		Character: *game.NewCharacter(2, 2),
 		Type:      game.MurlocMinionType,
-		Battlecry: &game.GlobalEffect{
+		Battlecry: game.GlobalEffect{
 			Func: func(player *game.Player) {
 				player.DrawCards(2)
 				player.GetOpponent().DrawCards(2)
 			},
 		},
 	},
-	ChillwindYeti: &game.Minion{
+	RaidLeader: game.Minion{
+		Card: game.Card{
+			ManaCost:    3,
+			Name:        "Лидер рейда",
+			Description: "Другие ваши существа получают +1 к атаке.",
+			Class:       game.NeutralClass,
+			Rarity:      game.BaseRarity,
+		},
+		Character: *game.NewCharacter(2, 3),
+		Type:      game.NoMinionType,
+		Passive: &game.PassiveAbility{
+			InEffect: game.TargetEffect{
+				Selector: game.TargetSelectorPresets.AllAllyMinions,  // TODO: all, except this minion
+				Func: func(target *game.Character) {
+					target.Attack++
+				},
+			},
+			OutEffect: game.TargetEffect{
+				Selector: game.TargetSelectorPresets.AllAllyMinions,
+				Func: func(target *game.Character) {
+					target.Attack--
+				},
+			},
+		},
+	},
+	ChillwindYeti: game.Minion{
 		Card: game.Card{
 			ManaCost:    4,
 			Name:        "Морозный йети",

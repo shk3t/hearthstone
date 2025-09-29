@@ -31,6 +31,16 @@ func (a TableArea) Choose(idx int) (*Minion, error) {
 	}
 }
 
+func (a TableArea) GetCharacters() []*Character {
+	characters := []*Character{}
+	for _, m := range a.Minions {
+		if m != nil {
+			characters = append(characters, &m.Character)
+		}
+	}
+	return characters
+}
+
 func newTableArea(side Side) TableArea {
 	return TableArea{
 		Minions: container.NewShrice[*Minion](areaSize),

@@ -4,7 +4,7 @@ import (
 	errpkg "hearthstone/pkg/errors"
 )
 
-type CardLike interface {
+type Cardlike interface {
 	cardMethod()
 }
 
@@ -16,25 +16,25 @@ type Card struct {
 	Rarity      rarity
 }
 
-func (c *Card) cardMethod() {
+func (c Card) cardMethod() {
 	panic(errpkg.NewUnusableFeatureError())
 }
 
-func ToCard(c CardLike) *Card {
+func ToCard(c Cardlike) Card {
 	switch card := c.(type) {
-	case *Card:
+	case Card:
 		return card
-	case *Minion:
-		return &card.Card
-	case *Spell:
-		return &card.Card
+	case Minion:
+		return card.Card
+	case Spell:
+		return card.Card
 	default:
 		panic("Invalid card type")
 	}
 }
 
 var BaseCards = struct {
-	TheCoin *Spell
+	TheCoin Spell
 }{}
 
 type class int

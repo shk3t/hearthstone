@@ -14,7 +14,7 @@ var TargetSelectorPresets = struct {
 	// AllyHero             targetSelector
 	// SingleAllyMinion     targetSelector
 	// MultipleAllyMinions  targetSelector
-	// AllAllyMinions       targetSelector
+	AllAllyMinions targetSelector
 	// SingleAlly           targetSelector
 	// MultipleAllies       targetSelector
 	// AllAllies            targetSelector
@@ -30,6 +30,9 @@ var TargetSelectorPresets = struct {
 	// Multiple             targetSelector
 	// All                  targetSelector
 }{
+	AllAllyMinions: func(g *Game, idxes []int, sides Sides) ([]*Character, error) {
+		return g.GetActivePlayer().GetArea().GetCharacters(), nil
+	},
 	Single: func(g *Game, idxes []int, sides Sides) ([]*Character, error) {
 		if len(idxes) == 0 {
 			return nil, NewUnmatchedTargetNumberError(0, 1)

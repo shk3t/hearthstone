@@ -1,11 +1,10 @@
 package game
 
-import "errors"
-
 type Minion struct {
 	Card
 	Character
 	Type        minionType
+	Passive     *PassiveAbility
 	Battlecry   Effect
 	Deathrattle Effect
 }
@@ -37,36 +36,48 @@ func (mt minionType) String() string {
 	}
 }
 
-func (m *Minion) Copy() *Minion {
-	minionCopy := *m
-	return &minionCopy
-}
-
-func (m *Minion) Play(player *Player, handIdx, areaIdx int) (*NextAction, error) {
-	area := player.GetArea()
+func (m *Minion) Play(owner *Player, handIdx, areaIdx int) (*NextAction, error) {
+	area := owner.GetArea()
 	err := area.place(areaIdx, m)
 	if err == nil {
 		m.Status.SetSleep(true)
 	}
 
 	if m.Battlecry != nil {
-		err = m.Battlecry.Play(player, nil, nil)
+		err = m.Battlecry.Play(owner, nil, nil)
 
-		if err != nil && errors.As(err, new(UnmatchedTargetNumberError)) {
+		switch err.(type) {
+		case UnmatchedTargetNumberError:
 			return &NextAction{
 				Do: func(idxes []int, sides Sides) error {
-					return m.Battlecry.Play(player, idxes, sides)
+					return m.Battlecry.Play(owner, idxes, sides)
 				},
 				OnSuccess: func() {
-					player.Hand.discard(handIdx)
-					_ = player.spendMana(m.ManaCost)
+					owner.Hand.discard(handIdx)
+					_ = owner.spendMana(m.ManaCost)
 				},
 				OnFail: func() {
 					area.remove(areaIdx)
 				},
 			}, nil
+		case nil:
+		default:
+			return nil, err
 		}
 	}
 
+	if m.Passive != nil {
+		m.Passive.InEffect.Play(owner, nil, nil)
+	}
+
 	return nil, err
+}
+
+func (m *Minion) Destroy(owner *Player) {
+	if m.Passive != nil {
+		m.Passive.OutEffect.Play(owner, nil, nil)
+	}
+	if m.Deathrattle != nil {
+		m.Deathrattle.Play(owner, nil, nil)
+	}
 }

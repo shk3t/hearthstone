@@ -3,10 +3,10 @@ package legacy
 import "hearthstone/internal/game"
 
 var Mage = struct {
-	Frostbolt *game.Spell
-	Fireball  *game.Spell
+	Frostbolt game.Spell
+	Fireball  game.Spell
 }{
-	Frostbolt: &game.Spell{
+	Frostbolt: game.Spell{
 		Card: game.Card{
 			ManaCost:    2,
 			Name:        "Ледяная стрела",
@@ -14,7 +14,7 @@ var Mage = struct {
 			Class:       game.MageClass,
 			Rarity:      game.BaseRarity,
 		},
-		Effect: &game.TargetEffect{
+		Effect: game.TargetEffect{
 			Selector: game.TargetSelectorPresets.Single,
 			Func: func(target *game.Character) {
 				target.DealDamage(3)
@@ -22,7 +22,7 @@ var Mage = struct {
 			},
 		},
 	},
-	Fireball: &game.Spell{
+	Fireball: game.Spell{
 		Card: game.Card{
 			ManaCost:    4,
 			Name:        "Огненный шар",
@@ -30,7 +30,7 @@ var Mage = struct {
 			Class:       game.MageClass,
 			Rarity:      game.BaseRarity,
 		},
-		Effect: &game.TargetEffect{
+		Effect: game.TargetEffect{
 			Selector: game.TargetSelectorPresets.Single,
 			Func: func(target *game.Character) {
 				target.DealDamage(6)

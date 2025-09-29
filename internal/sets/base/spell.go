@@ -2,7 +2,7 @@ package base
 
 import "hearthstone/internal/game"
 
-var TheCoin = &game.Spell{
+var TheCoin = game.Spell{
 	Card: game.Card{
 		ManaCost:    0,
 		Name:        "Монетка",
@@ -10,7 +10,7 @@ var TheCoin = &game.Spell{
 		Class:       game.NeutralClass,
 		Rarity:      game.BaseRarity,
 	},
-	Effect: &game.GlobalEffect{
+	Effect: game.GlobalEffect{
 		Func: func(player *game.Player) {
 			player.Mana++
 		},

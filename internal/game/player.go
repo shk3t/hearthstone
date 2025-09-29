@@ -42,7 +42,7 @@ func (p *Player) PlayCard(
 	areaIdx int,
 	spellIdxes []int, spellSides []Side,
 ) (*NextAction, error) {
-	var card CardLike
+	var card Cardlike
 	var next *NextAction
 	var err error
 	heroPowerUse := handIdx == HeroIdx
@@ -51,7 +51,7 @@ func (p *Player) PlayCard(
 		if p.Hero.PowerIsUsed {
 			return nil, NewUsedHeroPowerError()
 		}
-		card = &p.Hero.Power
+		card = p.Hero.Power
 	} else {
 		card, err = p.Hand.Get(handIdx)
 		if err != nil {
@@ -65,9 +65,9 @@ func (p *Player) PlayCard(
 	}
 
 	switch card := card.(type) {
-	case *Minion:
+	case Minion:
 		next, err = card.Play(p, handIdx, areaIdx)
-	case *Spell:
+	case Spell:
 		err = card.Play(p, spellIdxes, spellSides)
 	default:
 		panic("Invalid card type")
@@ -110,6 +110,7 @@ func (p *Player) DrawCards(number int) []error {
 
 	for range number {
 		card, err := p.deck.takeTop()
+
 		switch err := err.(type) {
 		case EmptyDeckError:
 			p.fatigue++

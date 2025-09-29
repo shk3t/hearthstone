@@ -13,10 +13,10 @@ func handString(h game.Hand) string {
 
 	for _, card := range h {
 		switch card := card.(type) {
-		case *game.Minion:
-			cardStr = minionHandString(card)
-		case *game.Spell:
-			cardStr = spellString(card)
+		case game.Minion:
+			cardStr = minionHandString(&card)
+		case game.Spell:
+			cardStr = spellString(&card)
 		case nil:
 			continue
 		default:
