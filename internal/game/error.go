@@ -27,7 +27,7 @@ type EmptyHandError struct {
 }
 type FullHandError struct {
 	BaseError
-	BurnedCard Playable
+	BurnedCard CardLike
 }
 type InvalidTableAreaPositionError struct {
 	BaseError

@@ -76,7 +76,7 @@ func (g *Game) Cleanup() {
 		for _, minion := range deadMinions {
 			if minion.Deathrattle != nil {
 				player := g.Players[side]
-				player.playEffect(minion.Deathrattle, nil, nil)
+				minion.Deathrattle.Play(&player, nil, nil)
 			}
 		}
 	}

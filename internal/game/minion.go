@@ -4,8 +4,8 @@ type Minion struct {
 	Card
 	Character
 	Type        minionType
-	Battlecry   *Effect
-	Deathrattle *Effect
+	Battlecry   Effect
+	Deathrattle Effect
 }
 
 type minionType int

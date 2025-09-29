@@ -17,9 +17,9 @@ var Heroes = struct {
 				Class:       game.MageClass,
 				Rarity:      game.BaseRarity,
 			},
-			Effect: game.Effect{
-				TargetSelector: game.TargetSelectorPresets.Single,
-				TargetEffect: func(target *game.Character) {
+			Effect: &game.TargetEffect{
+				Selector: game.TargetSelectorPresets.Single,
+				Func: func(target *game.Character) {
 					target.DealDamage(1)
 				},
 			},
@@ -36,9 +36,9 @@ var Heroes = struct {
 				Class:       game.PriestClass,
 				Rarity:      game.BaseRarity,
 			},
-			Effect: game.Effect{
-				TargetSelector: game.TargetSelectorPresets.Single,
-				TargetEffect: func(target *game.Character) {
+			Effect: &game.TargetEffect{
+				Selector: game.TargetSelectorPresets.Single,
+				Func: func(target *game.Character) {
 					target.RestoreHealth(2)
 				},
 				AllyIsDefaultTarget: true,

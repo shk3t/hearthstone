@@ -3,10 +3,11 @@ package legacy
 import "hearthstone/internal/game"
 
 var Neutral = struct {
-	ElvenArcher    *game.Minion
-	LootHoarder    *game.Minion
-	RiverCrocolisk *game.Minion
-	ChillwindYeti  *game.Minion
+	ElvenArcher     *game.Minion
+	LootHoarder     *game.Minion
+	RiverCrocolisk  *game.Minion
+	ColdlightOracle *game.Minion
+	ChillwindYeti   *game.Minion
 }{
 	ElvenArcher: &game.Minion{
 		Card: game.Card{
@@ -18,9 +19,9 @@ var Neutral = struct {
 		},
 		Character: *game.NewCharacter(1, 1),
 		Type:      game.NoMinionType,
-		Battlecry: &game.Effect{
-			TargetSelector: game.TargetSelectorPresets.Single,
-			TargetEffect: func(target *game.Character) {
+		Battlecry: &game.TargetEffect{
+			Selector: game.TargetSelectorPresets.Single,
+			Func: func(target *game.Character) {
 				target.DealDamage(1)
 			},
 		},
@@ -35,8 +36,8 @@ var Neutral = struct {
 		},
 		Character: *game.NewCharacter(2, 1),
 		Type:      game.NoMinionType,
-		Deathrattle: &game.Effect{
-			GlobalEffect: func(player *game.Player) {
+		Deathrattle: &game.GlobalEffect{
+			Func: func(player *game.Player) {
 				player.DrawCards(1)
 			},
 		},
@@ -51,6 +52,23 @@ var Neutral = struct {
 		},
 		Character: *game.NewCharacter(2, 3),
 		Type:      game.BeastMinionType,
+	},
+	ColdlightOracle: &game.Minion{
+		Card: game.Card{
+			ManaCost:    3,
+			Name:        "Вайш'ирский оракул",
+			Description: "",
+			Class:       game.NeutralClass,
+			Rarity:      game.RareRarity,
+		},
+		Character: *game.NewCharacter(2, 2),
+		Type:      game.MurlocMinionType,
+		Battlecry: &game.GlobalEffect{
+			Func: func(player *game.Player) {
+				player.DrawCards(2)
+				player.GetOpponent().DrawCards(2)
+			},
+		},
 	},
 	ChillwindYeti: &game.Minion{
 		Card: game.Card{

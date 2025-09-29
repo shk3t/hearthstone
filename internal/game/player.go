@@ -1,9 +1,9 @@
 package game
 
 import (
+	"errors"
 	"hearthstone/internal/config"
 	errpkg "hearthstone/pkg/errors"
-	"hearthstone/pkg/sugar"
 )
 
 type Player struct {
@@ -26,7 +26,7 @@ func (p *Player) PlayCard(
 	areaIdx int,
 	spellIdxes []int, spellSides []Side,
 ) (*NextAction, error) {
-	var card Playable
+	var card CardLike
 	var next *NextAction
 	var err error
 	heroPowerUse := handIdx == HeroIdx
@@ -52,7 +52,7 @@ func (p *Player) PlayCard(
 	case *Minion:
 		next, err = p.playMinion(card, handIdx, areaIdx)
 	case *Spell:
-		err = p.playEffect(&card.Effect, spellIdxes, spellSides)
+		err = card.Effect.Play(p, spellIdxes, spellSides)
 	default:
 		panic("Invalid card type")
 	}
@@ -151,70 +151,30 @@ func (p *Player) DrawCards(number int) []error {
 	return errs
 }
 
+// TODO: use card's Play method (for interface)
 func (p *Player) playMinion(minion *Minion, handIdx, areaIdx int) (*NextAction, error) {
 	area := p.Game.getArea(p.Side)
 	err := area.place(areaIdx, minion)
 	if err == nil {
 		minion.Status.SetSleep(true)
 	}
-	if minion.Battlecry != nil {
-		if minion.Battlecry.TargetSelector != nil {
-			return &NextAction{
-				Do: func(idxes []int, sides Sides) error {
-					return p.playEffect(minion.Battlecry, idxes, sides)
-				},
-				OnSuccess: func() {
-					p.Hand.discard(handIdx)
-					_ = p.spendMana(minion.ManaCost)
-				},
-				OnFail: func() {
-					area.remove(areaIdx)
-				},
-			}, nil
-		}
-		p.playEffect(minion.Battlecry, nil, nil)
+
+	err = minion.Battlecry.Play(p, nil, nil)
+
+	if err != nil && errors.As(err, new(UnmatchedTargetNumberError)) {
+		return &NextAction{
+			Do: func(idxes []int, sides Sides) error {
+				return minion.Battlecry.Play(p, idxes, sides)
+			},
+			OnSuccess: func() {
+				p.Hand.discard(handIdx)
+				_ = p.spendMana(minion.ManaCost)
+			},
+			OnFail: func() {
+				area.remove(areaIdx)
+			},
+		}, nil
 	}
 
-	return nil, nil
-}
-
-func (p *Player) playEffect(effect *Effect, idxes []int, sides Sides) error {
-	sides.SetUnset(
-		sugar.If(effect.AllyIsDefaultTarget, p.Side, p.Side.Opposite()),
-	)
-
-	if effect.TargetSelector != nil {
-		targets, err := effect.TargetSelector(p.Game, idxes, sides)
-		if err != nil {
-			return err
-		}
-
-		if effect.TargetEffect != nil {
-			for _, target := range targets {
-				if target != nil {
-					effect.TargetEffect(target)
-				}
-			}
-		}
-
-		if len(effect.DistinctTargetEffects) > 0 {
-			effectsLen := len(effect.DistinctTargetEffects)
-			targetsLen := len(targets)
-			if effectsLen != targetsLen {
-				panic(NewUnmatchedTargetNumberError(effectsLen, targetsLen))
-			}
-
-			for i, target := range targets {
-				if target != nil {
-					effect.DistinctTargetEffects[i](target)
-				}
-			}
-		}
-	}
-
-	if effect.GlobalEffect != nil {
-		effect.GlobalEffect(p)
-	}
-
-	return nil
+	return nil, err
 }

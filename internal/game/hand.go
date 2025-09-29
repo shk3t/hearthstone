@@ -5,20 +5,20 @@ import (
 	errpkg "hearthstone/pkg/errors"
 )
 
-type Hand container.Shrice[Playable]
+type Hand container.Shrice[CardLike]
 
 const HandCap = 10
 
 func (h Hand) Len() int {
-	return container.Shrice[Playable](h).Len()
+	return container.Shrice[CardLike](h).Len()
 }
 
-func (h Hand) Get(idx int) (Playable, error) {
-	card, err := container.Shrice[Playable](h).Get(idx)
+func (h Hand) Get(idx int) (CardLike, error) {
+	card, err := container.Shrice[CardLike](h).Get(idx)
 
 	switch err.(type) {
 	case errpkg.IndexError:
-		if container.Shrice[Playable](h).Len() == 0 {
+		if container.Shrice[CardLike](h).Len() == 0 {
 			return nil, NewEmptyHandError()
 		}
 		return nil, NewCardPickError(idx)
@@ -30,15 +30,15 @@ func (h Hand) Get(idx int) (Playable, error) {
 }
 
 func newHand() Hand {
-	return Hand(container.NewShrice[Playable](HandCap))
+	return Hand(container.NewShrice[CardLike](HandCap))
 }
 
 func (h Hand) discard(idx int) {
-	container.Shrice[Playable](h).Pop(idx)
+	container.Shrice[CardLike](h).Pop(idx)
 }
 
-func (h Hand) refill(card Playable) error {
-	err := container.Shrice[Playable](h).PushBack(card)
+func (h Hand) refill(card CardLike) error {
+	err := container.Shrice[CardLike](h).PushBack(card)
 	switch err.(type) {
 	case errpkg.NotEnoughSpaceError:
 		return NewFullHandError()
