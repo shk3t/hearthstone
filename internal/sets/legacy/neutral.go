@@ -58,7 +58,7 @@ var Neutral = struct {
 		Card: game.Card{
 			ManaCost:    3,
 			Name:        "Вайш'ирский оракул",
-			Description: "",
+			Description: "БОЕВОЙ КЛИЧ: каждый игрок берет 2 карты.",
 			Class:       game.NeutralClass,
 			Rarity:      game.RareRarity,
 		},
