@@ -6,6 +6,7 @@ import (
 	"hearthstone/internal/sets/base"
 	"hearthstone/internal/sets/legacy"
 	"hearthstone/internal/setup"
+	"hearthstone/pkg/helper"
 )
 
 func main() {
@@ -13,20 +14,34 @@ func main() {
 	defer setup.DeinitAll()
 
 	startingDeck := game.NewDeck(
-		legacy.Neutral.RaidLeader,
-		// legacy.Neutral.RiverCrocolisk,
 		legacy.Neutral.ChillwindYeti,
-		legacy.Neutral.ElvenArcher,
+		legacy.Neutral.ChillwindYeti,
+		legacy.Neutral.ChillwindYeti,
+		legacy.Neutral.ChillwindYeti,
+		legacy.Neutral.ChillwindYeti,
 		legacy.Neutral.LootHoarder,
-		legacy.Neutral.ColdlightOracle,
-		// legacy.Mage.Frostbolt,
-		// legacy.Mage.Fireball,
+		legacy.Neutral.RaidLeader,
 	)
 
-	loop.StartGame(
+	g := loop.StartGame(
 		base.Heroes.Mage.Copy(),
 		base.Heroes.Priest.Copy(),
 		startingDeck.Copy(),
 		startingDeck.Copy(),
 	)
+
+	topPlayer := g.Players[game.TopSide]
+	botPlayer := g.Players[game.BotSide]
+
+	topPlayer.PlayCard(0, 0, nil, nil)
+	topPlayer.PlayCard(0, 0, nil, nil)
+	topPlayer.PlayCard(0, 0, nil, nil)
+	g.StartNextTurn()
+	botPlayer.PlayCard(0, 0, nil, nil)
+	botPlayer.PlayCard(0, 0, nil, nil)
+	botPlayer.PlayCard(0, 0, nil, nil)
+	g.StartNextTurn()
+
+
+	helper.WaitForever()
 }

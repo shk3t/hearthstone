@@ -17,13 +17,14 @@ type Initializer struct {
 	interruptChan chan os.Signal
 }
 
-func NewInitializer(init initFunc, deinit deinitFunc) *Initializer {
-	return &Initializer{
+func CreateInitFuncs(init initFunc, deinit deinitFunc) (initFunc, deinitFunc) {
+	i := Initializer{
 		init:          init,
 		deinit:        deinit,
 		up:            false,
 		interruptChan: make(chan os.Signal, 1),
 	}
+	return i.Init, i.Deinit
 }
 
 func (i *Initializer) Init(args ...any) error {

@@ -7,7 +7,7 @@ import (
 
 func heroString(h *game.Hero) string {
 	elems := make([]string, 0, 3)
-	elems = append(elems, string(h.Class))
+	elems = append(elems, strings.ToUpper(h.Class.String()))
 
 	statusStr := characterStatusString(&h.Status)
 	if statusStr != "" {

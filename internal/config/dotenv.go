@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/joho/godotenv"
 )
@@ -20,10 +21,22 @@ func LoadEnv() {
 	Env.DisplayMethod = strings.ToUpper(parseString("DISPLAY_METHOD", "TUI"))
 	Env.UnlimitedMana = parseBool("UNLIMITED_MANA", false)
 	Env.RevealOpponentsHand = parseBool("REVEAL_OPPONENTS_HAND", false)
+
+	firstTurnSide := os.Getenv("FIRST_TURN_SIDE")
+	Env.FirstTurnSide = -1
+	if len(firstTurnSide) > 0 {
+		switch unicode.ToLower([]rune(firstTurnSide)[0]) {
+		case 't':
+			Env.FirstTurnSide = 0
+		case 'b':
+			Env.FirstTurnSide = 1
+		}
+	}
 }
 
 type envFields struct {
 	DisplayMethod       string
+	FirstTurnSide       int
 	UnlimitedMana       bool
 	RevealOpponentsHand bool
 }

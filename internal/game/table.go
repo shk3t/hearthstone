@@ -19,7 +19,7 @@ type TableArea struct {
 	Side    Side
 }
 
-func (a TableArea) Choose(idx int) (*Minion, error) {
+func (a TableArea) GetMinion(idx int) (*Minion, error) {
 	card, err := a.Minions.Get(idx)
 	switch err.(type) {
 	case errpkg.IndexError:

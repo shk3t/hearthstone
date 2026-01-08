@@ -32,7 +32,7 @@ func minionTableString(m *game.Minion, fieldWidths ...int) string {
 }
 
 func getMinionInfo(table *game.Table, idx int, side game.Side) (string, error) {
-	minion, err := table[side].Choose(idx)
+	minion, err := table[side].GetMinion(idx)
 	if err != nil {
 		return "", err
 	}

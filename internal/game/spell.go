@@ -6,5 +6,5 @@ type Spell struct {
 }
 
 func (s *Spell) Play(owner *Player, idxes []int, sides Sides) error {
-	return s.Effect.Play(owner, idxes, sides)
+	return s.Effect.Play(nil, owner, idxes, sides)
 }

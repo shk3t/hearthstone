@@ -1,6 +1,7 @@
 package game
 
 import (
+	"hearthstone/internal/config"
 	"math/rand"
 )
 
@@ -33,7 +34,10 @@ func (g *Game) GetActiveArea() TableArea {
 }
 
 func (g *Game) StartGame() {
-	turn := Side(rand.Int() % 2)
+	turn := Side(config.Env.FirstTurnSide)
+	if turn == UnsetSide {
+		turn = Side(rand.Int() % 2)
+	}
 	firstPlayer, secondPlayer := g.Players[turn], g.Players[turn.Opposite()]
 
 	firstPlayer.DrawCards(3)
@@ -94,7 +98,7 @@ func (g *Game) getCharacter(idx int, side Side) (*Character, error) {
 	if idx == HeroIdx {
 		return &g.Players[side].Hero.Character, nil
 	} else {
-		minion, err := g.Table[side].Choose(idx)
+		minion, err := g.Table[side].GetMinion(idx)
 		if err != nil {
 			return nil, err
 		}

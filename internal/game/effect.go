@@ -2,34 +2,39 @@ package game
 
 import "hearthstone/pkg/sugar"
 
-type targetEffectFunc func(target *Character)
-type globalEffectFunc func(player *Player)
+type characterEffectFunc func(target *Character)
+type playerEffectFunc func(player *Player)
 
 type Effect interface {
-	Play(owner *Player, idxes []int, sides Sides) error
+	Play(source *Character, owner *Player, idxes []int, sides Sides) error
 }
 
-type GlobalEffect struct {
-	Func globalEffectFunc
+type PlayerEffect struct {
+	Func playerEffectFunc
 }
 
-func (e GlobalEffect) Play(owner *Player, idxes []int, sides Sides) error {
+func (e PlayerEffect) Play(source *Character, owner *Player, idxes []int, sides Sides) error {
 	e.Func(owner)
 	return nil
 }
 
-type TargetEffect struct {
-	Selector            targetSelector
-	Func                targetEffectFunc
+type CharacterEffect struct {
+	Selector            characterSelector
+	Func                characterEffectFunc
 	AllyIsDefaultTarget bool
 }
 
-func (e TargetEffect) Play(owner *Player, idxes []int, sides Sides) error {
-	sides.SetUnset(
+func (e CharacterEffect) Play(
+	source *Character,
+	owner *Player,
+	idxes []int,
+	sides Sides,
+) error {
+	sides.SetIfUnset(
 		sugar.If(e.AllyIsDefaultTarget, owner.Side, owner.Side.Opposite()),
 	)
 
-	targets, err := e.Selector(owner.Game, idxes, sides)
+	targets, err := e.Selector(source, owner, idxes, sides)
 	if err != nil {
 		return err
 	}
@@ -43,18 +48,23 @@ func (e TargetEffect) Play(owner *Player, idxes []int, sides Sides) error {
 	return nil
 }
 
-type DistinctTargetEffect struct {
-	Selector            targetSelector
-	Funcs               []targetEffectFunc
+type IndividualCharacterEffect struct {
+	Selector            characterSelector
+	Funcs               []characterEffectFunc
 	AllyIsDefaultTarget bool
 }
 
-func (e DistinctTargetEffect) Play(owner *Player, idxes []int, sides Sides) error {
-	sides.SetUnset(
+func (e IndividualCharacterEffect) Play(
+	source *Character,
+	owner *Player,
+	idxes []int,
+	sides Sides,
+) error {
+	sides.SetIfUnset(
 		sugar.If(e.AllyIsDefaultTarget, owner.Side, owner.Side.Opposite()),
 	)
 
-	targets, err := e.Selector(owner.Game, idxes, sides)
+	targets, err := e.Selector(source, owner, idxes, sides)
 	if err != nil {
 		return err
 	}
@@ -74,8 +84,48 @@ func (e DistinctTargetEffect) Play(owner *Player, idxes []int, sides Sides) erro
 	return nil
 }
 
-// TODO: apply buffs for new minions
-type PassiveAbility struct {
-	InEffect  Effect
-	OutEffect Effect
+type PassiveEffect struct {
+	Selector characterSelector
+	InFunc   characterEffectFunc
+	OutFunc  characterEffectFunc
+}
+
+func (e PassiveEffect) Play(
+	source *Character,
+	owner *Player,
+	idxes []int,
+	sides Sides,
+) error {
+	targets, err := e.Selector(source, owner, idxes, sides)
+	if err != nil {
+		return err
+	}
+
+	for _, target := range targets {
+		if target != nil {
+			e.InFunc(target)
+		}
+	}
+
+	return nil
+}
+
+func (e PassiveEffect) Cancel(
+	source *Character,
+	owner *Player,
+	idxes []int,
+	sides Sides,
+) error {
+	targets, err := e.Selector(source, owner, idxes, sides)
+	if err != nil {
+		return err
+	}
+
+	for _, target := range targets {
+		if target != nil {
+			e.OutFunc(target)
+		}
+	}
+
+	return nil
 }

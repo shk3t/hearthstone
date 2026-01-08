@@ -17,9 +17,9 @@ func getCardInfo(player *game.Player, handIdx int) (string, error) {
 	}
 
 	switch card := card.(type) {
-	case *game.Minion:
-		return minionInfo(card), nil
-	case *game.Spell:
+	case game.Minion:
+		return minionInfo(&card), nil
+	case game.Spell:
 		return cardInfo(&card.Card), nil
 	default:
 		panic("Invalid card type")

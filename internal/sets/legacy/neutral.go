@@ -20,8 +20,8 @@ var Neutral = struct {
 		},
 		Character: *game.NewCharacter(1, 1),
 		Type:      game.NoMinionType,
-		Battlecry: game.TargetEffect{
-			Selector: game.TargetSelectorPresets.Single,
+		Battlecry: game.CharacterEffect{
+			Selector: game.CharacterSelectorPresets.Single,
 			Func: func(target *game.Character) {
 				target.DealDamage(1)
 			},
@@ -37,7 +37,7 @@ var Neutral = struct {
 		},
 		Character: *game.NewCharacter(2, 1),
 		Type:      game.NoMinionType,
-		Deathrattle: game.GlobalEffect{
+		Deathrattle: game.PlayerEffect{
 			Func: func(player *game.Player) {
 				player.DrawCards(1)
 			},
@@ -64,7 +64,7 @@ var Neutral = struct {
 		},
 		Character: *game.NewCharacter(2, 2),
 		Type:      game.MurlocMinionType,
-		Battlecry: game.GlobalEffect{
+		Battlecry: game.PlayerEffect{
 			Func: func(player *game.Player) {
 				player.DrawCards(2)
 				player.GetOpponent().DrawCards(2)
@@ -81,18 +81,13 @@ var Neutral = struct {
 		},
 		Character: *game.NewCharacter(2, 3),
 		Type:      game.NoMinionType,
-		Passive: &game.PassiveAbility{
-			InEffect: game.TargetEffect{
-				Selector: game.TargetSelectorPresets.AllAllyMinions,  // TODO: all, except this minion
-				Func: func(target *game.Character) {
-					target.Attack++
-				},
+		Passive: &game.PassiveEffect{
+			Selector: game.CharacterSelectorPresets.RestAllyMinions,
+			InFunc: func(target *game.Character) {
+				target.Attack++
 			},
-			OutEffect: game.TargetEffect{
-				Selector: game.TargetSelectorPresets.AllAllyMinions,
-				Func: func(target *game.Character) {
-					target.Attack--
-				},
+			OutFunc: func(target *game.Character) {
+				target.Attack--
 			},
 		},
 	},

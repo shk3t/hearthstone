@@ -87,7 +87,7 @@ var actions = struct {
 				idxes = append(idxes, 0)
 				sides = append(sides, game.UnsetSide)
 			}
-			sides.SetUnset(g.Turn)
+			sides.SetIfUnset(g.Turn)
 			out, err = getMinionInfo(&g.Table, idxes[0], sides[0])
 			return out, nil, err
 		},

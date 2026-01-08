@@ -10,7 +10,7 @@ var TheCoin = game.Spell{
 		Class:       game.NeutralClass,
 		Rarity:      game.BaseRarity,
 	},
-	Effect: game.GlobalEffect{
+	Effect: game.PlayerEffect{
 		Func: func(player *game.Player) {
 			player.Mana++
 		},
