@@ -17,10 +17,9 @@ func main() {
 		legacy.Neutral.ChillwindYeti,
 		legacy.Neutral.ChillwindYeti,
 		legacy.Neutral.ChillwindYeti,
-		legacy.Neutral.ChillwindYeti,
-		legacy.Neutral.ChillwindYeti,
-		legacy.Neutral.LootHoarder,
 		legacy.Neutral.RaidLeader,
+		legacy.Neutral.ChillwindYeti,
+		legacy.Neutral.ChillwindYeti,
 	)
 
 	g := loop.StartGame(

@@ -2,9 +2,10 @@ package game
 
 import "hearthstone/pkg/sugar"
 
-type characterEffectFunc func(target *Character)
+type targetEffectFunc func(target *Character)
 type playerEffectFunc func(player *Player)
 
+// Value-type interface
 type Effect interface {
 	Play(source *Character, owner *Player, idxes []int, sides Sides) error
 }
@@ -18,13 +19,13 @@ func (e PlayerEffect) Play(source *Character, owner *Player, idxes []int, sides 
 	return nil
 }
 
-type CharacterEffect struct {
-	Selector            characterSelector
-	Func                characterEffectFunc
+type TargetEffect struct {
+	Selector            targetSelector
+	Func                targetEffectFunc
 	AllyIsDefaultTarget bool
 }
 
-func (e CharacterEffect) Play(
+func (e TargetEffect) Play(
 	source *Character,
 	owner *Player,
 	idxes []int,
@@ -48,13 +49,13 @@ func (e CharacterEffect) Play(
 	return nil
 }
 
-type IndividualCharacterEffect struct {
-	Selector            characterSelector
-	Funcs               []characterEffectFunc
+type IndividualTargetEffect struct {
+	Selector            targetSelector
+	Funcs               []targetEffectFunc
 	AllyIsDefaultTarget bool
 }
 
-func (e IndividualCharacterEffect) Play(
+func (e IndividualTargetEffect) Play(
 	source *Character,
 	owner *Player,
 	idxes []int,
@@ -84,13 +85,13 @@ func (e IndividualCharacterEffect) Play(
 	return nil
 }
 
-type PassiveEffect struct {
-	Selector characterSelector
-	InFunc   characterEffectFunc
-	OutFunc  characterEffectFunc
+type StatusEffect struct {
+	Selector targetSelector
+	InFunc   targetEffectFunc
+	OutFunc  targetEffectFunc
 }
 
-func (e PassiveEffect) Play(
+func (e StatusEffect) Play(
 	source *Character,
 	owner *Player,
 	idxes []int,
@@ -101,6 +102,11 @@ func (e PassiveEffect) Play(
 		return err
 	}
 
+	// TODO: get all status effects on `info` input
+	// TODO: show status effects in preview
+	owner.Game.statusEffects[source] = e
+
+	// TODO: properly apply effects in the game loop
 	for _, target := range targets {
 		if target != nil {
 			e.InFunc(target)
@@ -110,7 +116,7 @@ func (e PassiveEffect) Play(
 	return nil
 }
 
-func (e PassiveEffect) Cancel(
+func (e StatusEffect) Cancel(
 	source *Character,
 	owner *Player,
 	idxes []int,
@@ -121,6 +127,9 @@ func (e PassiveEffect) Cancel(
 		return err
 	}
 
+	delete(owner.Game.statusEffects, source)
+
+	// TODO: properly cancel effects in the game loop
 	for _, target := range targets {
 		if target != nil {
 			e.OutFunc(target)

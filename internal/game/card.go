@@ -4,6 +4,7 @@ import (
 	errpkg "hearthstone/pkg/errors"
 )
 
+// Value-type interface
 type Cardlike interface {
 	cardMethod()
 }

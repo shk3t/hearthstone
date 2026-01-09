@@ -18,14 +18,17 @@ var Neutral = struct {
 			Class:       game.NeutralClass,
 			Rarity:      game.BaseRarity,
 		},
-		Character: *game.NewCharacter(1, 1),
-		Type:      game.NoMinionType,
-		Battlecry: game.CharacterEffect{
-			Selector: game.CharacterSelectorPresets.Single,
-			Func: func(target *game.Character) {
-				target.DealDamage(1)
+		Character: game.Character{
+			Attack:    1,
+			MaxHealth: 1,
+			Battlecry: game.TargetEffect{
+				Selector: game.CharacterSelectorPresets.Single,
+				Func: func(target *game.Character) {
+					target.DealDamage(1)
+				},
 			},
 		},
+		Type: game.NoMinionType,
 	},
 	LootHoarder: game.Minion{
 		Card: game.Card{
@@ -35,13 +38,16 @@ var Neutral = struct {
 			Class:       game.NeutralClass,
 			Rarity:      game.CommonRarity,
 		},
-		Character: *game.NewCharacter(2, 1),
-		Type:      game.NoMinionType,
-		Deathrattle: game.PlayerEffect{
-			Func: func(player *game.Player) {
-				player.DrawCards(1)
+		Character: game.Character{
+			Attack:    2,
+			MaxHealth: 1,
+			Deathrattle: game.PlayerEffect{
+				Func: func(player *game.Player) {
+					player.DrawCards(1)
+				},
 			},
 		},
+		Type: game.NoMinionType,
 	},
 	RiverCrocolisk: game.Minion{
 		Card: game.Card{
@@ -51,8 +57,11 @@ var Neutral = struct {
 			Class:       game.NeutralClass,
 			Rarity:      game.BaseRarity,
 		},
-		Character: *game.NewCharacter(2, 3),
-		Type:      game.BeastMinionType,
+		Character: game.Character{
+			Attack:    2,
+			MaxHealth: 3,
+		},
+		Type: game.BeastMinionType,
 	},
 	ColdlightOracle: game.Minion{
 		Card: game.Card{
@@ -62,14 +71,17 @@ var Neutral = struct {
 			Class:       game.NeutralClass,
 			Rarity:      game.RareRarity,
 		},
-		Character: *game.NewCharacter(2, 2),
-		Type:      game.MurlocMinionType,
-		Battlecry: game.PlayerEffect{
-			Func: func(player *game.Player) {
-				player.DrawCards(2)
-				player.GetOpponent().DrawCards(2)
+		Character: game.Character{
+			Attack:    2,
+			MaxHealth: 2,
+			Battlecry: game.PlayerEffect{
+				Func: func(player *game.Player) {
+					player.DrawCards(2)
+					player.GetOpponent().DrawCards(2)
+				},
 			},
 		},
+		Type: game.MurlocMinionType,
 	},
 	RaidLeader: game.Minion{
 		Card: game.Card{
@@ -79,17 +91,20 @@ var Neutral = struct {
 			Class:       game.NeutralClass,
 			Rarity:      game.BaseRarity,
 		},
-		Character: *game.NewCharacter(2, 3),
-		Type:      game.NoMinionType,
-		Passive: &game.PassiveEffect{
-			Selector: game.CharacterSelectorPresets.RestAllyMinions,
-			InFunc: func(target *game.Character) {
-				target.Attack++
-			},
-			OutFunc: func(target *game.Character) {
-				target.Attack--
+		Character: game.Character{
+			Attack:    2,
+			MaxHealth: 3,
+			Passive: &game.StatusEffect{
+				Selector: game.CharacterSelectorPresets.RestAllyMinions,
+				InFunc: func(target *game.Character) {
+					target.Attack++
+				},
+				OutFunc: func(target *game.Character) {
+					target.Attack--
+				},
 			},
 		},
+		Type: game.NoMinionType,
 	},
 	ChillwindYeti: game.Minion{
 		Card: game.Card{
@@ -99,7 +114,10 @@ var Neutral = struct {
 			Class:       game.NeutralClass,
 			Rarity:      game.BaseRarity,
 		},
-		Character: *game.NewCharacter(4, 5),
-		Type:      game.NoMinionType,
+		Character: game.Character{
+			Attack:    4,
+			MaxHealth: 5,
+		},
+		Type: game.NoMinionType,
 	},
 }

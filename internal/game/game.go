@@ -6,22 +6,28 @@ import (
 )
 
 type Game struct {
-	Players      [SidesCount]Player
-	Table        Table
-	Turn         Side
-	TurnFinished bool
+	Players       [SidesCount]Player
+	Table         Table
+	Turn          Side
+	TurnFinished  bool
+	statusEffects map[*Character]StatusEffect
 }
 
 func NewGame(topHero, botHero *Hero, topDeck, botDeck Deck) *Game {
 	game := &Game{
-		Table:        *NewTable(),
-		Turn:         UnsetSide,
-		TurnFinished: false,
+		Table:         *NewTable(),
+		Turn:          UnsetSide,
+		TurnFinished:  false,
+		statusEffects: map[*Character]StatusEffect{},
 	}
+
+	topHero.SetHealthToMax()
+	botHero.SetHealthToMax()
 	game.Players = [SidesCount]Player{
 		TopSide: *newPlayer(TopSide, topHero, topDeck, game),
 		BotSide: *newPlayer(BotSide, botHero, botDeck, game),
 	}
+
 	return game
 }
 
@@ -77,17 +83,14 @@ func (g *Game) Cleanup() {
 	for i := range SidesCount {
 		side := Side(i)
 		owner := g.Players[side]
-		deadMinions := g.Table[side].cleanupDeadMinions()
-		for _, minion := range deadMinions {
-			minion.Destroy(&owner)
-		}
+		g.Table[side].cleanupDeadMinions(&owner)
 	}
 }
 
 func (g *Game) GetWinner() Side {
 	for i := range SidesCount {
 		side := Side(i)
-		if !g.Players[side].Hero.Alive {
+		if g.Players[side].Hero.Health == 0 {
 			return side.Opposite()
 		}
 	}
@@ -104,4 +107,12 @@ func (g *Game) getCharacter(idx int, side Side) (*Character, error) {
 		}
 		return &minion.Character, nil
 	}
+}
+
+func (g *Game) getStatusEffect(character *Character, side Side) *StatusEffect {
+	effect, ok := g.statusEffects[character]
+	if !ok {
+		return nil
+	}
+	return &effect
 }

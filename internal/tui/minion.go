@@ -25,7 +25,7 @@ func minionTableString(m *game.Minion, fieldWidths ...int) string {
 	attackHealthStr := fmt.Sprintf("%d/%d", m.Attack, m.Health)
 	str := fmt.Sprintf(
 		format,
-		m.Name, attackHealthStr, characterStatusString(&m.Status),
+		m.Name, attackHealthStr, characterStatusString(&m.Character),
 	)
 
 	return strings.TrimRight(str, "| ")
@@ -47,6 +47,6 @@ func minionInfo(m *game.Minion) string {
 	if m.Type != game.NoMinionType {
 		fmt.Fprintf(&builder, "Тип:      %s\n", m.Type)
 	}
-	builder.WriteString(characterStatusInfo(&m.Status))
+	builder.WriteString(characterStatusInfo(&m.Character))
 	return strings.TrimSuffix(builder.String(), "\n")
 }

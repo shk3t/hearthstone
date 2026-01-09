@@ -23,8 +23,7 @@ var actionList []playerAction
 var actions = struct {
 	shortHelp playerAction
 	help      playerAction
-	infoHand  playerAction
-	infoTable playerAction
+	info      playerAction
 	play      playerAction
 	attack    playerAction
 	power     playerAction
@@ -64,31 +63,20 @@ var actions = struct {
 			return builder.String(), nil, nil
 		},
 	},
-	infoHand: playerAction{
+	info: playerAction{
 		name:        "info",
 		shortcut:    "i",
-		args:        []string{"<номер_карты>"},
-		description: "подробное описание карты в руке",
+		args:        []string{"<номер_карты>/<позиция_на_столе><b/t>"},
+		description: "подробное описание карты на руке/столе",
 		do: func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
 			if len(idxes) != 1 {
 				return "", nil, NewInvalidArgumentsError()
 			}
-			out, err = getCardInfo(g.GetActivePlayer(), idxes[0])
-			return out, nil, err
-		},
-	},
-	infoTable: playerAction{
-		name:        "table",
-		shortcut:    "t",
-		args:        []string{"<позиция_на_столе>"},
-		description: "подробное описание существа на столе",
-		do: func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
-			if len(idxes) == 0 {
-				idxes = append(idxes, 0)
-				sides = append(sides, game.UnsetSide)
+			if sides[0] == game.UnsetSide {
+				out, err = getCardInfo(g.GetActivePlayer(), idxes[0])
+			} else {
+				out, err = getMinionInfo(&g.Table, idxes[0], sides[0])
 			}
-			sides.SetIfUnset(g.Turn)
-			out, err = getMinionInfo(&g.Table, idxes[0], sides[0])
 			return out, nil, err
 		},
 	},
@@ -118,7 +106,7 @@ var actions = struct {
 	attack: playerAction{
 		name:        "attack",
 		shortcut:    "a",
-		args:        []string{"<номер_союзного_персонажа>", "<номер_персонажа_противника>"},
+		args:        []string{"<позиция_союзного_персонажа>", "<позиция_персонажа_противника>"},
 		description: "атаковать персонажа",
 		do: func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
 			if len(idxes) == 0 {
@@ -283,8 +271,7 @@ func appendCancelDescription(str string) string {
 func init() {
 	actionList = []playerAction{
 		actions.help,
-		actions.infoHand,
-		actions.infoTable,
+		actions.info,
 		actions.play,
 		actions.attack,
 		actions.power,

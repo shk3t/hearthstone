@@ -7,8 +7,10 @@ var Heroes = struct {
 	Priest game.Hero
 }{
 	Mage: game.Hero{
-		Character: *game.NewHeroCharacter(),
-		Class:     game.MageClass,
+		Character: game.Character{
+			MaxHealth: 30,
+		},
+		Class: game.MageClass,
 		Power: game.Spell{
 			Card: game.Card{
 				ManaCost:    2,
@@ -17,7 +19,7 @@ var Heroes = struct {
 				Class:       game.MageClass,
 				Rarity:      game.BaseRarity,
 			},
-			Effect: game.CharacterEffect{
+			Effect: game.TargetEffect{
 				Selector: game.CharacterSelectorPresets.Single,
 				Func: func(target *game.Character) {
 					target.DealDamage(1)
@@ -26,8 +28,10 @@ var Heroes = struct {
 		},
 	},
 	Priest: game.Hero{
-		Character: *game.NewHeroCharacter(),
-		Class:     game.PriestClass,
+		Character: game.Character{
+			MaxHealth: 30,
+		},
+		Class: game.PriestClass,
 		Power: game.Spell{
 			Card: game.Card{
 				ManaCost:    2,
@@ -36,7 +40,7 @@ var Heroes = struct {
 				Class:       game.PriestClass,
 				Rarity:      game.BaseRarity,
 			},
-			Effect: game.CharacterEffect{
+			Effect: game.TargetEffect{
 				Selector: game.CharacterSelectorPresets.Single,
 				Func: func(target *game.Character) {
 					target.RestoreHealth(2)

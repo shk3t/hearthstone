@@ -3,8 +3,8 @@ package game
 import "slices"
 
 // Len of idxes and sides always must be equal
-type characterSelector func(
-	current *Character,
+type targetSelector func(
+	active *Character,
 	owner *Player,
 	idxes []int,
 	sides Sides,
@@ -21,11 +21,11 @@ var CharacterSelectorPresets = struct {
 	// AllyHero             characterSelector
 	// SingleAllyMinion     characterSelector
 	// MultipleAllyMinions  characterSelector
-	AllAllyMinions characterSelector
+	AllAllyMinions targetSelector
 	// SingleAlly           characterSelector
 	// MultipleAllies       characterSelector
 	// AllAllies            characterSelector
-	RestAllyMinions characterSelector
+	RestAllyMinions targetSelector
 	// RestAllies           characterSelector
 	// Rest                 characterSelector
 	// Hero                 characterSelector
@@ -33,21 +33,24 @@ var CharacterSelectorPresets = struct {
 	// SingleMinion         characterSelector
 	// MultipleMinions      characterSelector
 	// AllMinions           characterSelector
-	Single characterSelector
+	Single targetSelector
 	// Multiple             characterSelector
 	// All                  characterSelector
 }{
-	AllAllyMinions: func(cur *Character, owner *Player, idxes []int, sides Sides) ([]*Character, error) {
+	AllAllyMinions: func(active *Character, owner *Player, idxes []int, sides Sides) ([]*Character, error) {
 		return owner.GetArea().GetCharacters(), nil
 	},
-	RestAllyMinions: func(cur *Character, owner *Player, idxes []int, sides Sides) ([]*Character, error) {
+	RestAllyMinions: func(active *Character, owner *Player, idxes []int, sides Sides) ([]*Character, error) {
 		characters := owner.GetArea().GetCharacters()
-		if cur != nil {
-			characters = slices.DeleteFunc(characters, func(c *Character) bool { return c == cur })
+		if active != nil {
+			characters = slices.DeleteFunc(
+				characters,
+				func(c *Character) bool { return c == active },
+			)
 		}
 		return characters, nil
 	},
-	Single: func(cur *Character, owner *Player, idxes []int, sides Sides) ([]*Character, error) {
+	Single: func(active *Character, owner *Player, idxes []int, sides Sides) ([]*Character, error) {
 		if len(idxes) == 0 {
 			return nil, NewUnmatchedTargetNumberError(0, 1)
 		}

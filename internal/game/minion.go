@@ -3,10 +3,7 @@ package game
 type Minion struct {
 	Card
 	Character
-	Type        minionType
-	Passive     *PassiveEffect
-	Battlecry   Effect
-	Deathrattle Effect
+	Type minionType
 }
 
 type minionType int
@@ -37,6 +34,7 @@ func (mt minionType) String() string {
 }
 
 func (m *Minion) Play(owner *Player, handIdx, areaIdx int) (*NextAction, error) {
+	m.SetHealthToMax()
 	area := owner.GetArea()
 	err := area.place(areaIdx, m)
 	if err == nil {
@@ -74,7 +72,7 @@ func (m *Minion) Play(owner *Player, handIdx, areaIdx int) (*NextAction, error) 
 	return nil, err
 }
 
-func (m *Minion) Destroy(owner *Player) {
+func (m *Minion) Die(owner *Player) {
 	c := &m.Character
 	if m.Passive != nil {
 		m.Passive.Cancel(c, owner, nil, nil)

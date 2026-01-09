@@ -18,6 +18,7 @@ var DisplayMethods = struct {
 
 func LoadEnv() {
 	godotenv.Load(".env")
+	Env.TableSize = parseInt("TABLE_SIZE", 7)
 	Env.DisplayMethod = strings.ToUpper(parseString("DISPLAY_METHOD", "TUI"))
 	Env.UnlimitedMana = parseBool("UNLIMITED_MANA", false)
 	Env.RevealOpponentsHand = parseBool("REVEAL_OPPONENTS_HAND", false)
@@ -35,10 +36,26 @@ func LoadEnv() {
 }
 
 type envFields struct {
+	TableSize           int
 	DisplayMethod       string
 	FirstTurnSide       int
 	UnlimitedMana       bool
 	RevealOpponentsHand bool
+}
+
+func parseInt(variable string, defaultValue int) int {
+	if os.Getenv(variable) == "" {
+		return defaultValue
+	}
+	value, error := strconv.Atoi(os.Getenv(variable))
+	if error != nil {
+		return defaultValue
+	}
+	return value
+}
+
+func parseString(variable string, defaultValue string) string {
+	return sugar.If(os.Getenv(variable) != "", os.Getenv(variable), defaultValue)
 }
 
 func parseBool(variable string, defaultValue bool) bool {
@@ -50,8 +67,4 @@ func parseBool(variable string, defaultValue bool) bool {
 		return defaultValue
 	}
 	return value
-}
-
-func parseString(variable string, defaultValue string) string {
-	return sugar.If(os.Getenv(variable) != "", os.Getenv(variable), defaultValue)
 }

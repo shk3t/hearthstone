@@ -1,6 +1,7 @@
 package game
 
 import (
+	"hearthstone/internal/config"
 	"hearthstone/pkg/container"
 	errpkg "hearthstone/pkg/errors"
 )
@@ -43,15 +44,13 @@ func (a TableArea) GetCharacters() []*Character {
 
 func newTableArea(side Side) TableArea {
 	return TableArea{
-		Minions: container.NewShrice[*Minion](areaSize),
+		Minions: container.NewShrice[*Minion](config.Env.TableSize),
 		Side:    side,
 	}
 }
 
-const areaSize = 7
-
 func (a TableArea) place(idx int, minion *Minion) error {
-	idx = min(idx, areaSize-1)
+	idx = min(idx, config.Env.TableSize-1)
 	err := a.Minions.Insert(idx, minion)
 	switch err.(type) {
 	case errpkg.IndexError:
@@ -69,14 +68,17 @@ func (a TableArea) remove(idx int) {
 	a.Minions.Pop(idx)
 }
 
-func (a TableArea) cleanupDeadMinions() (deadMinions []Minion) {
+func (a TableArea) cleanupDeadMinions(owner *Player) {
+	deadMinions := []Minion{}
 	for i, minion := range a.Minions {
-		if minion != nil && !minion.Alive {
+		if minion != nil && minion.Health == 0 {
 			deadMinions = append(deadMinions, *a.Minions[i])
 			a.Minions[i] = nil
 		}
 	}
-	a.Minions.Shrink()
 
-	return deadMinions
+	a.Minions.Shrink()
+	for _, minion := range deadMinions {
+		minion.Die(owner)
+	}
 }

@@ -1,29 +1,21 @@
 package game
 
 type Character struct {
-	Attack    int
-	Health    int
-	MaxHealth int
-	Alive     bool
-	Status    CharacterStatus
+	Attack      int
+	Health      int
+	MaxHealth   int
+	Status      CharacterStatus
+	Passive     *StatusEffect
+	Battlecry   Effect
+	Deathrattle Effect
 }
 
-func NewCharacter(attack, health int) *Character {
-	return &Character{
-		Attack:    attack,
-		Health:    health,
-		MaxHealth: health,
-		Alive:     true,
-	}
+func (c *Character) SetHealthToMax() {
+	c.Health = c.MaxHealth
 }
 
-func NewHeroCharacter() *Character {
-	return &Character{
-		Attack:    0,
-		Health:    30,
-		MaxHealth: 30,
-		Alive:     true,
-	}
+func (c *Character) RestoreHealth(value int) {
+	c.Health = min(c.Health+value, c.MaxHealth)
 }
 
 func (c *Character) ExecuteAttack(target *Character) {
@@ -32,12 +24,6 @@ func (c *Character) ExecuteAttack(target *Character) {
 }
 
 func (c *Character) DealDamage(value int) {
-	c.Health -= value
-	if c.Health <= 0 {
-		c.Alive = false
-	}
+	c.Health = min(c.Health-value, 0)
 }
 
-func (c *Character) RestoreHealth(value int) {
-	c.Health = min(c.Health+value, c.MaxHealth)
-}
