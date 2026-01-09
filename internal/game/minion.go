@@ -33,23 +33,26 @@ func (mt minionType) String() string {
 	}
 }
 
-func (m *Minion) Play(owner *Player, handIdx, areaIdx int) (*NextAction, error) {
-	m.SetHealthToMax()
+func (m *Minion) Summon(owner *Player, handIdx, areaIdx int) (*NextAction, error) {
+	game := owner.Game
 	area := owner.GetArea()
+	char := &m.Character
+
+	m.SetHealthToMax()
+	m.owner = owner
 	err := area.place(areaIdx, m)
 	if err == nil {
 		m.Status.SetSleep(true)
 	}
-	c := &m.Character
 
 	if m.Battlecry != nil {
-		err = m.Battlecry.Play(c, owner, nil, nil)
+		err = m.Battlecry.Apply(char, nil, nil)
 
 		switch err.(type) {
 		case UnmatchedTargetNumberError:
 			return &NextAction{
 				Do: func(idxes []int, sides Sides) error {
-					return m.Battlecry.Play(c, owner, idxes, sides)
+					return m.Battlecry.Apply(char, idxes, sides)
 				},
 				OnSuccess: func() {
 					owner.Hand.discard(handIdx)
@@ -66,18 +69,22 @@ func (m *Minion) Play(owner *Player, handIdx, areaIdx int) (*NextAction, error) 
 	}
 
 	if m.Passive != nil {
-		m.Passive.Play(c, owner, nil, nil)
+		m.Passive.Apply(char, nil, nil)
+	}
+
+	for _, effect := range game.getApplicableStatusEffects(char) {
+		effect.InFunc(char)
 	}
 
 	return nil, err
 }
 
-func (m *Minion) Die(owner *Player) {
-	c := &m.Character
+func (m *Minion) Die() {
+	char := &m.Character
 	if m.Passive != nil {
-		m.Passive.Cancel(c, owner, nil, nil)
+		m.Passive.Cancel(char, nil, nil)
 	}
 	if m.Deathrattle != nil {
-		m.Deathrattle.Play(c, owner, nil, nil)
+		m.Deathrattle.Apply(char, nil, nil)
 	}
 }

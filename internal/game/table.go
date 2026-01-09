@@ -68,17 +68,17 @@ func (a TableArea) remove(idx int) {
 	a.Minions.Pop(idx)
 }
 
-func (a TableArea) cleanupDeadMinions(owner *Player) {
-	deadMinions := []Minion{}
+func (a TableArea) cleanupDeadMinions() {
+	deadMinions := []*Minion{}
 	for i, minion := range a.Minions {
-		if minion != nil && minion.Health == 0 {
-			deadMinions = append(deadMinions, *a.Minions[i])
+		if minion != nil && minion.Health <= 0 {
+			deadMinions = append(deadMinions, a.Minions[i])
 			a.Minions[i] = nil
 		}
 	}
 
 	a.Minions.Shrink()
 	for _, minion := range deadMinions {
-		minion.Die(owner)
+		minion.Die()
 	}
 }

@@ -66,9 +66,9 @@ func (p *Player) PlayCard(
 
 	switch card := card.(type) {
 	case Minion:
-		next, err = card.Play(p, handIdx, areaIdx)
+		next, err = card.Summon(p, handIdx, areaIdx)
 	case Spell:
-		err = card.Play(p, spellIdxes, spellSides)
+		err = card.Cast(p.Hero, spellIdxes, spellSides)
 	default:
 		panic("Invalid card type")
 	}

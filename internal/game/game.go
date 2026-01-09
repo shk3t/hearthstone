@@ -27,6 +27,8 @@ func NewGame(topHero, botHero *Hero, topDeck, botDeck Deck) *Game {
 		TopSide: *newPlayer(TopSide, topHero, topDeck, game),
 		BotSide: *newPlayer(BotSide, botHero, botDeck, game),
 	}
+	topHero.owner = &game.Players[0]
+	botHero.owner = &game.Players[1]
 
 	return game
 }
@@ -82,15 +84,14 @@ func (g *Game) StartNextTurn() []error {
 func (g *Game) Cleanup() {
 	for i := range SidesCount {
 		side := Side(i)
-		owner := g.Players[side]
-		g.Table[side].cleanupDeadMinions(&owner)
+		g.Table[side].cleanupDeadMinions()
 	}
 }
 
 func (g *Game) GetWinner() Side {
 	for i := range SidesCount {
 		side := Side(i)
-		if g.Players[side].Hero.Health == 0 {
+		if g.Players[side].Hero.Health <= 0 {
 			return side.Opposite()
 		}
 	}
@@ -109,10 +110,15 @@ func (g *Game) getCharacter(idx int, side Side) (*Character, error) {
 	}
 }
 
-func (g *Game) getStatusEffect(character *Character, side Side) *StatusEffect {
-	effect, ok := g.statusEffects[character]
-	if !ok {
-		return nil
+func (g *Game) getApplicableStatusEffects(character *Character) []StatusEffect {
+	applicableEffects := []StatusEffect{}
+	for source, effect := range g.statusEffects {
+		targets, _ := effect.Selector(source, nil, nil)
+		for _, target := range targets {
+			if target == character {
+				applicableEffects = append(applicableEffects, effect)
+			}
+		}
 	}
-	return &effect
+	return applicableEffects
 }

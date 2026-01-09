@@ -1,21 +1,23 @@
 package game
 
-import "hearthstone/pkg/sugar"
+import (
+	"hearthstone/pkg/sugar"
+)
 
 type targetEffectFunc func(target *Character)
 type playerEffectFunc func(player *Player)
 
 // Value-type interface
 type Effect interface {
-	Play(source *Character, owner *Player, idxes []int, sides Sides) error
+	Apply(source *Character, idxes []int, sides Sides) error
 }
 
 type PlayerEffect struct {
 	Func playerEffectFunc
 }
 
-func (e PlayerEffect) Play(source *Character, owner *Player, idxes []int, sides Sides) error {
-	e.Func(owner)
+func (e PlayerEffect) Apply(source *Character, idxes []int, sides Sides) error {
+	e.Func(source.owner)
 	return nil
 }
 
@@ -25,17 +27,16 @@ type TargetEffect struct {
 	AllyIsDefaultTarget bool
 }
 
-func (e TargetEffect) Play(
+func (e TargetEffect) Apply(
 	source *Character,
-	owner *Player,
 	idxes []int,
 	sides Sides,
 ) error {
 	sides.SetIfUnset(
-		sugar.If(e.AllyIsDefaultTarget, owner.Side, owner.Side.Opposite()),
+		sugar.If(e.AllyIsDefaultTarget, source.getSide(), source.getSide().Opposite()),
 	)
 
-	targets, err := e.Selector(source, owner, idxes, sides)
+	targets, err := e.Selector(source, idxes, sides)
 	if err != nil {
 		return err
 	}
@@ -55,17 +56,16 @@ type IndividualTargetEffect struct {
 	AllyIsDefaultTarget bool
 }
 
-func (e IndividualTargetEffect) Play(
+func (e IndividualTargetEffect) Apply(
 	source *Character,
-	owner *Player,
 	idxes []int,
 	sides Sides,
 ) error {
 	sides.SetIfUnset(
-		sugar.If(e.AllyIsDefaultTarget, owner.Side, owner.Side.Opposite()),
+		sugar.If(e.AllyIsDefaultTarget, source.getSide(), source.getSide().Opposite()),
 	)
 
-	targets, err := e.Selector(source, owner, idxes, sides)
+	targets, err := e.Selector(source, idxes, sides)
 	if err != nil {
 		return err
 	}
@@ -91,22 +91,18 @@ type StatusEffect struct {
 	OutFunc  targetEffectFunc
 }
 
-func (e StatusEffect) Play(
+func (e StatusEffect) Apply(
 	source *Character,
-	owner *Player,
 	idxes []int,
 	sides Sides,
 ) error {
-	targets, err := e.Selector(source, owner, idxes, sides)
+	targets, err := e.Selector(source, idxes, sides)
 	if err != nil {
 		return err
 	}
 
-	// TODO: get all status effects on `info` input
-	// TODO: show status effects in preview
-	owner.Game.statusEffects[source] = e
+	source.getGame().statusEffects[source] = e
 
-	// TODO: properly apply effects in the game loop
 	for _, target := range targets {
 		if target != nil {
 			e.InFunc(target)
@@ -118,18 +114,16 @@ func (e StatusEffect) Play(
 
 func (e StatusEffect) Cancel(
 	source *Character,
-	owner *Player,
 	idxes []int,
 	sides Sides,
 ) error {
-	targets, err := e.Selector(source, owner, idxes, sides)
+	targets, err := e.Selector(source, idxes, sides)
 	if err != nil {
 		return err
 	}
 
-	delete(owner.Game.statusEffects, source)
+	delete(source.getGame().statusEffects, source)
 
-	// TODO: properly cancel effects in the game loop
 	for _, target := range targets {
 		if target != nil {
 			e.OutFunc(target)

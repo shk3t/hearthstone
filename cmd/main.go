@@ -18,7 +18,7 @@ func main() {
 		legacy.Neutral.ChillwindYeti,
 		legacy.Neutral.ChillwindYeti,
 		legacy.Neutral.RaidLeader,
-		legacy.Neutral.ChillwindYeti,
+		legacy.Neutral.RaidLeader,
 		legacy.Neutral.ChillwindYeti,
 	)
 
@@ -40,7 +40,6 @@ func main() {
 	botPlayer.PlayCard(0, 0, nil, nil)
 	botPlayer.PlayCard(0, 0, nil, nil)
 	g.StartNextTurn()
-
 
 	helper.WaitForever()
 }

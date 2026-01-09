@@ -5,6 +5,6 @@ type Spell struct {
 	Effect
 }
 
-func (s *Spell) Play(owner *Player, idxes []int, sides Sides) error {
-	return s.Effect.Play(nil, owner, idxes, sides)
+func (s *Spell) Cast(hero *Hero, idxes []int, sides Sides) error {
+	return s.Effect.Apply(&hero.Character, idxes, sides)
 }

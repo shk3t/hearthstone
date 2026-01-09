@@ -4,8 +4,7 @@ import "slices"
 
 // Len of idxes and sides always must be equal
 type targetSelector func(
-	active *Character,
-	owner *Player,
+	source *Character,
 	idxes []int,
 	sides Sides,
 ) (targets []*Character, err error)
@@ -37,25 +36,25 @@ var CharacterSelectorPresets = struct {
 	// Multiple             characterSelector
 	// All                  characterSelector
 }{
-	AllAllyMinions: func(active *Character, owner *Player, idxes []int, sides Sides) ([]*Character, error) {
-		return owner.GetArea().GetCharacters(), nil
+	AllAllyMinions: func(source *Character, idxes []int, sides Sides) ([]*Character, error) {
+		return source.getAllies(), nil
 	},
-	RestAllyMinions: func(active *Character, owner *Player, idxes []int, sides Sides) ([]*Character, error) {
-		characters := owner.GetArea().GetCharacters()
-		if active != nil {
-			characters = slices.DeleteFunc(
-				characters,
-				func(c *Character) bool { return c == active },
+	RestAllyMinions: func(source *Character, idxes []int, sides Sides) ([]*Character, error) {
+		allies := source.getAllies()
+		if source != nil {
+			allies = slices.DeleteFunc(
+				allies,
+				func(char *Character) bool { return char == source },
 			)
 		}
-		return characters, nil
+		return allies, nil
 	},
-	Single: func(active *Character, owner *Player, idxes []int, sides Sides) ([]*Character, error) {
+	Single: func(source *Character, idxes []int, sides Sides) ([]*Character, error) {
 		if len(idxes) == 0 {
 			return nil, NewUnmatchedTargetNumberError(0, 1)
 		}
 
-		target, err := owner.Game.getCharacter(idxes[0], sides[0])
+		target, err := source.getGame().getCharacter(idxes[0], sides[0])
 		return []*Character{target}, err
 	},
 }

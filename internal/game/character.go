@@ -8,6 +8,7 @@ type Character struct {
 	Passive     *StatusEffect
 	Battlecry   Effect
 	Deathrattle Effect
+	owner       *Player
 }
 
 func (c *Character) SetHealthToMax() {
@@ -24,6 +25,21 @@ func (c *Character) ExecuteAttack(target *Character) {
 }
 
 func (c *Character) DealDamage(value int) {
-	c.Health = min(c.Health-value, 0)
+	c.Health -= value
 }
 
+func (c *Character) getGame() *Game {
+	return c.owner.Game
+}
+
+func (c *Character) getSide() Side {
+	return c.owner.Side
+}
+
+func (c *Character) getAllies() []*Character {
+	return c.owner.GetArea().GetCharacters()
+}
+
+func (c *Character) getEnemies() []*Character {
+	return c.owner.GetOpponent().GetArea().GetCharacters()
+}

@@ -17,23 +17,27 @@ type characterStatusGetter func(cs *game.CharacterStatus) bool
 
 var characterStatusInfoEntries = [...]*characterStatusInfoEntry{
 	{
-		(*game.CharacterStatus).IsSleep,
-		"Z", "Сон",
-		"Не может атаковать в этом ходу.",
-	},
-	{
 		(*game.CharacterStatus).IsFreeze,
 		"F", "Заморозка",
 		"Замороженные персонажи пропускают следующую атаку.",
+	},
+	{
+		(*game.CharacterStatus).IsSleep,
+		"Z", "Сон",
+		"Не может атаковать в этом ходу.",
 	},
 }
 
 const characterStatusHeader = "Статусы:\n"
 const characterStatusEffectHeader = "Пассивно:\n"
+const characterStatusEffectPictogram = "P"
 
-// TODO: add pictrogram of status effect
 func characterStatusString(c *game.Character) string {
 	builder := strings.Builder{}
+
+	if c.Passive != nil {
+		builder.WriteString(characterStatusEffectPictogram)
+	}
 
 	for _, status := range characterStatusInfoEntries {
 		if status.isActive(&c.Status) {
@@ -41,12 +45,9 @@ func characterStatusString(c *game.Character) string {
 		}
 	}
 
-	// if c.Passive
-
 	return builder.String()
 }
 
-// TODO: add info about status effect
 func characterStatusInfo(c *game.Character) string {
 	builder := strings.Builder{}
 

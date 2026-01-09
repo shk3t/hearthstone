@@ -12,7 +12,7 @@ func minionHandString(m *game.Minion) string {
 		m.ManaCost,
 		m.Name,
 		m.Attack,
-		m.Health,
+		m.MaxHealth,
 	)
 }
 

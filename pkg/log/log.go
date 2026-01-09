@@ -8,6 +8,7 @@ import (
 
 var DebugLogger *log.Logger
 var DLog func(...any)
+var DLogPtr func(any)
 
 func Init() error {
 	err := os.MkdirAll("logs", 0755)
@@ -21,6 +22,9 @@ func Init() error {
 
 	DebugLogger = log.New(debugLogFile, "", log.LstdFlags|log.Lshortfile)
 	DLog = DebugLogger.Println
+	DLogPtr = func(arg any) {
+		DebugLogger.Printf("%p", arg)
+	}
 	return nil
 }
 

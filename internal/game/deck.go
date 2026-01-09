@@ -16,7 +16,7 @@ func NewDeck(cards ...Cardlike) Deck {
 func (d Deck) Copy() Deck {
 	newContainer := container.NewShrice[Cardlike](deckSize)
 	dLen := container.Shrice[Cardlike](d).Len()
-	for i := 0; i < dLen; i++ {
+	for i := range dLen {
 		switch card := d[i].(type) {
 		case Minion:
 			newContainer[i] = card
