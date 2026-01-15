@@ -5,42 +5,51 @@ import (
 	"hearthstone/internal/game"
 	"strconv"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 const barLeftAlign = 10
-const barRightAlign = 33
+const barRightAlign = 62
 
-func barString(head string, val, maxVal int, sym string) string {
+type formatFunc func(format string, a ...any) string
+
+func barString(head string, val, maxVal int, sym string, fmtFunc formatFunc) string {
 	builder := strings.Builder{}
 
-	fmt.Fprintf(&builder,
-		"%-"+strconv.Itoa(barLeftAlign)+"s",
-		head,
+	builder.WriteString(
+		color.HiBlackString(
+			"%-"+strconv.Itoa(barLeftAlign)+"s",
+			head,
+		),
 	)
 	fmt.Fprintf(&builder,
-		"%2d/%2d",
-		val, maxVal,
+		"%2d%s%2d",
+		val,
+		color.HiBlackString("/"),
+		maxVal,
+	)
+	bar := fmtFunc(
+		"%s%s",
+		strings.Repeat(" ", min(max(maxVal-val, 0), maxVal)),
+		strings.Repeat(sym, max(val, 0)),
 	)
 	fmt.Fprintf(&builder,
 		"%"+strconv.Itoa(barRightAlign)+"s",
-		fmt.Sprintf(
-			"[%s%s]",
-			strings.Repeat(" ", min(max(maxVal-val, 0), maxVal)),
-			strings.Repeat(sym, max(val, 0)),
-		),
+		color.HiBlackString("[")+bar+color.HiBlackString("]"),
 	)
 
 	return builder.String()
 }
 
 func healthString(h *game.Hero) string {
-	return barString("Здоровье:", h.Health, h.MaxHealth, "+")
+	return barString("Здоровье:", h.Health, h.MaxHealth, "+", color.RedString)
 }
 
 func manaString(p *game.Player) string {
-	return barString("Мана:", p.Mana, p.MaxMana, "*")
+	return barString("Мана:", p.Mana, p.MaxMana, "*", color.BlueString)
 }
 
 func handLenString(h game.Hand) string {
-	return barString("Карт:", h.Len(), game.HandCap, "#")
+	return barString("Карт:", h.Len(), game.HandCap, "#", color.MagentaString)
 }
