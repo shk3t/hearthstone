@@ -4,15 +4,18 @@ import (
 	"fmt"
 	"hearthstone/internal/game"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 func minionHandString(m *game.Minion) string {
 	return fmt.Sprintf(
-		"<%d> %s %d/%d",
-		m.ManaCost,
+		"%s %s %s%s%s",
+		color.BlueString("<%d>", m.ManaCost),
 		m.Name,
-		m.Attack,
-		m.MaxHealth,
+		color.YellowString("%d", m.Attack),
+		color.HiBlackString("/"),
+		color.RedString("%d", m.MaxHealth),
 	)
 }
 
@@ -22,7 +25,12 @@ func minionTableString(m *game.Minion, fieldWidths ...int) string {
 		format = fmt.Sprintf("%%-%ds %%%ds | %%s", fieldWidths[0], fieldWidths[1])
 	}
 
-	attackHealthStr := fmt.Sprintf("%d/%d", m.Attack, m.Health)
+	attackHealthStr := fmt.Sprintf(
+		"%s%s%s",
+		color.YellowString("%d", m.Attack),
+		color.HiBlackString("/"),
+		color.RedString("%d", m.Health),
+	)
 	str := fmt.Sprintf(
 		format,
 		m.Name, attackHealthStr, characterStatusString(&m.Character),

@@ -6,16 +6,18 @@ import (
 	"strconv"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/fatih/color"
 )
 
 func tableString(t *game.Table) string {
 	builder := strings.Builder{}
 	fmt.Fprintln(&builder)
-	fmt.Fprintln(&builder, strings.Repeat("=", 50))
+	fmt.Fprintln(&builder, color.HiBlackString(strings.Repeat("=", 50)))
 	fmt.Fprintln(&builder, tableAreaString(t[game.TopSide]))
-	fmt.Fprintln(&builder, strings.Repeat("-", 50))
+	fmt.Fprintln(&builder, color.HiBlackString(strings.Repeat("-", 50)))
 	fmt.Fprintln(&builder, tableAreaString(t[game.BotSide]))
-	fmt.Fprintln(&builder, strings.Repeat("=", 50))
+	fmt.Fprintln(&builder, color.HiBlackString(strings.Repeat("=", 50)))
 	fmt.Fprintln(&builder)
 	return builder.String()
 }
@@ -34,10 +36,17 @@ func tableAreaString(a game.TableArea) string {
 		}
 	}
 
+	colorFunc := getColorFunc(a.Side)
 	i := 1
 	for _, m := range a.Minions {
 		if m != nil {
-			fmt.Fprintf(&builder, "%d. %s\n", i, minionTableString(m, nameMaxLen, attackHpMaxLen))
+			fmt.Fprintf(
+				&builder,
+				"%s%s %s\n",
+				colorFunc("%d", i),
+				color.HiBlackString("."),
+				minionTableString(m, nameMaxLen, attackHpMaxLen),
+			)
 			i++
 		}
 	}

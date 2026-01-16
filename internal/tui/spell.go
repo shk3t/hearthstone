@@ -3,12 +3,14 @@ package tui
 import (
 	"fmt"
 	"hearthstone/internal/game"
+
+	"github.com/fatih/color"
 )
 
 func spellString(s *game.Spell) string {
 	return fmt.Sprintf(
-		"<%d> %s",
-		s.ManaCost,
-		s.Name,
+		"%s %s",
+		color.BlueString("<%d>", s.ManaCost),
+		color.MagentaString(s.Name),
 	)
 }

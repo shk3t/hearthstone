@@ -29,6 +29,10 @@ func newPlayer(side Side, hero *Hero, deck Deck, game *Game) *Player {
 	}
 }
 
+func (p *Player) IsActive() bool {
+	return p.Side == p.Game.Turn
+}
+
 func (p *Player) GetArea() TableArea {
 	return p.Game.Table[p.Side]
 }

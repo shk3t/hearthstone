@@ -3,6 +3,7 @@ package tui
 import (
 	"fmt"
 	"hearthstone/internal/game"
+	"hearthstone/pkg/ui"
 	"strconv"
 	"strings"
 
@@ -12,9 +13,7 @@ import (
 const barLeftAlign = 10
 const barRightAlign = 62
 
-type formatFunc func(format string, a ...any) string
-
-func barString(head string, val, maxVal int, sym string, fmtFunc formatFunc) string {
+func barString(head string, val, maxVal int, sym string, fmtFunc ui.FormatFunc) string {
 	builder := strings.Builder{}
 
 	builder.WriteString(
@@ -23,12 +22,14 @@ func barString(head string, val, maxVal int, sym string, fmtFunc formatFunc) str
 			head,
 		),
 	)
+
 	fmt.Fprintf(&builder,
 		"%2d%s%2d",
 		val,
 		color.HiBlackString("/"),
 		maxVal,
 	)
+
 	bar := fmtFunc(
 		"%s%s",
 		strings.Repeat(" ", min(max(maxVal-val, 0), maxVal)),
