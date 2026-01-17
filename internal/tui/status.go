@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"hearthstone/internal/game"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 type characterStatusInfoEntry struct {
@@ -18,19 +20,20 @@ type characterStatusGetter func(cs *game.CharacterStatus) bool
 var characterStatusInfoEntries = [...]*characterStatusInfoEntry{
 	{
 		(*game.CharacterStatus).IsFreeze,
-		"F", "Заморозка",
+		color.BlueString("󰆧 "), "Заморозка",
 		"Замороженные персонажи пропускают следующую атаку.",
 	},
 	{
 		(*game.CharacterStatus).IsSleep,
-		"Z", "Сон",
+		"󰒲 ", "Сон",
 		"Не может атаковать в этом ходу.",
 	},
 }
 
 const characterStatusHeader = "Статусы:\n"
 const characterStatusEffectHeader = "Пассивно:\n"
-const characterStatusEffectPictogram = "P"
+
+var characterStatusEffectPictogram = color.YellowString("󰜷 ")
 
 func characterStatusString(c *game.Character) string {
 	builder := strings.Builder{}

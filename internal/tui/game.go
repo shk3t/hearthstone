@@ -3,6 +3,7 @@ package tui
 import (
 	"fmt"
 	"hearthstone/internal/game"
+	"hearthstone/pkg/ui"
 	"strings"
 )
 
@@ -27,7 +28,10 @@ func gameString(g *game.Game) string {
 			strings.ToUpper(winner.String()),
 		)
 	} else {
-		fmt.Fprint(&builder, prompt)
+		fmt.Fprint(
+			&builder,
+			ui.BoldString(getColorStringFunc(g.Turn)(prompt)),
+		)
 	}
 
 	return builder.String()

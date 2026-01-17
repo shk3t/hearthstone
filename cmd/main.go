@@ -17,6 +17,7 @@ func main() {
 		legacy.Neutral.ChillwindYeti,
 		legacy.Neutral.ChillwindYeti,
 		legacy.Neutral.ChillwindYeti,
+		legacy.Mage.Frostbolt,
 		legacy.Neutral.RaidLeader,
 		legacy.Neutral.RaidLeader,
 		legacy.Neutral.ChillwindYeti,
