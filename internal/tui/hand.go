@@ -3,17 +3,19 @@ package tui
 import (
 	"fmt"
 	"hearthstone/internal/game"
+	"hearthstone/pkg/sugar"
+	"hearthstone/pkg/ui"
 	"strings"
 
 	"github.com/fatih/color"
 )
 
-func handString(h game.Hand, side game.Side) string {
+func handString(h game.Hand, side game.Side, isActive bool) string {
 	builder := strings.Builder{}
 	var cardStr string
 	i := 1
 
-	colorFunc := getColorFunc(side)
+	colorStringFunc := getColorStringFunc(side)
 
 	for _, card := range h {
 		switch card := card.(type) {
@@ -30,7 +32,11 @@ func handString(h game.Hand, side game.Side) string {
 		fmt.Fprintf(
 			&builder,
 			"%s%s %s\n",
-			colorFunc("%d", i),
+			sugar.If(
+				isActive,
+				ui.BoldString(colorStringFunc("%d", i)),
+				colorStringFunc("%d", i),
+			),
 			color.HiBlackString("."),
 			cardStr,
 		)

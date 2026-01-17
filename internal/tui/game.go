@@ -12,7 +12,7 @@ func gameString(g *game.Game) string {
 	builder := strings.Builder{}
 
 	fmt.Fprint(&builder, playerString(&g.Players[game.TopSide]))
-	fmt.Fprint(&builder, tableString(&g.Table))
+	fmt.Fprint(&builder, tableString(&g.Table, g.Turn))
 	fmt.Fprint(&builder, playerString(&g.Players[game.BotSide]))
 	builder.WriteString("\n")
 

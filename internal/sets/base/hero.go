@@ -7,6 +7,7 @@ var Heroes = struct {
 	Priest game.Hero
 }{
 	Mage: game.Hero{
+		Name: "Джайна Праудмур",
 		Character: game.Character{
 			MaxHealth: 30,
 		},
@@ -28,6 +29,7 @@ var Heroes = struct {
 		},
 	},
 	Priest: game.Hero{
+		Name: "Андуин Ринн",
 		Character: game.Character{
 			MaxHealth: 30,
 		},

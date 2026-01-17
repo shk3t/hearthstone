@@ -3,6 +3,8 @@ package tui
 import (
 	"fmt"
 	"hearthstone/internal/game"
+	"hearthstone/pkg/sugar"
+	"hearthstone/pkg/ui"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -10,19 +12,19 @@ import (
 	"github.com/fatih/color"
 )
 
-func tableString(t *game.Table) string {
+func tableString(t *game.Table, turn game.Side) string {
 	builder := strings.Builder{}
 	fmt.Fprintln(&builder)
 	fmt.Fprintln(&builder, color.HiBlackString(strings.Repeat("=", 50)))
-	fmt.Fprintln(&builder, tableAreaString(t[game.TopSide]))
+	fmt.Fprintln(&builder, tableAreaString(t[game.TopSide], turn == game.TopSide))
 	fmt.Fprintln(&builder, color.HiBlackString(strings.Repeat("-", 50)))
-	fmt.Fprintln(&builder, tableAreaString(t[game.BotSide]))
+	fmt.Fprintln(&builder, tableAreaString(t[game.BotSide], turn == game.BotSide))
 	fmt.Fprintln(&builder, color.HiBlackString(strings.Repeat("=", 50)))
 	fmt.Fprintln(&builder)
 	return builder.String()
 }
 
-func tableAreaString(a game.TableArea) string {
+func tableAreaString(a game.TableArea, isActive bool) string {
 	builder := strings.Builder{}
 
 	nameMaxLen, attackHpMaxLen := 0, 0
@@ -36,14 +38,18 @@ func tableAreaString(a game.TableArea) string {
 		}
 	}
 
-	colorFunc := getColorFunc(a.Side)
+	colorStringFunc := getColorStringFunc(a.Side)
 	i := 1
 	for _, m := range a.Minions {
 		if m != nil {
 			fmt.Fprintf(
 				&builder,
 				"%s%s %s\n",
-				colorFunc("%d", i),
+				sugar.If(
+					isActive,
+					ui.BoldString(colorStringFunc("%d", i)),
+					colorStringFunc("%d", i),
+				),
 				color.HiBlackString("."),
 				minionTableString(m, nameMaxLen, attackHpMaxLen),
 			)

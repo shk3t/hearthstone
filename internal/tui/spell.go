@@ -11,6 +11,6 @@ func spellString(s *game.Spell) string {
 	return fmt.Sprintf(
 		"%s %s",
 		color.BlueString("<%d>", s.ManaCost),
-		color.MagentaString(s.Name),
+		color.MagentaString("%s", s.Name),
 	)
 }

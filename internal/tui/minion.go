@@ -20,9 +20,17 @@ func minionHandString(m *game.Minion) string {
 }
 
 func minionTableString(m *game.Minion, fieldWidths ...int) string {
-	format := "%s %s | %s"
+	format := fmt.Sprintf(
+		"%%s %%s %s %%s",
+		color.HiBlackString("|"),
+	)
 	if len(fieldWidths) == 2 {
-		format = fmt.Sprintf("%%-%ds %%%ds | %%s", fieldWidths[0], fieldWidths[1])
+		format = fmt.Sprintf(
+			"%%-%ds %%%ds %s %%s",
+			fieldWidths[0],
+			fieldWidths[1],
+			color.HiBlackString("|"),
+		)
 	}
 
 	attackHealthStr := fmt.Sprintf(
@@ -36,7 +44,7 @@ func minionTableString(m *game.Minion, fieldWidths ...int) string {
 		m.Name, attackHealthStr, characterStatusString(&m.Character),
 	)
 
-	return strings.TrimRight(str, "| ")
+	return strings.TrimRight(str, color.HiBlackString("|")+" ")
 }
 
 func getMinionInfo(table *game.Table, idx int, side game.Side) (string, error) {

@@ -2,6 +2,7 @@ package game
 
 type Hero struct {
 	Character
+	Name        string
 	Class       class
 	Weapon      *Weapon
 	Power       Spell

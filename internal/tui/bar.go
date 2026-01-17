@@ -24,10 +24,8 @@ func barString(head string, val, maxVal int, sym string, fmtFunc ui.FormatFunc) 
 	)
 
 	fmt.Fprintf(&builder,
-		"%2d%s%2d",
-		val,
-		color.HiBlackString("/"),
-		maxVal,
+		"%2d%s",
+		val, color.HiBlackString("/%2d", maxVal),
 	)
 
 	bar := fmtFunc(
