@@ -46,23 +46,23 @@ var actions = struct {
 		description: "вывести полную помощь по командам",
 		do: func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
 			builder := strings.Builder{}
-			builder.WriteString(
+			fmt.Fprint(&builder, 
 				color.YellowString("Доступные действия:\n"),
 			)
 			for _, action := range actionList {
 				fmt.Fprintln(&builder, action.info(false, false))
 			}
-			builder.WriteString(fmt.Sprintf(
+			fmt.Fprintf(&builder,
 				"Чтобы указать героя в качестве цели, используйте %s или %s\n",
 				color.MagentaString("h"),
 				color.MagentaString("0"),
-			))
-			builder.WriteString(fmt.Sprintf(
+			)
+			fmt.Fprintf(&builder,
 				"Чтобы указать сторону цели, используйте %s (верх) или %s (низ), например %s",
 				color.MagentaString("t"),
 				color.MagentaString("b"),
 				color.MagentaString("5b"),
-			))
+			)
 			return builder.String(), nil, nil
 		},
 	},

@@ -29,8 +29,7 @@ func handString(h game.Hand, side game.Side, isActive bool) string {
 			panic("Invalid card type")
 		}
 
-		fmt.Fprintf(
-			&builder,
+		fmt.Fprintf(&builder,
 			"%s%s %s\n",
 			sugar.If(
 				isActive,

@@ -16,7 +16,7 @@ const barRightAlign = 62
 func barString(head string, val, maxVal int, sym string, fmtFunc ui.FormatFunc) string {
 	builder := strings.Builder{}
 
-	builder.WriteString(
+	fmt.Fprint(&builder,
 		color.HiBlackString(
 			"%-"+strconv.Itoa(barLeftAlign)+"s",
 			head,
@@ -24,8 +24,9 @@ func barString(head string, val, maxVal int, sym string, fmtFunc ui.FormatFunc) 
 	)
 
 	fmt.Fprintf(&builder,
-		"%2d%s",
-		val, color.HiBlackString("/%2d", maxVal),
+		"%s%s",
+		fmtFunc("%2d", val),
+		color.HiBlackString("/%2d", maxVal),
 	)
 
 	bar := fmtFunc(

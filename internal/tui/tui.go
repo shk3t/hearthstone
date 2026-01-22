@@ -66,8 +66,8 @@ var scanner = bufio.NewScanner(os.Stdin)
 
 func getShortHelp() string {
 	builder := strings.Builder{}
-	builder.WriteString(color.RedString("Некорректное действие\n"))
-	builder.WriteString(color.YellowString("Доступные действия:\n"))
+	fmt.Fprint(&builder, color.RedString("Некорректное действие\n"))
+	fmt.Fprint(&builder, color.YellowString("Доступные действия:\n"))
 	for _, action := range actionList {
 		fmt.Fprintln(&builder, action.info(false, true))
 	}

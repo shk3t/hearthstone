@@ -13,15 +13,16 @@ import (
 )
 
 func tableString(t *game.Table, turn game.Side) string {
-	builder := strings.Builder{}
-	fmt.Fprintln(&builder)
-	fmt.Fprintln(&builder, color.HiBlackString(strings.Repeat("=", 50)))
-	fmt.Fprintln(&builder, tableAreaString(t[game.TopSide], turn == game.TopSide))
-	fmt.Fprintln(&builder, color.HiBlackString(strings.Repeat("-", 50)))
-	fmt.Fprintln(&builder, tableAreaString(t[game.BotSide], turn == game.BotSide))
-	fmt.Fprintln(&builder, color.HiBlackString(strings.Repeat("=", 50)))
-	fmt.Fprintln(&builder)
-	return builder.String()
+	lines := []string{
+		"",
+		color.HiBlackString(strings.Repeat("=", 50)),
+		tableAreaString(t[game.TopSide], turn == game.TopSide),
+		color.HiBlackString(strings.Repeat("-", 50)),
+		tableAreaString(t[game.BotSide], turn == game.BotSide),
+		color.HiBlackString(strings.Repeat("=", 50)),
+		"",
+	}
+	return strings.Join(lines, "\n")
 }
 
 func tableAreaString(a game.TableArea, isActive bool) string {
@@ -42,8 +43,7 @@ func tableAreaString(a game.TableArea, isActive bool) string {
 	i := 1
 	for _, m := range a.Minions {
 		if m != nil {
-			fmt.Fprintf(
-				&builder,
+			fmt.Fprintf(&builder,
 				"%s%s %s\n",
 				sugar.If(
 					isActive,

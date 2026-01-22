@@ -3,6 +3,8 @@ package tui
 import (
 	"fmt"
 	"hearthstone/internal/game"
+	"hearthstone/pkg/sugar"
+	"hearthstone/pkg/ui"
 	"strings"
 
 	"github.com/fatih/color"
@@ -37,7 +39,13 @@ func minionTableString(m *game.Minion, fieldWidths ...int) string {
 		"%s%s%s",
 		color.YellowString("%d", m.Attack),
 		color.HiBlackString("/"),
-		color.RedString("%d", m.Health),
+		color.RedString(
+			sugar.If(
+				m.Health < m.MaxHealth,
+				ui.UnderlineString("%d", m.Health),
+				fmt.Sprintf("%d", m.Health),
+			),
+		),
 	)
 	str := fmt.Sprintf(
 		format,
@@ -57,12 +65,21 @@ func getMinionInfo(table *game.Table, idx int, side game.Side) (string, error) {
 
 func minionInfo(m *game.Minion) string {
 	builder := strings.Builder{}
-	fmt.Fprintln(&builder, cardInfo(&m.Card))
-	fmt.Fprintf(&builder, "Атака:    %d\n", m.Attack)
-	fmt.Fprintf(&builder, "Здоровье: %d\n", m.Health)
+	fmt.Fprintln(&builder, cardInfo(&m.Card, nil))
+	fmt.Fprintf(&builder,
+		"%s    %s\n",
+		color.HiBlackString("Атака:"),
+		color.YellowString("%d", m.Attack),
+	)
+	fmt.Fprintf(&builder,
+		"%s %s%s\n",
+		color.HiBlackString("Здоровье:"),
+		color.RedString("%d", m.Health),
+		color.HiBlackString("/%d", m.MaxHealth),
+	)
 	if m.Type != game.NoMinionType {
 		fmt.Fprintf(&builder, "Тип:      %s\n", m.Type)
 	}
-	builder.WriteString(characterStatusInfo(&m.Character))
+	fmt.Fprint(&builder, characterStatusInfo(&m.Character))
 	return strings.TrimSuffix(builder.String(), "\n")
 }

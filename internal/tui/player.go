@@ -34,13 +34,13 @@ func playerString(p *game.Player) string {
 			handString(p.Hand, p.Side, p.IsActive()),
 			handLenString(p.Hand),
 		),
+		"",
 	}
 
 	if p.Side == game.BotSide {
 		slices.Reverse(lines)
 	}
 
-	lines = append(lines, "")
 	str := strings.Join(lines, "\n")
 	str = multipleBreakRegexp.ReplaceAllString(str, "\n")
 	return str
