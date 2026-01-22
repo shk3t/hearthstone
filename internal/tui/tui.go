@@ -8,6 +8,8 @@ import (
 	"hearthstone/pkg/ui"
 	"os"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 func Display(g *game.Game) {
@@ -40,7 +42,7 @@ func HandleInput(g *game.Game) error {
 
 	for _, action := range actionList {
 		if action.matches(command) {
-			state.hint, state.nextAction = action.wrappedDo(args, g)
+			state.hint, state.nextAction = action.Do(args, g)
 			if state.nextAction != nil {
 				state.hint = nextActionHint
 			}
@@ -48,7 +50,7 @@ func HandleInput(g *game.Game) error {
 		}
 	}
 
-	state.hint, _ = actions.shortHelp.wrappedDo(args, g)
+	state.hint = getShortHelp()
 	return nil
 }
 
@@ -61,3 +63,13 @@ func Feedback(errs ...error) {
 }
 
 var scanner = bufio.NewScanner(os.Stdin)
+
+func getShortHelp() string {
+	builder := strings.Builder{}
+	builder.WriteString(color.RedString("Некорректное действие\n"))
+	builder.WriteString(color.YellowString("Доступные действия:\n"))
+	for _, action := range actionList {
+		fmt.Fprintln(&builder, action.info(false, true))
+	}
+	return strings.TrimSuffix(builder.String(), "\n")
+}

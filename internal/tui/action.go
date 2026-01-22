@@ -6,6 +6,8 @@ import (
 	"hearthstone/pkg/helper"
 	"regexp"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 type doAction = func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error)
@@ -20,6 +22,14 @@ type playerAction struct {
 
 var actionList []playerAction
 
+var doNothing doAction = func(
+	g *game.Game,
+	idxes []int,
+	sides game.Sides,
+) (out string, next *game.NextAction, err error) {
+	return "", nil, nil
+}
+
 var actions = struct {
 	shortHelp playerAction
 	help      playerAction
@@ -30,20 +40,6 @@ var actions = struct {
 	end       playerAction
 	cancel    playerAction
 }{
-	shortHelp: playerAction{
-		name:        "",
-		shortcut:    "",
-		args:        nil,
-		description: "вывести краткую помощь по командам",
-		do: func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
-			builder := strings.Builder{}
-			fmt.Fprint(&builder, "Некорректное действие. Доступны:\n")
-			for _, action := range actionList {
-				fmt.Fprintln(&builder, action.whatis(false))
-			}
-			return strings.TrimSuffix(builder.String(), "\n"), nil, nil
-		},
-	},
 	help: playerAction{
 		name:        "help",
 		shortcut:    "h",
@@ -51,15 +47,23 @@ var actions = struct {
 		description: "вывести полную помощь по командам",
 		do: func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
 			builder := strings.Builder{}
-			fmt.Fprint(&builder, "Доступные действия:\n")
-			for _, action := range actionList {
-				fmt.Fprintln(&builder, action.usage(false))
-			}
-			fmt.Fprint(&builder, "Чтобы указать героя в качестве цели, используйте 'h' или '0'\n")
-			fmt.Fprint(
-				&builder,
-				"Чтобы указать сторону цели, используйте 't' (верх) ил 'b' (низ), например '5b'",
+			builder.WriteString(
+				color.YellowString("Доступные действия:\n"),
 			)
+			for _, action := range actionList {
+				fmt.Fprintln(&builder, action.info(false, false))
+			}
+			builder.WriteString(fmt.Sprintf(
+				"Чтобы указать героя в качестве цели, используйте %s или %s\n",
+				color.MagentaString("h"),
+				color.MagentaString("0"),
+			))
+			builder.WriteString(fmt.Sprintf(
+				"Чтобы указать сторону цели, используйте %s (верх) или %s (низ), например %s",
+				color.MagentaString("t"),
+				color.MagentaString("b"),
+				color.MagentaString("5b"),
+			))
 			return builder.String(), nil, nil
 		},
 	},
@@ -152,17 +156,13 @@ var actions = struct {
 	},
 }
 
-var doNothing doAction = func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
-	return "", nil, nil
-}
-
-func (a *playerAction) wrappedDo(
+func (a *playerAction) Do(
 	args []string, g *game.Game,
 ) (out string, nextPa *nextPlayerAction) {
 	idxes, sides, errs := parseAllPositions(args)
 
 	if helper.FirstError(errs) != nil {
-		return NewInvalidArgumentsError().Set(a.usage(true)).Error(), nil
+		return NewInvalidArgumentsError().Set(a.info(true, false)).Error(), nil
 	}
 
 	out, next, err := a.do(g, idxes, sides)
@@ -171,43 +171,67 @@ func (a *playerAction) wrappedDo(
 	case nil:
 		return out, newNextPlayerAction(next)
 	case InvalidArgumentsError:
-		return err.Set(a.usage(true)).Error(), nil
+		return err.Set(a.info(true, false)).Error(), nil
 	default:
 		return tuiError(err), nil
 	}
 }
 
-func (a *playerAction) whatis(compactContent bool) string {
-	output := fmt.Sprintf(
-		"%6s %3s: %s",
-		a.name,
-		fmt.Sprintf("(%s)", a.shortcut),
-		a.description,
-	)
-	if compactContent {
-		output = multipleSpaceRegex.ReplaceAllString(output, " ")
-		output = strings.Trim(output, " ")
+func (a *playerAction) info(trimSpaces bool, hideArgs bool) string {
+	if hideArgs {
+		return fmt.Sprintf(
+			"%53s %s %s",
+			a.getFormattedName(),
+			color.HiBlackString("-"),
+			a.description,
+		)
 	}
-	return output
-}
 
-func (a *playerAction) usage(compactContent bool) string {
 	output := fmt.Sprintf(
-		"%6s %3s %-60s: %s",
-		a.name,
-		fmt.Sprintf("(%s)", a.shortcut),
+		"%53s %-59s %s %s",
+		a.getFormattedName(),
 		strings.Join(a.args, " "),
+		color.HiBlackString("-"),
 		a.description,
 	)
-	if compactContent {
-		output = multipleSpaceRegex.ReplaceAllString(output, " ")
+
+	output = strings.ReplaceAll(
+		output, ">/<", ">"+color.HiBlackString("/")+"<",
+	)
+
+	output = actionArgumentRegexp.ReplaceAllString(
+		output,
+		fmt.Sprintf(
+			"%s%s%s",
+			color.HiBlackString("<"),
+			color.BlueString("$1"),
+			color.HiBlackString(">"),
+		),
+	)
+
+	if trimSpaces {
+		output = multipleSpaceRegexp.ReplaceAllString(output, " ")
 		output = strings.Trim(output, " ")
-		output = strings.Replace(output, " :", ":", 1)
 	}
+
 	return output
 }
 
-var multipleSpaceRegex = regexp.MustCompile(" +")
+func (a *playerAction) getFormattedName() string {
+	nameParts := strings.SplitN(a.name, a.shortcut, 2)
+	if len(nameParts) != 2 {
+		return color.MagentaString(a.name)
+	}
+
+	return fmt.Sprintf(
+		"%s%s%s%s%s",
+		color.MagentaString(nameParts[0]),
+		color.HiBlackString("["),
+		color.MagentaString(a.shortcut),
+		color.HiBlackString("]"),
+		color.MagentaString(nameParts[1]),
+	)
+}
 
 func (a *playerAction) matches(command string) bool {
 	return strings.HasPrefix(command, a.shortcut) || command == a.name

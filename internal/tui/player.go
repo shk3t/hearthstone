@@ -42,6 +42,6 @@ func playerString(p *game.Player) string {
 
 	lines = append(lines, "")
 	str := strings.Join(lines, "\n")
-	str = strings.ReplaceAll(str, "\n\n", "\n")
+	str = multipleBreakRegexp.ReplaceAllString(str, "\n")
 	return str
 }
