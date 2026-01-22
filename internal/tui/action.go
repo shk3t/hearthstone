@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"hearthstone/internal/game"
 	"hearthstone/pkg/helper"
-	"regexp"
 	"strings"
 
 	"github.com/fatih/color"

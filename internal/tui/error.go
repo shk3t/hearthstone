@@ -5,73 +5,79 @@ import (
 	"hearthstone/internal/game"
 	errpkg "hearthstone/pkg/errors"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 func tuiError(err error) string {
+	var out string
+
 	switch err := err.(type) {
 
 	case nil:
-		return ""
+		out = ""
 
 	case game.CardPickError:
-		return fmt.Sprintf("Выбрана некорректная карта: %d", err.Position)
+		out = fmt.Sprintf("Выбрана некорректная карта: %d", err.Position)
 
 	case game.NotEnoughManaError:
-		return fmt.Sprintf(
+		out = fmt.Sprintf(
 			"Недостаточно маны. Нужно: %d, имеется: %d",
 			err.Required,
 			err.Available,
 		)
 
 	case game.EmptyHandError:
-		return "Пустая рука"
+		out = "Пустая рука"
 
 	case game.FullHandError:
 		if err.BurnedCard != nil {
-			return fmt.Sprintf(
+			out = fmt.Sprintf(
 				"Полная рука. Последняя сожженная карта: \"%s\"",
 				game.ToCard(err.BurnedCard).Name,
 			)
 		}
-		return "Полная рука"
+		out = "Полная рука"
 
 	case game.InvalidTableAreaPositionError:
 		if err.Side == game.UnsetSide {
-			return fmt.Sprintf("Некорректная позиция на столе: %d", err.Position)
+			out = fmt.Sprintf("Некорректная позиция на столе: %d", err.Position)
 		}
 
 		sideText := strings.ToLower(err.Side.String())
 		sideText = strings.Replace(sideText, "ий", "ей", 1)
-		return fmt.Sprintf(
+		out = fmt.Sprintf(
 			"Некорректная позиция на %s части стола: %d",
 			sideText,
 			err.Position,
 		)
 
 	case game.FullTableAreaError:
-		return "Полный стол"
+		out = "Полный стол"
 
 	case game.EmptyDeckError:
 		if err.Fatigue != 0 {
-			return fmt.Sprintf("Пустая колода.\nПотеря здоровья из-за усталости: %d", err.Fatigue)
+			out = fmt.Sprintf("Пустая колода.\nПотеря здоровья из-за усталости: %d", err.Fatigue)
 		}
-		return "Пустая колода"
+		out = "Пустая колода"
 
 	case game.UnmatchedTargetNumberError:
-		return fmt.Sprintf(
+		out = fmt.Sprintf(
 			"Несоответствующее число целей.\nУказано: %d, требуется: %d",
 			err.Specified, err.Required,
 		)
 
 	case game.UsedHeroPowerError:
-		return "Сила героя уже была использована в этом ходу"
+		out = "Сила героя уже была использована в этом ходу"
 
 	case game.UnavailableMinionAttackError:
-		return "Это существо сможет атаковать только в следующем ходу"
+		out = "Это существо сможет атаковать только в следующем ходу"
 
 	default:
 		panic(errpkg.NewUnexpectedError(err))
 	}
+
+	return color.RedString(out)
 }
 
 type InvalidArgumentsError struct {
@@ -93,11 +99,12 @@ func NewEndOfInputError() EndOfInputError {
 }
 
 func (err InvalidArgumentsError) Error() string {
-	return strings.TrimSuffix(
-		"Некорректные аргументы\n"+err.correctUsage,
-		"\n",
+	return fmt.Sprintf(
+		"%s:\n%s",
+		color.RedString("Некорректные аргументы"),
+		err.correctUsage,
 	)
 }
 func (err EndOfInputError) Error() string {
-	return "Конец ввода"
+	return color.RedString("Конец ввода")
 }
