@@ -15,7 +15,7 @@ var Mage = struct {
 			Rarity:      game.BaseRarity,
 		},
 		Effect: game.TargetEffect{
-			Selector: game.CharacterSelectorPresets.Single,
+			Target: game.Targets.Single,
 			Func: func(target *game.Character) {
 				target.DealDamage(3)
 				target.Status.SetFreeze(true)
@@ -31,7 +31,7 @@ var Mage = struct {
 			Rarity:      game.BaseRarity,
 		},
 		Effect: game.TargetEffect{
-			Selector: game.CharacterSelectorPresets.Single,
+			Target: game.Targets.Single,
 			Func: func(target *game.Character) {
 				target.DealDamage(6)
 			},

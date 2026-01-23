@@ -19,9 +19,10 @@ var Heroes = struct {
 				Description: "Наносит 1 ед. урона",
 				Class:       game.MageClass,
 				Rarity:      game.BaseRarity,
+				Abstract:    true,
 			},
 			Effect: game.TargetEffect{
-				Selector: game.CharacterSelectorPresets.Single,
+				Target: game.Targets.Single,
 				Func: func(target *game.Character) {
 					target.DealDamage(1)
 				},
@@ -41,9 +42,10 @@ var Heroes = struct {
 				Description: "Восстанавливает 2 ед. здоровья",
 				Class:       game.PriestClass,
 				Rarity:      game.BaseRarity,
+				Abstract:    true,
 			},
 			Effect: game.TargetEffect{
-				Selector: game.CharacterSelectorPresets.Single,
+				Target: game.Targets.Single,
 				Func: func(target *game.Character) {
 					target.RestoreHealth(2)
 				},

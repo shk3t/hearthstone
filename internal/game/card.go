@@ -15,6 +15,7 @@ type Card struct {
 	Description string
 	Class       class
 	Rarity      rarity
+	Abstract    bool
 }
 
 func (c Card) cardMethod() {

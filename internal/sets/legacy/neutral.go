@@ -3,12 +3,13 @@ package legacy
 import "hearthstone/internal/game"
 
 var Neutral = struct {
-	ElvenArcher     game.Minion
-	LootHoarder     game.Minion
-	RiverCrocolisk  game.Minion
-	ColdlightOracle game.Minion
-	RaidLeader      game.Minion
-	ChillwindYeti   game.Minion
+	ElvenArcher        game.Minion
+	LootHoarder        game.Minion
+	RiverCrocolisk     game.Minion
+	ColdlightOracle    game.Minion
+	QuestingAdventurer game.Minion
+	RaidLeader         game.Minion
+	ChillwindYeti      game.Minion
 }{
 	ElvenArcher: game.Minion{
 		Card: game.Card{
@@ -22,7 +23,7 @@ var Neutral = struct {
 			Attack:    1,
 			MaxHealth: 1,
 			Battlecry: game.TargetEffect{
-				Selector: game.CharacterSelectorPresets.Single,
+				Target: game.Targets.Single,
 				Func: func(target *game.Character) {
 					target.DealDamage(1)
 				},
@@ -67,7 +68,7 @@ var Neutral = struct {
 		Card: game.Card{
 			ManaCost:    3,
 			Name:        "Вайш'ирский оракул",
-			Description: "БОЕВОЙ КЛИЧ: каждый игрок берет 2 карты.",
+			Description: "БОЕВОЙ КЛИЧ: каждый игрок берет 2 карты.", // TODO: use bold font instead of CAPS
 			Class:       game.NeutralClass,
 			Rarity:      game.RareRarity,
 		},
@@ -83,6 +84,29 @@ var Neutral = struct {
 		},
 		Type: game.MurlocMinionType,
 	},
+	QuestingAdventurer: game.Minion{
+		Card: game.Card{
+			ManaCost:    3,
+			Name:        "Авантюрист",
+			Description: "Получает +1/+1, когда вы разыгрываете карту.",
+			Class:       game.NeutralClass,
+			Rarity:      game.RareRarity,
+		},
+		Character: game.Character{
+			Attack:    2,
+			MaxHealth: 2,
+			Trigger: &game.TriggerEffect{
+				Target: game.Targets.Self,
+				Func: func(target *game.Character) {
+					target.Attack++
+					target.MaxHealth++
+					target.Health++
+				},
+				Event: game.Events.PlayersCardPlayed,
+			},
+		},
+		Type: game.NoMinionType,
+	},
 	RaidLeader: game.Minion{
 		Card: game.Card{
 			ManaCost:    3,
@@ -94,8 +118,8 @@ var Neutral = struct {
 		Character: game.Character{
 			Attack:    2,
 			MaxHealth: 3,
-			Passive: &game.StatusEffect{
-				Selector: game.CharacterSelectorPresets.RestAllyMinions,
+			Passive: &game.PassiveEffect{
+				Target: game.Targets.RestAllyMinions,
 				InFunc: func(target *game.Character) {
 					target.Attack++
 				},

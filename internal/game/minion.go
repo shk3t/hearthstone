@@ -36,7 +36,7 @@ func (mt minionType) String() string {
 func (m *Minion) Summon(owner *Player, handIdx, areaIdx int) (*NextAction, error) {
 	game := owner.Game
 	area := owner.GetArea()
-	char := &m.Character
+	character := &m.Character
 
 	m.SetHealthToMax()
 	m.owner = owner
@@ -46,13 +46,13 @@ func (m *Minion) Summon(owner *Player, handIdx, areaIdx int) (*NextAction, error
 	}
 
 	if m.Battlecry != nil {
-		err = m.Battlecry.Apply(char, nil, nil)
+		err = m.Battlecry.Apply(character, nil, nil)
 
 		switch err.(type) {
 		case UnmatchedTargetNumberError:
 			return &NextAction{
 				Do: func(idxes []int, sides Sides) error {
-					return m.Battlecry.Apply(char, idxes, sides)
+					return m.Battlecry.Apply(character, idxes, sides)
 				},
 				OnSuccess: func() {
 					owner.Hand.discard(handIdx)
@@ -68,23 +68,32 @@ func (m *Minion) Summon(owner *Player, handIdx, areaIdx int) (*NextAction, error
 		}
 	}
 
+	Events.CardPlayed.Trigger(owner, nil, nil)
+	sideAwareCardPlayedEvent(owner.Side).Trigger(owner, nil, nil)
+
 	if m.Passive != nil {
-		m.Passive.Apply(char, nil, nil)
+		m.Passive.Apply(character, nil, nil)
+	}
+	if m.Trigger != nil {
+		m.Trigger.Register(character)
 	}
 
-	for _, effect := range game.getApplicableStatusEffects(char) {
-		effect.InFunc(char)
+	for _, effect := range game.getApplicableStatusEffects(character) {
+		effect.InFunc(character)
 	}
 
-	return nil, err
+	return nil, nil
 }
 
 func (m *Minion) Die() {
-	char := &m.Character
+	character := &m.Character
 	if m.Passive != nil {
-		m.Passive.Cancel(char, nil, nil)
+		m.Passive.Cancel(character, nil, nil)
 	}
 	if m.Deathrattle != nil {
-		m.Deathrattle.Apply(char, nil, nil)
+		m.Deathrattle.Apply(character, nil, nil)
+	}
+	if m.Trigger != nil {
+		m.Trigger.Remove(character)
 	}
 }

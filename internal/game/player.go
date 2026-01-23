@@ -85,6 +85,7 @@ func (p *Player) PlayCard(
 	}
 	p.Hand.discard(handIdx)
 	_ = p.spendMana(manaCost)
+
 	return nil, nil
 }
 

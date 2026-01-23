@@ -14,13 +14,11 @@ func main() {
 	defer setup.DeinitAll()
 
 	startingDeck := game.NewDeck(
-		legacy.Neutral.ChillwindYeti,
-		legacy.Neutral.ChillwindYeti,
-		legacy.Neutral.ChillwindYeti,
-		legacy.Mage.Frostbolt,
-		legacy.Neutral.RaidLeader,
-		legacy.Neutral.RaidLeader,
-		legacy.Neutral.ChillwindYeti,
+		legacy.Neutral.QuestingAdventurer,
+		legacy.Neutral.QuestingAdventurer,
+		legacy.Neutral.QuestingAdventurer,
+		legacy.Neutral.QuestingAdventurer,
+		legacy.Neutral.QuestingAdventurer,
 	)
 
 	g := loop.StartGame(
@@ -30,17 +28,18 @@ func main() {
 		startingDeck.Copy(),
 	)
 
-	topPlayer := g.Players[game.TopSide]
-	botPlayer := g.Players[game.BotSide]
-
-	topPlayer.PlayCard(0, 0, nil, nil)
-	topPlayer.PlayCard(0, 0, nil, nil)
-	topPlayer.PlayCard(0, 0, nil, nil)
-	g.StartNextTurn()
-	botPlayer.PlayCard(0, 0, nil, nil)
-	botPlayer.PlayCard(0, 0, nil, nil)
-	botPlayer.PlayCard(0, 0, nil, nil)
-	g.StartNextTurn()
+	_ = g
+	// topPlayer := g.Players[game.TopSide]
+	// botPlayer := g.Players[game.BotSide]
+	//
+	// topPlayer.PlayCard(0, 0, nil, nil)
+	// topPlayer.PlayCard(0, 0, nil, nil)
+	// topPlayer.PlayCard(0, 0, nil, nil)
+	// g.StartNextTurn()
+	// botPlayer.PlayCard(0, 0, nil, nil)
+	// botPlayer.PlayCard(0, 0, nil, nil)
+	// botPlayer.PlayCard(0, 0, nil, nil)
+	// g.StartNextTurn()
 
 	helper.WaitForever()
 }

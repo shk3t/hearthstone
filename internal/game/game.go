@@ -10,7 +10,8 @@ type Game struct {
 	Table         Table
 	Turn          Side
 	TurnFinished  bool
-	statusEffects map[*Character]StatusEffect
+	statusEffects map[*Character]PassiveEffect
+	eventEffects  map[int]map[*Character]TriggerEffect
 }
 
 func NewGame(topHero, botHero *Hero, topDeck, botDeck Deck) *Game {
@@ -18,7 +19,8 @@ func NewGame(topHero, botHero *Hero, topDeck, botDeck Deck) *Game {
 		Table:         *NewTable(),
 		Turn:          UnsetSide,
 		TurnFinished:  false,
-		statusEffects: map[*Character]StatusEffect{},
+		statusEffects: map[*Character]PassiveEffect{},
+		eventEffects:  map[int]map[*Character]TriggerEffect{},
 	}
 
 	topHero.SetHealthToMax()
@@ -110,10 +112,10 @@ func (g *Game) getCharacter(idx int, side Side) (*Character, error) {
 	}
 }
 
-func (g *Game) getApplicableStatusEffects(character *Character) []StatusEffect {
-	applicableEffects := []StatusEffect{}
+func (g *Game) getApplicableStatusEffects(character *Character) []PassiveEffect {
+	applicableEffects := []PassiveEffect{}
 	for source, effect := range g.statusEffects {
-		targets, _ := effect.Selector(source, nil, nil)
+		targets, _ := effect.Target(source, nil, nil)
 		for _, target := range targets {
 			if target == character {
 				applicableEffects = append(applicableEffects, effect)

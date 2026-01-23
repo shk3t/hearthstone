@@ -9,7 +9,8 @@ type targetSelector func(
 	sides Sides,
 ) (targets []*Character, err error)
 
-var CharacterSelectorPresets = struct {
+var Targets = struct {
+	Self targetSelector
 	// EnemyHero            characterSelector
 	// SingleEnemyMinion    characterSelector
 	// MultipleEnemyMinions characterSelector
@@ -36,6 +37,9 @@ var CharacterSelectorPresets = struct {
 	// Multiple             characterSelector
 	// All                  characterSelector
 }{
+	Self: func(source *Character, idxes []int, sides Sides) ([]*Character, error) {
+		return []*Character{source}, nil
+	},
 	AllAllyMinions: func(source *Character, idxes []int, sides Sides) ([]*Character, error) {
 		return source.getAllies(), nil
 	},

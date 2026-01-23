@@ -5,9 +5,10 @@ type Character struct {
 	Health      int
 	MaxHealth   int
 	Status      CharacterStatus
-	Passive     *StatusEffect
 	Battlecry   Effect
 	Deathrattle Effect
+	Passive     *PassiveEffect
+	Trigger     *TriggerEffect
 	owner       *Player
 }
 

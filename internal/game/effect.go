@@ -22,7 +22,7 @@ func (e PlayerEffect) Apply(source *Character, idxes []int, sides Sides) error {
 }
 
 type TargetEffect struct {
-	Selector            targetSelector
+	Target              targetSelector
 	Func                targetEffectFunc
 	AllyIsDefaultTarget bool
 }
@@ -36,7 +36,7 @@ func (e TargetEffect) Apply(
 		sugar.If(e.AllyIsDefaultTarget, source.getSide(), source.getSide().Opposite()),
 	)
 
-	targets, err := e.Selector(source, idxes, sides)
+	targets, err := e.Target(source, idxes, sides)
 	if err != nil {
 		return err
 	}
@@ -51,7 +51,7 @@ func (e TargetEffect) Apply(
 }
 
 type IndividualTargetEffect struct {
-	Selector            targetSelector
+	Target              targetSelector
 	Funcs               []targetEffectFunc
 	AllyIsDefaultTarget bool
 }
@@ -65,7 +65,7 @@ func (e IndividualTargetEffect) Apply(
 		sugar.If(e.AllyIsDefaultTarget, source.getSide(), source.getSide().Opposite()),
 	)
 
-	targets, err := e.Selector(source, idxes, sides)
+	targets, err := e.Target(source, idxes, sides)
 	if err != nil {
 		return err
 	}
@@ -85,18 +85,18 @@ func (e IndividualTargetEffect) Apply(
 	return nil
 }
 
-type StatusEffect struct {
-	Selector targetSelector
-	InFunc   targetEffectFunc
-	OutFunc  targetEffectFunc
+type PassiveEffect struct {
+	Target  targetSelector
+	InFunc  targetEffectFunc
+	OutFunc targetEffectFunc
 }
 
-func (e StatusEffect) Apply(
+func (e PassiveEffect) Apply(
 	source *Character,
 	idxes []int,
 	sides Sides,
 ) error {
-	targets, err := e.Selector(source, idxes, sides)
+	targets, err := e.Target(source, idxes, sides)
 	if err != nil {
 		return err
 	}
@@ -112,12 +112,12 @@ func (e StatusEffect) Apply(
 	return nil
 }
 
-func (e StatusEffect) Cancel(
+func (e PassiveEffect) Cancel(
 	source *Character,
 	idxes []int,
 	sides Sides,
 ) error {
-	targets, err := e.Selector(source, idxes, sides)
+	targets, err := e.Target(source, idxes, sides)
 	if err != nil {
 		return err
 	}
@@ -127,6 +127,67 @@ func (e StatusEffect) Cancel(
 	for _, target := range targets {
 		if target != nil {
 			e.OutFunc(target)
+		}
+	}
+
+	return nil
+}
+
+type TriggerEffect struct {
+	Event           event
+	Target          targetSelector
+	Func            targetEffectFunc
+	IndividualFuncs []targetEffectFunc
+	PlayerFunc      playerEffectFunc
+}
+
+func (eff TriggerEffect) Register(source *Character) error {
+	g := source.getGame()
+
+	event := eff.Event
+	if event.getPrimaryEvent != nil {
+		event = event.getPrimaryEvent(source.owner)
+	}
+
+	characterEffects, ok := g.eventEffects[event.id]
+	if !ok {
+		characterEffects = map[*Character]TriggerEffect{}
+		g.eventEffects[event.id] = characterEffects
+	}
+	characterEffects[source] = eff
+
+	return nil
+}
+
+func (eff TriggerEffect) Remove(source *Character) error {
+	g := source.getGame()
+
+	event := eff.Event
+	if event.getPrimaryEvent != nil {
+		event = event.getPrimaryEvent(source.owner)
+	}
+
+	characterEffects, ok := g.eventEffects[event.id]
+	if ok {
+		delete(characterEffects, source)
+	}
+
+	return nil
+}
+
+func (eff TriggerEffect) Apply(
+	source *Character,
+	idxes []int,
+	sides Sides,
+) error {
+	targets, err := eff.Target(source, idxes, sides)
+	if err != nil {
+		return err
+	}
+
+	for _, target := range targets {
+		if target != nil { // TODO: can target actually be nil??? what about other effects?
+			eff.Func(target)
 		}
 	}
 
