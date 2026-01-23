@@ -10,7 +10,7 @@ var Mage = struct {
 		Card: game.Card{
 			ManaCost:    2,
 			Name:        "Ледяная стрела",
-			Description: "Наносит 3 ед. урона персонажу и замораживает его",
+			Description: "Наносит 3 ед. урона персонажу и " + b("замораживает") + " его",
 			Class:       game.MageClass,
 			Rarity:      game.BaseRarity,
 		},

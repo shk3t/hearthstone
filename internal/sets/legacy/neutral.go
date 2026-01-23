@@ -1,6 +1,11 @@
 package legacy
 
-import "hearthstone/internal/game"
+import (
+	"hearthstone/internal/game"
+	"hearthstone/pkg/ui"
+)
+
+var b = ui.BoldString
 
 var Neutral = struct {
 	ElvenArcher        game.Minion
@@ -15,7 +20,7 @@ var Neutral = struct {
 		Card: game.Card{
 			ManaCost:    1,
 			Name:        "Эльфийская лучница",
-			Description: "БОЕВОЙ КЛИЧ: наносит 1 ед. урона.",
+			Description: b("Боевой клич:") + " наносит 1 ед. урона.",
 			Class:       game.NeutralClass,
 			Rarity:      game.BaseRarity,
 		},
@@ -35,7 +40,7 @@ var Neutral = struct {
 		Card: game.Card{
 			ManaCost:    2,
 			Name:        "Собиратель сокровищ",
-			Description: "ПРЕДСМЕРТНЫЙ ХРИП: вы берете карту.",
+			Description: b("Предсмертный хрип:") + " вы берете карту.",
 			Class:       game.NeutralClass,
 			Rarity:      game.CommonRarity,
 		},
@@ -68,7 +73,7 @@ var Neutral = struct {
 		Card: game.Card{
 			ManaCost:    3,
 			Name:        "Вайш'ирский оракул",
-			Description: "БОЕВОЙ КЛИЧ: каждый игрок берет 2 карты.", // TODO: use bold font instead of CAPS
+			Description: b("Боевой клич:") + " каждый игрок берет 2 карты.",
 			Class:       game.NeutralClass,
 			Rarity:      game.RareRarity,
 		},

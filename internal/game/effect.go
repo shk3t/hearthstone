@@ -42,9 +42,7 @@ func (e TargetEffect) Apply(
 	}
 
 	for _, target := range targets {
-		if target != nil {
-			e.Func(target)
-		}
+		e.Func(target)
 	}
 
 	return nil
@@ -77,9 +75,7 @@ func (e IndividualTargetEffect) Apply(
 	}
 
 	for i, target := range targets {
-		if target != nil {
-			e.Funcs[i](target)
-		}
+		e.Funcs[i](target)
 	}
 
 	return nil
@@ -104,9 +100,7 @@ func (e PassiveEffect) Apply(
 	source.getGame().statusEffects[source] = e
 
 	for _, target := range targets {
-		if target != nil {
-			e.InFunc(target)
-		}
+		e.InFunc(target)
 	}
 
 	return nil
@@ -125,9 +119,7 @@ func (e PassiveEffect) Cancel(
 	delete(source.getGame().statusEffects, source)
 
 	for _, target := range targets {
-		if target != nil {
-			e.OutFunc(target)
-		}
+		e.OutFunc(target)
 	}
 
 	return nil
@@ -186,9 +178,7 @@ func (eff TriggerEffect) Apply(
 	}
 
 	for _, target := range targets {
-		if target != nil { // TODO: can target actually be nil??? what about other effects?
-			eff.Func(target)
-		}
+		eff.Func(target)
 	}
 
 	return nil

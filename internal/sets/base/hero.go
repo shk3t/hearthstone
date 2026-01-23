@@ -1,6 +1,11 @@
 package base
 
-import "hearthstone/internal/game"
+import (
+	"hearthstone/internal/game"
+	"hearthstone/pkg/ui"
+)
+
+var b = ui.BoldString
 
 var Heroes = struct {
 	Mage   game.Hero
@@ -16,7 +21,7 @@ var Heroes = struct {
 			Card: game.Card{
 				ManaCost:    2,
 				Name:        "Вспышка огня",
-				Description: "Наносит 1 ед. урона",
+				Description: b("Сила героя") + " Наносит 1 ед. урона",
 				Class:       game.MageClass,
 				Rarity:      game.BaseRarity,
 				Abstract:    true,
@@ -39,7 +44,7 @@ var Heroes = struct {
 			Card: game.Card{
 				ManaCost:    2,
 				Name:        "Малое исцеление",
-				Description: "Восстанавливает 2 ед. здоровья",
+				Description: b("Сила героя") + "Восстанавливает 2 ед. здоровья",
 				Class:       game.PriestClass,
 				Rarity:      game.BaseRarity,
 				Abstract:    true,

@@ -14,11 +14,11 @@ func main() {
 	defer setup.DeinitAll()
 
 	startingDeck := game.NewDeck(
-		legacy.Neutral.QuestingAdventurer,
-		legacy.Neutral.QuestingAdventurer,
-		legacy.Neutral.QuestingAdventurer,
-		legacy.Neutral.QuestingAdventurer,
-		legacy.Neutral.QuestingAdventurer,
+		legacy.Neutral.QuestingAdventurer, // TODO: not scaled after tricky battlecry
+		legacy.Neutral.RaidLeader,
+		legacy.Neutral.ElvenArcher,
+		legacy.Neutral.LootHoarder,
+		legacy.Neutral.ColdlightOracle,
 	)
 
 	g := loop.StartGame(

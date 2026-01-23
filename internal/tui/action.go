@@ -46,7 +46,7 @@ var actions = struct {
 		description: "вывести полную помощь по командам",
 		do: func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
 			builder := strings.Builder{}
-			fmt.Fprint(&builder, 
+			fmt.Fprint(&builder,
 				color.YellowString("Доступные действия:\n"),
 			)
 			for _, action := range actionList {
@@ -72,6 +72,8 @@ var actions = struct {
 		args:        []string{"<номер_карты>/<позиция_на_столе><b/t>"},
 		description: "подробное описание карты на руке/столе",
 		do: func(g *game.Game, idxes []int, sides game.Sides) (out string, next *game.NextAction, err error) {
+			// TODO: use `w` as alias for `h`
+			// TODO: show info about opponent's hero power
 			if len(idxes) != 1 {
 				return "", nil, NewInvalidArgumentsError()
 			}
