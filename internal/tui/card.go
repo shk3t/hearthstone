@@ -9,9 +9,9 @@ import (
 	"github.com/fatih/color"
 )
 
-func getCardInfo(player *game.Player, handIdx int) (string, error) {
+func getCardInfo(player game.Player, handIdx int) (string, error) {
 	if handIdx == game.HeroIdx {
-		return cardInfo(&player.Hero.Power.Card, color.MagentaString), nil
+		return cardInfo(player.Hero.Power.Card, color.MagentaString), nil
 	}
 
 	card, err := player.Hand.Get(handIdx)
@@ -21,15 +21,15 @@ func getCardInfo(player *game.Player, handIdx int) (string, error) {
 
 	switch card := card.(type) {
 	case game.Minion:
-		return minionInfo(&card), nil
+		return minionInfo(card), nil
 	case game.Spell:
-		return cardInfo(&card.Card, color.MagentaString), nil
+		return cardInfo(card.Card, color.MagentaString), nil
 	default:
 		panic("Invalid card type")
 	}
 }
 
-func cardInfo(c *game.Card, fmtFunc ui.FormatFunc) string {
+func cardInfo(c game.Card, fmtFunc ui.FormatFunc) string {
 	builder := strings.Builder{}
 
 	name := ui.BoldString(c.Name)

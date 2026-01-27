@@ -10,7 +10,7 @@ import (
 	"github.com/fatih/color"
 )
 
-func heroString(h *game.Hero, isActive bool) string {
+func heroString(h game.Hero, isActive bool) string {
 	elems := []string{
 		fmt.Sprintf(
 			"%s %s %s",
@@ -28,7 +28,7 @@ func heroString(h *game.Hero, isActive bool) string {
 		),
 	}
 
-	statusStr := characterStatusString(&h.Character)
+	statusStr := characterStatusString(h.Character)
 	if statusStr != "" {
 		elems = append(elems, statusStr)
 	}

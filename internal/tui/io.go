@@ -13,7 +13,7 @@ import (
 )
 
 func Display(g *game.Game) {
-	ui.UpdateFrame(gameString(g))
+	ui.UpdateFrame(gameString(*g))
 }
 
 func HandleInput(g *game.Game) error {

@@ -12,12 +12,12 @@ import (
 	"github.com/fatih/color"
 )
 
-func playerString(p *game.Player) string {
+func playerString(p game.Player) string {
 	colorStringFunc := getColorStringFunc(p.Side)
 
 	lines := []string{
-		heroString(p.Hero, p.IsActive()),
-		healthString(p.Hero),
+		heroString(*p.Hero, p.IsActive()),
+		healthString(*p.Hero),
 		manaString(p),
 		sugar.If(
 			p.IsActive() && !p.Hero.PowerIsUsed,
@@ -25,7 +25,7 @@ func playerString(p *game.Player) string {
 				"%s%s %s",
 				ui.BoldString(colorStringFunc("w")),
 				color.HiBlackString("."),
-				spellString(&p.Hero.Power),
+				spellString(p.Hero.Power),
 			),
 			"",
 		),

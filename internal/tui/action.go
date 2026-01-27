@@ -78,9 +78,9 @@ var actions = struct {
 				return "", nil, NewInvalidArgumentsError()
 			}
 			if sides[0] == game.UnsetSide {
-				out, err = getCardInfo(g.GetActivePlayer(), idxes[0])
+				out, err = getCardInfo(*g.GetActivePlayer(), idxes[0])
 			} else {
-				out, err = getMinionInfo(&g.Table, idxes[0], sides[0])
+				out, err = getMinionInfo(g.Table, idxes[0], sides[0])
 			}
 			return out, nil, err
 		},

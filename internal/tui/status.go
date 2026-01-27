@@ -36,7 +36,7 @@ var characterStatusInfoEntries = [...]*characterStatusInfoEntry{
 var characterStatusHeader = color.HiBlackString("Статусы:") + "\n"
 var characterStatusEffectPictogram = color.YellowString("󰜷 ")
 
-func characterStatusString(c *game.Character) string {
+func characterStatusString(c game.Character) string {
 	builder := strings.Builder{}
 
 	if c.Passive != nil {
@@ -52,7 +52,7 @@ func characterStatusString(c *game.Character) string {
 	return builder.String()
 }
 
-func characterStatusInfo(c *game.Character) string {
+func characterStatusInfo(c game.Character) string {
 	builder := strings.Builder{}
 
 	statusNameMaxLen := 0

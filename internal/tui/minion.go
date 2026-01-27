@@ -10,7 +10,7 @@ import (
 	"github.com/fatih/color"
 )
 
-func minionHandString(m *game.Minion) string {
+func minionHandString(m game.Minion) string {
 	return fmt.Sprintf(
 		"%s %s %s%s%s",
 		color.BlueString("<%d>", m.ManaCost),
@@ -21,7 +21,7 @@ func minionHandString(m *game.Minion) string {
 	)
 }
 
-func minionTableString(m *game.Minion, fieldWidths ...int) string {
+func minionTableString(m game.Minion, fieldWidths ...int) string {
 	format := fmt.Sprintf(
 		"%%s %%s %s %%s",
 		color.HiBlackString("|"),
@@ -49,23 +49,23 @@ func minionTableString(m *game.Minion, fieldWidths ...int) string {
 	)
 	str := fmt.Sprintf(
 		format,
-		m.Name, attackHealthStr, characterStatusString(&m.Character),
+		m.Name, attackHealthStr, characterStatusString(m.Character),
 	)
 
 	return strings.TrimRight(str, color.HiBlackString("|")+" ")
 }
 
-func getMinionInfo(table *game.Table, idx int, side game.Side) (string, error) {
+func getMinionInfo(table game.Table, idx int, side game.Side) (string, error) {
 	minion, err := table[side].GetMinion(idx)
 	if err != nil {
 		return "", err
 	}
-	return minionInfo(minion), nil
+	return minionInfo(*minion), nil
 }
 
-func minionInfo(m *game.Minion) string {
+func minionInfo(m game.Minion) string {
 	builder := strings.Builder{}
-	fmt.Fprintln(&builder, cardInfo(&m.Card, nil))
+	fmt.Fprintln(&builder, cardInfo(m.Card, nil))
 	fmt.Fprintf(&builder,
 		"%s    %s\n",
 		color.HiBlackString("Атака:"),
@@ -80,6 +80,6 @@ func minionInfo(m *game.Minion) string {
 	if m.Type != game.NoMinionType {
 		fmt.Fprintf(&builder, "Тип:      %s\n", m.Type)
 	}
-	fmt.Fprint(&builder, characterStatusInfo(&m.Character))
+	fmt.Fprint(&builder, characterStatusInfo(m.Character))
 	return strings.TrimSuffix(builder.String(), "\n")
 }

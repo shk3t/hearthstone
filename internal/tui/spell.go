@@ -7,7 +7,7 @@ import (
 	"github.com/fatih/color"
 )
 
-func spellString(s *game.Spell) string {
+func spellString(s game.Spell) string {
 	return fmt.Sprintf(
 		"%s %s",
 		color.BlueString("<%d>", s.ManaCost),

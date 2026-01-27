@@ -12,7 +12,7 @@ import (
 	"github.com/fatih/color"
 )
 
-func tableString(t *game.Table, turn game.Side) string {
+func tableString(t game.Table, turn game.Side) string {
 	lines := []string{
 		"",
 		color.HiBlackString(strings.Repeat("=", 50)),
@@ -51,7 +51,7 @@ func tableAreaString(a game.TableArea, isActive bool) string {
 					colorStringFunc("%d", i),
 				),
 				color.HiBlackString("."),
-				minionTableString(m, nameMaxLen, attackHpMaxLen),
+				minionTableString(*m, nameMaxLen, attackHpMaxLen),
 			)
 			i++
 		}

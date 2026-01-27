@@ -42,11 +42,11 @@ func barString(head string, val, maxVal int, sym string, fmtFunc ui.FormatFunc) 
 	return builder.String()
 }
 
-func healthString(h *game.Hero) string {
+func healthString(h game.Hero) string {
 	return barString("Здоровье:", h.Health, h.MaxHealth, "+", color.RedString)
 }
 
-func manaString(p *game.Player) string {
+func manaString(p game.Player) string {
 	return barString("Мана:", p.Mana, p.MaxMana, "*", color.BlueString)
 }
 

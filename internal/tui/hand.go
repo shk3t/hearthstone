@@ -20,9 +20,9 @@ func handString(h game.Hand, side game.Side, isActive bool) string {
 	for _, card := range h {
 		switch card := card.(type) {
 		case game.Minion:
-			cardStr = minionHandString(&card)
+			cardStr = minionHandString(card)
 		case game.Spell:
-			cardStr = spellString(&card)
+			cardStr = spellString(card)
 		case nil:
 			continue
 		default:
