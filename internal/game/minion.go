@@ -45,6 +45,22 @@ func (m *Minion) Summon(owner *Player, handIdx, areaIdx int) (*NextAction, error
 		m.Status.SetSleep(true)
 	}
 
+	processEffects := func() {
+		Events.CardPlayed.Trigger(owner, nil, nil)
+		sideAwareCardPlayedEvent(owner.Side).Trigger(owner, nil, nil)
+
+		if m.Passive != nil {
+			m.Passive.Apply(character, nil, nil)
+		}
+		if m.Trigger != nil {
+			m.Trigger.Register(character)
+		}
+
+		for _, effect := range game.getApplicablePassiveEffects(character) {
+			effect.InFunc(character)
+		}
+	}
+
 	if m.Battlecry != nil {
 		err = m.Battlecry.Apply(character, nil, nil)
 
@@ -57,6 +73,7 @@ func (m *Minion) Summon(owner *Player, handIdx, areaIdx int) (*NextAction, error
 				OnSuccess: func() {
 					owner.Hand.discard(handIdx)
 					_ = owner.spendMana(m.ManaCost)
+					processEffects()
 				},
 				OnFail: func() {
 					area.remove(areaIdx)
@@ -68,19 +85,7 @@ func (m *Minion) Summon(owner *Player, handIdx, areaIdx int) (*NextAction, error
 		}
 	}
 
-	Events.CardPlayed.Trigger(owner, nil, nil)
-	sideAwareCardPlayedEvent(owner.Side).Trigger(owner, nil, nil)
-
-	if m.Passive != nil {
-		m.Passive.Apply(character, nil, nil)
-	}
-	if m.Trigger != nil {
-		m.Trigger.Register(character)
-	}
-
-	for _, effect := range game.getApplicableStatusEffects(character) {
-		effect.InFunc(character)
-	}
+	processEffects()
 
 	return nil, nil
 }

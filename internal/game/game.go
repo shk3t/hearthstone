@@ -112,7 +112,7 @@ func (g *Game) getCharacter(idx int, side Side) (*Character, error) {
 	}
 }
 
-func (g *Game) getApplicableStatusEffects(character *Character) []PassiveEffect {
+func (g *Game) getApplicablePassiveEffects(character *Character) []PassiveEffect {
 	applicableEffects := []PassiveEffect{}
 	for source, effect := range g.statusEffects {
 		targets, _ := effect.Target(source, nil, nil)
