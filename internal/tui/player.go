@@ -2,7 +2,6 @@ package tui
 
 import (
 	"fmt"
-	"hearthstone/internal/config"
 	"hearthstone/internal/game"
 	"hearthstone/pkg/sugar"
 	"hearthstone/pkg/ui"
@@ -30,7 +29,7 @@ func playerString(p game.Player) string {
 			"",
 		),
 		sugar.If(
-			p.IsActive() || config.Env.RevealOpponentsHand,
+			p.IsActive() || p.Game.Config.RevealOpponentsHand,
 			handString(p.Hand, p.Side, p.IsActive()),
 			handLenString(p.Hand),
 		),

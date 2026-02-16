@@ -1,7 +1,6 @@
 package game
 
 import (
-	"hearthstone/internal/config"
 	"math/rand"
 )
 
@@ -12,11 +11,13 @@ type Game struct {
 	TurnFinished   bool
 	passiveEffects map[*Character]PassiveEffect
 	eventEffects   map[int]map[*Character]Effect
+	Config         GameConfig
 }
 
-func NewGame(topHero, botHero *Hero, topDeck, botDeck Deck) *Game {
+func NewGame(config GameConfig, topHero, botHero *Hero, topDeck, botDeck Deck) *Game {
 	game := &Game{
-		Table:          *NewTable(),
+		Config:         config,
+		Table:          *newTable(config.TableSize),
 		Turn:           UnsetSide,
 		TurnFinished:   false,
 		passiveEffects: map[*Character]PassiveEffect{},
@@ -44,8 +45,8 @@ func (g *Game) GetActiveArea() TableArea {
 }
 
 func (g *Game) StartGame() {
-	turn := Side(config.Env.FirstTurnSide)
-	if turn == UnsetSide {
+	turn := UnsetSide
+	if g.Config.FirstTurnSide == UnsetSide {
 		turn = Side(rand.Int() % 2)
 	}
 	firstPlayer, secondPlayer := g.Players[turn], g.Players[turn.Opposite()]

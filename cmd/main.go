@@ -23,6 +23,13 @@ func main() {
 
 	g := loop.StartGame(
 		tui.NewGameIO(),
+		game.GameConfig{
+			TableSize:           7,
+			DisplayMethod:       game.DisplayMethods.TUI,
+			FirstTurnSide:       game.BotSide,
+			UnlimitedMana:       true,
+			RevealOpponentsHand: false,
+		},
 		base.Heroes.Mage.Copy(),
 		base.Heroes.Priest.Copy(),
 		startingDeck.Copy(),

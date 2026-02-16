@@ -1,13 +1,11 @@
 package loop
 
 import (
-	"hearthstone/internal/config"
 	"hearthstone/pkg/helper"
 	"hearthstone/pkg/log"
 )
 
 func initAll(args ...any) error {
-	config.LoadEnv()
 	if err := log.Init(); err != nil {
 		return err
 	}

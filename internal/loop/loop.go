@@ -18,8 +18,13 @@ type GameIO interface {
 	Redraw(g game.Game)
 }
 
-func StartGame(io GameIO, topHero, botHero *game.Hero, topDeck, botDeck game.Deck) *game.Game {
-	g := game.NewGame(topHero, botHero, topDeck, botDeck)
+func StartGame(
+	io GameIO,
+	config game.GameConfig,
+	topHero, botHero *game.Hero,
+	topDeck, botDeck game.Deck,
+) *game.Game {
+	g := game.NewGame(config, topHero, botHero, topDeck, botDeck)
 	g.StartGame()
 
 	ctx, cancel := context.WithCancel(context.Background())

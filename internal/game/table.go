@@ -1,23 +1,23 @@
 package game
 
 import (
-	"hearthstone/internal/config"
 	"hearthstone/pkg/container"
 	errpkg "hearthstone/pkg/errors"
 )
 
 type Table [SidesCount]TableArea
 
-func NewTable() *Table {
+func newTable(size int) *Table {
 	return &Table{
-		newTableArea(TopSide),
-		newTableArea(BotSide),
+		newTableArea(TopSide, size),
+		newTableArea(BotSide, size),
 	}
 }
 
 type TableArea struct {
 	Minions container.Shrice[*Minion]
 	Side    Side
+	size    int
 }
 
 func (a TableArea) GetMinion(idx int) (*Minion, error) {
@@ -42,15 +42,16 @@ func (a TableArea) GetCharacters() []*Character {
 	return characters
 }
 
-func newTableArea(side Side) TableArea {
+func newTableArea(side Side, size int) TableArea {
 	return TableArea{
-		Minions: container.NewShrice[*Minion](config.Env.TableSize),
+		Minions: container.NewShrice[*Minion](size),
 		Side:    side,
+		size:    size,
 	}
 }
 
 func (a TableArea) place(idx int, minion *Minion) error {
-	idx = min(idx, config.Env.TableSize-1)
+	idx = min(idx, a.size-1)
 	err := a.Minions.Insert(idx, minion)
 	switch err.(type) {
 	case errpkg.IndexError:
