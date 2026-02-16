@@ -48,6 +48,10 @@ func (p *Player) PlayCard(
 	var card Cardlike
 	var err error
 
+	if handIdx == HeroIdx {
+		return p.CastHeroPower(spellIdxes, spellSides)
+	}
+
 	card, err = p.Hand.Get(handIdx)
 	if err != nil {
 		return err

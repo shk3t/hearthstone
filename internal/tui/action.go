@@ -37,7 +37,6 @@ var actions = struct {
 			return NewHelpError()
 		},
 	},
-	// TODO: use `w` as alias for `h`
 	// TODO: show info about opponent's hero power
 	info: tuiAction{
 		name:        "info",
@@ -117,6 +116,10 @@ var actions = struct {
 	},
 }
 
+func (a *tuiAction) matches(command string) bool {
+	return strings.HasPrefix(command, a.shortcut) || command == a.name
+}
+
 func (a *tuiAction) info(trimSpaces bool, hideArgs bool) string {
 	if hideArgs {
 		return fmt.Sprintf(
@@ -171,10 +174,6 @@ func (a *tuiAction) getFormattedName() string {
 		color.HiBlackString("]"),
 		color.MagentaString(nameParts[1]),
 	)
-}
-
-func (a *tuiAction) matches(command string) bool {
-	return strings.HasPrefix(command, a.shortcut) || command == a.name
 }
 
 func init() {

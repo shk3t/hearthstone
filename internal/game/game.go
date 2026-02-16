@@ -1,6 +1,7 @@
 package game
 
 import (
+	"hearthstone/pkg/sugar"
 	"math/rand"
 )
 
@@ -45,10 +46,11 @@ func (g *Game) GetActiveArea() TableArea {
 }
 
 func (g *Game) StartGame() {
-	turn := UnsetSide
-	if g.Config.FirstTurnSide == UnsetSide {
-		turn = Side(rand.Int() % 2)
-	}
+	turn := sugar.If(
+		g.Config.FirstTurnSide != UnsetSide,
+		g.Config.FirstTurnSide,
+		Side(rand.Int()%2),
+	)
 	firstPlayer, secondPlayer := g.Players[turn], g.Players[turn.Opposite()]
 
 	firstPlayer.DrawCards(3)
@@ -102,25 +104,28 @@ func (g *Game) GetWinner() Side {
 }
 
 func (g *Game) GetInfo(idx int, side Side) error {
-	if side == UnsetSide {
-		player := g.GetActivePlayer()
-		if idx == HeroIdx {
-			return NewInfoError(player.Hero.Power)
-		}
+	player := g.GetActivePlayer()
 
+	if idx == HeroIdx {
+		if side == player.Side.Opposite() {
+			return NewInfoError(player.GetOpponent().Hero.Power)
+		}
+		return NewInfoError(player.Hero.Power)
+	}
+
+	if side == UnsetSide {
 		card, err := player.Hand.Get(idx)
 		if err != nil {
 			return err
 		}
 		return NewInfoError(card)
-
-	} else {
-		minion, err := g.Table[side].GetMinion(idx)
-		if err != nil {
-			return err
-		}
-		return NewInfoError(*minion)
 	}
+
+	minion, err := g.Table[side].GetMinion(idx)
+	if err != nil {
+		return err
+	}
+	return NewInfoError(*minion)
 }
 
 func (g *Game) getCharacter(idx int, side Side) (*Character, error) {

@@ -44,7 +44,7 @@ var Heroes = struct {
 			Card: game.Card{
 				ManaCost:    2,
 				Name:        "Малое исцеление",
-				Description: b("Сила героя") + "Восстанавливает 2 ед. здоровья",
+				Description: b("Сила героя") + " Восстанавливает 2 ед. здоровья",
 				Class:       game.PriestClass,
 				Rarity:      game.BaseRarity,
 			},
