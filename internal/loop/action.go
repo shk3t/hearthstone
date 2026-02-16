@@ -7,15 +7,6 @@ import (
 
 type GameAction func(g *game.Game, idxes []int, sides game.Sides) error
 
-// TODO: Do I really need this?
-var doNothing = func(
-	g *game.Game,
-	idxes []int,
-	sides game.Sides,
-) error {
-	return nil
-}
-
 var Actions = struct {
 	Info   GameAction
 	Play   GameAction
@@ -26,26 +17,7 @@ var Actions = struct {
 }{
 	Info: func(g *game.Game, idxes []int, sides game.Sides) error {
 		idx, side := idxes[0], sides[0]
-
-		if side == game.UnsetSide {
-			player := g.GetActivePlayer()
-			if idx == game.HeroIdx {
-				return game.NewInfoError(player.Hero.Power.Card)
-			}
-
-			card, err := player.Hand.Get(idx)
-			if err != nil {
-				return err
-			}
-			return game.NewInfoError(card)
-
-		} else {
-			minion, err := g.Table[side].GetMinion(idx)
-			if err != nil {
-				return err
-			}
-			return game.NewInfoError(*minion)
-		}
+		return g.GetInfo(idx, side)
 	},
 	Play: func(g *game.Game, idxes []int, sides game.Sides) error {
 		handIdx, areaIdx := idxes[0], idxes[1]
@@ -57,15 +29,12 @@ var Actions = struct {
 		return g.GetActivePlayer().Attack(allyIdx, enemyIdx)
 	},
 	Power: func(g *game.Game, idxes []int, sides game.Sides) error {
-		return g.GetActivePlayer().
-			PlayCard(game.HeroIdx, -1, idxes, sides)
-		// TODO: use separate function for Hero Power
+		return g.GetActivePlayer().CastHeroPower(idxes, sides)
 	},
 	End: func(g *game.Game, idxes []int, sides game.Sides) error {
 		g.TurnFinished = true
 		return nil
 	},
-	Cancel: doNothing,
 }
 
 func GetAction(name string) GameAction {
@@ -80,9 +49,9 @@ func GetAction(name string) GameAction {
 		return Actions.Power
 	case "end":
 		return Actions.End
-	case "cancel":
-		return Actions.Cancel
 	default:
-		return Actions.Cancel
+		return func(g *game.Game, idxes []int, sides game.Sides) error {
+			return nil
+		}
 	}
 }

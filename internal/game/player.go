@@ -48,18 +48,10 @@ func (p *Player) PlayCard(
 ) error {
 	var card Cardlike
 	var err error
-	heroPowerUse := handIdx == HeroIdx
 
-	if heroPowerUse {
-		if p.Hero.PowerIsUsed {
-			return NewUsedHeroPowerError()
-		}
-		card = p.Hero.Power
-	} else {
-		card, err = p.Hand.Get(handIdx)
-		if err != nil {
-			return err
-		}
+	card, err = p.Hand.Get(handIdx)
+	if err != nil {
+		return err
 	}
 
 	manaCost := ToCard(card).ManaCost
@@ -79,11 +71,34 @@ func (p *Player) PlayCard(
 		return err
 	}
 
-	if heroPowerUse {
-		p.Hero.PowerIsUsed = true
-	}
 	p.Hand.discard(handIdx)
-	_ = p.spendMana(manaCost)
+	p.spendMana(manaCost)
+
+	Events.CardPlayed.Trigger(p, nil, nil)
+	getSideAwareCardPlayedEvent(p.Side).Trigger(p, nil, nil)
+
+	return nil
+}
+
+func (p *Player) CastHeroPower(idxes []int, sides []Side) error {
+	if p.Hero.PowerIsUsed {
+		return NewUsedHeroPowerError()
+	}
+
+	power := p.Hero.Power
+
+	manaCost := power.Card.ManaCost
+	if !p.haveEnoughMana(manaCost) {
+		return NewNotEnoughManaError(p.Mana, manaCost)
+	}
+
+	err := power.Cast(p.Hero, idxes, sides)
+	if err != nil {
+		return err
+	}
+
+	p.Hero.PowerIsUsed = true
+	p.spendMana(manaCost)
 
 	return nil
 }

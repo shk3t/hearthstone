@@ -27,7 +27,6 @@ var actions = struct {
 	attack    tuiAction
 	power     tuiAction
 	end       tuiAction
-	cancel    tuiAction
 }{
 	help: tuiAction{
 		name:        "help",
@@ -116,12 +115,6 @@ var actions = struct {
 		args:        nil,
 		description: "закончить ход",
 	},
-	cancel: tuiAction{
-		name:        "cancel",
-		shortcut:    "c",
-		args:        nil,
-		description: "отмена действия",
-	},
 }
 
 func (a *tuiAction) info(trimSpaces bool, hideArgs bool) string {
@@ -192,6 +185,5 @@ func init() {
 		actions.attack,
 		actions.power,
 		actions.end,
-		actions.cancel,
 	}
 }

@@ -24,7 +24,6 @@ var Heroes = struct {
 				Description: b("Сила героя") + " Наносит 1 ед. урона",
 				Class:       game.MageClass,
 				Rarity:      game.BaseRarity,
-				Abstract:    true,
 			},
 			DeprecatedEffect: game.TargetEffect{
 				Target: game.Targets.Single,
@@ -32,6 +31,7 @@ var Heroes = struct {
 					target.DealDamage(1)
 				},
 			},
+			HeroPower: true,
 		},
 	},
 	Priest: game.Hero{
@@ -47,7 +47,6 @@ var Heroes = struct {
 				Description: b("Сила героя") + "Восстанавливает 2 ед. здоровья",
 				Class:       game.PriestClass,
 				Rarity:      game.BaseRarity,
-				Abstract:    true,
 			},
 			DeprecatedEffect: game.TargetEffect{
 				Target: game.Targets.Single,
@@ -56,6 +55,7 @@ var Heroes = struct {
 				},
 				AllyIsDefaultTarget: true,
 			},
+			HeroPower: true,
 		},
 	},
 }

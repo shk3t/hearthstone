@@ -45,26 +45,18 @@ func (m *Minion) Summon(owner *Player, handIdx, areaIdx int) (error) {
 		m.Status.SetSleep(true)
 	}
 
-	// TODO: move it to `PlayCard`
-	processEffects := func() {
-		Events.CardPlayed.Trigger(owner, nil, nil)
-		getSideAwareCardPlayedEvent(owner.Side).Trigger(owner, nil, nil)
-
-		if m.Passive != nil {
-			m.Passive.Apply(character, nil, nil)
-		}
-		if m.Effect != nil {
-			m.Effect.Register(character)
-		}
-
-		for _, effect := range game.getApplicablePassiveEffects(character) {
-			effect.InFunc(character)
-		}
-	}
-
 	Events.Battlecry.Trigger(owner, nil, nil)
 
-	processEffects()
+	if m.Passive != nil {
+		m.Passive.Apply(character, nil, nil)
+	}
+	if m.Effect != nil {
+		m.Effect.Register(character)
+	}
+
+	for _, effect := range game.getApplicablePassiveEffects(character) {
+		effect.InFunc(character)
+	}
 
 	return nil
 }

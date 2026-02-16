@@ -14,7 +14,7 @@ import (
 
 type gameIO struct {
 	game      game.Game
-	errs      []error
+	errorChan chan error
 	scanner   *bufio.Scanner
 	inputChan chan loop.ActionEntry
 }
@@ -22,6 +22,7 @@ type gameIO struct {
 func NewGameIO() *gameIO {
 	return &gameIO{
 		scanner:   bufio.NewScanner(os.Stdin),
+		errorChan: make(chan error, 64),
 		inputChan: make(chan loop.ActionEntry, 64),
 	}
 }
@@ -93,7 +94,9 @@ func (io *gameIO) Input() <-chan loop.ActionEntry {
 }
 
 func (io *gameIO) SetErrors(errs ...error) {
-	io.errs = errs
+	for _, err := range errs {
+		io.errorChan <- err
+	}
 }
 
 func (io *gameIO) Redraw(g game.Game) {
@@ -104,9 +107,15 @@ func (io *gameIO) Redraw(g game.Game) {
 func (io *gameIO) redraw() {
 	builder := strings.Builder{}
 
-	for _, err := range io.errs {
-		if err != nil {
-			fmt.Fprintln(&builder, tuiError(err))
+errLoop:
+	for {
+		select {
+		case err := <-io.errorChan:
+			if err != nil {
+				fmt.Fprintln(&builder, tuiError(err))
+			}
+		default:
+			break errLoop
 		}
 	}
 

@@ -6,21 +6,21 @@ import (
 )
 
 type Game struct {
-	Players       [SidesCount]Player
-	Table         Table
-	Turn          Side
-	TurnFinished  bool
+	Players        [SidesCount]Player
+	Table          Table
+	Turn           Side
+	TurnFinished   bool
 	passiveEffects map[*Character]PassiveEffect
-	eventEffects  map[int]map[*Character]Effect
+	eventEffects   map[int]map[*Character]Effect
 }
 
 func NewGame(topHero, botHero *Hero, topDeck, botDeck Deck) *Game {
 	game := &Game{
-		Table:         *NewTable(),
-		Turn:          UnsetSide,
-		TurnFinished:  false,
+		Table:          *NewTable(),
+		Turn:           UnsetSide,
+		TurnFinished:   false,
 		passiveEffects: map[*Character]PassiveEffect{},
-		eventEffects:  map[int]map[*Character]Effect{},
+		eventEffects:   map[int]map[*Character]Effect{},
 	}
 
 	topHero.SetHealthToMax()
@@ -98,6 +98,28 @@ func (g *Game) GetWinner() Side {
 		}
 	}
 	return UnsetSide
+}
+
+func (g *Game) GetInfo(idx int, side Side) error {
+	if side == UnsetSide {
+		player := g.GetActivePlayer()
+		if idx == HeroIdx {
+			return NewInfoError(player.Hero.Power)
+		}
+
+		card, err := player.Hand.Get(idx)
+		if err != nil {
+			return err
+		}
+		return NewInfoError(card)
+
+	} else {
+		minion, err := g.Table[side].GetMinion(idx)
+		if err != nil {
+			return err
+		}
+		return NewInfoError(*minion)
+	}
 }
 
 func (g *Game) getCharacter(idx int, side Side) (*Character, error) {
