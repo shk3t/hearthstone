@@ -41,6 +41,9 @@ type EmptyDeckError struct {
 	BaseError
 	Fatigue int
 }
+type NoTargetSpecifiedError struct {
+	BaseError
+}
 type UnmatchedTargetNumberError struct {
 	BaseError
 	Specified int
@@ -51,6 +54,10 @@ type UsedHeroPowerError struct {
 }
 type UnavailableMinionAttackError struct {
 	BaseError
+}
+type InfoError struct {
+	BaseError
+	Card Cardlike
 }
 
 func NewCardPickError(idx int) CardPickError {
@@ -77,6 +84,9 @@ func NewFullTableAreaError() FullTableAreaError {
 func NewEmptyDeckError() EmptyDeckError {
 	return EmptyDeckError{}
 }
+func NewNoTargetSpecifiedError() NoTargetSpecifiedError {
+	return NoTargetSpecifiedError{}
+}
 func NewUnmatchedTargetNumberError(specified, required int) UnmatchedTargetNumberError {
 	return UnmatchedTargetNumberError{
 		Specified: specified,
@@ -88,4 +98,7 @@ func NewUsedHeroPowerError() UsedHeroPowerError {
 }
 func NewUnavailableMinionAttackError() UnavailableMinionAttackError {
 	return UnavailableMinionAttackError{}
+}
+func NewInfoError(card Cardlike) InfoError {
+	return InfoError{Card: card}
 }

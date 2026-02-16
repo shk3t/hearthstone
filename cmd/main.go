@@ -5,13 +5,13 @@ import (
 	"hearthstone/internal/loop"
 	"hearthstone/internal/sets/base"
 	"hearthstone/internal/sets/legacy"
-	"hearthstone/internal/setup"
+	"hearthstone/internal/tui"
 	"hearthstone/pkg/helper"
 )
 
 func main() {
-	setup.InitAll()
-	defer setup.DeinitAll()
+	loop.InitAll()
+	defer loop.DeinitAll()
 
 	startingDeck := game.NewDeck(
 		legacy.Neutral.QuestingAdventurer,
@@ -22,6 +22,7 @@ func main() {
 	)
 
 	g := loop.StartGame(
+		tui.NewGameIO(),
 		base.Heroes.Mage.Copy(),
 		base.Heroes.Priest.Copy(),
 		startingDeck.Copy(),

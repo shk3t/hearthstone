@@ -5,7 +5,9 @@ import (
 	"hearthstone/internal/game"
 	"hearthstone/pkg/sugar"
 	"hearthstone/pkg/ui"
+	"strconv"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/fatih/color"
 )
@@ -13,14 +15,24 @@ import (
 func handString(h game.Hand, side game.Side, isActive bool) string {
 	builder := strings.Builder{}
 	var cardStr string
-	i := 1
+
+	nameMaxLen, attackHpMaxLen := 0, 0
+	for _, card := range h {
+		if m, ok := card.(game.Minion); ok {
+			nameMaxLen = max(nameMaxLen, utf8.RuneCountInString(m.Name))
+			attackHpMaxLen = max(
+				attackHpMaxLen,
+				len(strconv.Itoa(m.Attack))+len(strconv.Itoa(m.Health))+1,
+			)
+		}
+	}
 
 	colorStringFunc := getColorStringFunc(side)
-
+	i := 1
 	for _, card := range h {
 		switch card := card.(type) {
 		case game.Minion:
-			cardStr = minionHandString(card)
+			cardStr = minionHandString(card, nameMaxLen, attackHpMaxLen)
 		case game.Spell:
 			cardStr = spellString(card)
 		case nil:

@@ -10,14 +10,29 @@ import (
 	"github.com/fatih/color"
 )
 
-func minionHandString(m game.Minion) string {
-	return fmt.Sprintf(
-		"%s %s %s%s%s",
-		color.BlueString("<%d>", m.ManaCost),
-		m.Name,
+func minionHandString(m game.Minion, fieldWidths ...int) string {
+	format := "%s %s %s"
+
+	if len(fieldWidths) == 2 {
+		format = fmt.Sprintf(
+			"%%s %%-%ds %%%ds",
+			fieldWidths[0],
+			fieldWidths[1],
+		)
+	}
+
+	attackHealthStr := fmt.Sprintf(
+		"%s%s%s",
 		color.YellowString("%d", m.Attack),
 		color.HiBlackString("/"),
 		color.RedString("%d", m.MaxHealth),
+	)
+
+	return fmt.Sprintf(
+		format,
+		color.BlueString("<%d>", m.ManaCost),
+		m.Name,
+		attackHealthStr,
 	)
 }
 
@@ -47,20 +62,15 @@ func minionTableString(m game.Minion, fieldWidths ...int) string {
 			),
 		),
 	)
+
 	str := fmt.Sprintf(
 		format,
-		m.Name, attackHealthStr, characterStatusString(m.Character),
+		m.Name,
+		attackHealthStr,
+		characterStatusString(m.Character),
 	)
 
 	return strings.TrimRight(str, color.HiBlackString("|")+" ")
-}
-
-func getMinionInfo(table game.Table, idx int, side game.Side) (string, error) {
-	minion, err := table[side].GetMinion(idx)
-	if err != nil {
-		return "", err
-	}
-	return minionInfo(*minion), nil
 }
 
 func minionInfo(m game.Minion) string {
@@ -72,10 +82,13 @@ func minionInfo(m game.Minion) string {
 		color.YellowString("%d", m.Attack),
 	)
 	fmt.Fprintf(&builder,
-		"%s %s%s\n",
+		"%s %s\n",
 		color.HiBlackString("Здоровье:"),
-		color.RedString("%d", m.Health),
-		color.HiBlackString("/%d", m.MaxHealth),
+		sugar.If(
+			m.Health == 0,
+			color.RedString("%d", m.MaxHealth),
+			color.RedString("%d", m.Health)+color.HiBlackString("/%d", m.MaxHealth),
+		),
 	)
 	if m.Type != game.NoMinionType {
 		fmt.Fprintf(&builder, "Тип:      %s\n", m.Type)

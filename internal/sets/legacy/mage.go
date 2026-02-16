@@ -14,7 +14,7 @@ var Mage = struct {
 			Class:       game.MageClass,
 			Rarity:      game.BaseRarity,
 		},
-		Effect: game.TargetEffect{
+		DeprecatedEffect: game.TargetEffect{
 			Target: game.Targets.Single,
 			Func: func(target *game.Character) {
 				target.DealDamage(3)
@@ -30,7 +30,7 @@ var Mage = struct {
 			Class:       game.MageClass,
 			Rarity:      game.BaseRarity,
 		},
-		Effect: game.TargetEffect{
+		DeprecatedEffect: game.TargetEffect{
 			Target: game.Targets.Single,
 			Func: func(target *game.Character) {
 				target.DealDamage(6)

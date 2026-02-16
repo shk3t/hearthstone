@@ -1,4 +1,4 @@
-package setup
+package loop
 
 import (
 	"hearthstone/internal/config"
@@ -11,7 +11,6 @@ func initAll(args ...any) error {
 	if err := log.Init(); err != nil {
 		return err
 	}
-	setupUI()
 	return nil
 }
 

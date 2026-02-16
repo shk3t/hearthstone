@@ -27,7 +27,8 @@ var Neutral = struct {
 		Character: game.Character{
 			Attack:    1,
 			MaxHealth: 1,
-			Battlecry: game.TargetEffect{
+			Effect: &game.Effect{
+				Event:  game.Events.Battlecry,
 				Target: game.Targets.Single,
 				Func: func(target *game.Character) {
 					target.DealDamage(1)
@@ -47,8 +48,9 @@ var Neutral = struct {
 		Character: game.Character{
 			Attack:    2,
 			MaxHealth: 1,
-			Deathrattle: game.PlayerEffect{
-				Func: func(player *game.Player) {
+			Effect: &game.Effect{
+				Event: game.Events.Deathrattle,
+				PlayerFunc: func(player *game.Player) {
 					player.DrawCards(1)
 				},
 			},
@@ -80,8 +82,9 @@ var Neutral = struct {
 		Character: game.Character{
 			Attack:    2,
 			MaxHealth: 2,
-			Battlecry: game.PlayerEffect{
-				Func: func(player *game.Player) {
+			Effect: &game.Effect{
+				Event: game.Events.Battlecry,
+				PlayerFunc: func(player *game.Player) {
 					player.DrawCards(2)
 					player.GetOpponent().DrawCards(2)
 				},
@@ -100,7 +103,7 @@ var Neutral = struct {
 		Character: game.Character{
 			Attack:    2,
 			MaxHealth: 2,
-			Trigger: &game.TriggerEffect{
+			Effect: &game.Effect{
 				Target: game.Targets.Self,
 				Func: func(target *game.Character) {
 					target.Attack++

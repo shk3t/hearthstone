@@ -11,7 +11,7 @@ import (
 
 const prompt = "> "
 
-func gameString(g game.Game) string {
+func gameString(g game.Game, hint string) string {
 	builder := strings.Builder{}
 
 	fmt.Fprint(&builder, playerString(g.Players[game.TopSide]))
@@ -19,8 +19,8 @@ func gameString(g game.Game) string {
 	fmt.Fprint(&builder, playerString(g.Players[game.BotSide]))
 	fmt.Fprint(&builder, "\n\n")
 
-	if state.hint != "" {
-		fmt.Fprintf(&builder, "%s\n\n", state.hint)
+	if hint != "" {
+		fmt.Fprintln(&builder, hint)
 	}
 
 	if winner := g.GetWinner(); winner != game.UnsetSide {

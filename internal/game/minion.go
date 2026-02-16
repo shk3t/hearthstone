@@ -33,7 +33,7 @@ func (mt minionType) String() string {
 	}
 }
 
-func (m *Minion) Summon(owner *Player, handIdx, areaIdx int) (*NextAction, error) {
+func (m *Minion) Summon(owner *Player, handIdx, areaIdx int) (error) {
 	game := owner.Game
 	area := owner.GetArea()
 	character := &m.Character
@@ -45,15 +45,16 @@ func (m *Minion) Summon(owner *Player, handIdx, areaIdx int) (*NextAction, error
 		m.Status.SetSleep(true)
 	}
 
+	// TODO: move it to `PlayCard`
 	processEffects := func() {
 		Events.CardPlayed.Trigger(owner, nil, nil)
-		sideAwareCardPlayedEvent(owner.Side).Trigger(owner, nil, nil)
+		getSideAwareCardPlayedEvent(owner.Side).Trigger(owner, nil, nil)
 
 		if m.Passive != nil {
 			m.Passive.Apply(character, nil, nil)
 		}
-		if m.Trigger != nil {
-			m.Trigger.Register(character)
+		if m.Effect != nil {
+			m.Effect.Register(character)
 		}
 
 		for _, effect := range game.getApplicablePassiveEffects(character) {
@@ -61,33 +62,11 @@ func (m *Minion) Summon(owner *Player, handIdx, areaIdx int) (*NextAction, error
 		}
 	}
 
-	if m.Battlecry != nil {
-		err = m.Battlecry.Apply(character, nil, nil)
-
-		switch err.(type) {
-		case UnmatchedTargetNumberError:
-			return &NextAction{
-				Do: func(idxes []int, sides Sides) error {
-					return m.Battlecry.Apply(character, idxes, sides)
-				},
-				OnSuccess: func() {
-					owner.Hand.discard(handIdx)
-					_ = owner.spendMana(m.ManaCost)
-					processEffects()
-				},
-				OnFail: func() {
-					area.remove(areaIdx)
-				},
-			}, nil
-		case nil:
-		default:
-			return nil, err
-		}
-	}
+	Events.Battlecry.Trigger(owner, nil, nil)
 
 	processEffects()
 
-	return nil, nil
+	return nil
 }
 
 func (m *Minion) Die() {
@@ -95,10 +74,8 @@ func (m *Minion) Die() {
 	if m.Passive != nil {
 		m.Passive.Cancel(character, nil, nil)
 	}
-	if m.Deathrattle != nil {
-		m.Deathrattle.Apply(character, nil, nil)
-	}
-	if m.Trigger != nil {
-		m.Trigger.Remove(character)
+	Events.Deathrattle.Trigger(character.owner, nil, nil)
+	if m.Effect != nil {
+		m.Effect.Remove(character)
 	}
 }

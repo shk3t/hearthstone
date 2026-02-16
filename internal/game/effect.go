@@ -8,7 +8,7 @@ type targetEffectFunc func(target *Character)
 type playerEffectFunc func(player *Player)
 
 // Value-type interface
-type Effect interface {
+type DeprecatedEffect interface {
 	Apply(source *Character, idxes []int, sides Sides) error
 }
 
@@ -97,7 +97,7 @@ func (e PassiveEffect) Apply(
 		return err
 	}
 
-	source.getGame().statusEffects[source] = e
+	source.getGame().passiveEffects[source] = e
 
 	for _, target := range targets {
 		e.InFunc(target)
@@ -116,7 +116,7 @@ func (e PassiveEffect) Cancel(
 		return err
 	}
 
-	delete(source.getGame().statusEffects, source)
+	delete(source.getGame().passiveEffects, source)
 
 	for _, target := range targets {
 		e.OutFunc(target)
@@ -125,7 +125,7 @@ func (e PassiveEffect) Cancel(
 	return nil
 }
 
-type TriggerEffect struct {
+type Effect struct {
 	Event           event
 	Target          targetSelector
 	Func            targetEffectFunc
@@ -133,7 +133,7 @@ type TriggerEffect struct {
 	PlayerFunc      playerEffectFunc
 }
 
-func (eff TriggerEffect) Register(source *Character) error {
+func (eff Effect) Register(source *Character) error {
 	g := source.getGame()
 
 	event := eff.Event
@@ -143,7 +143,7 @@ func (eff TriggerEffect) Register(source *Character) error {
 
 	characterEffects, ok := g.eventEffects[event.id]
 	if !ok {
-		characterEffects = map[*Character]TriggerEffect{}
+		characterEffects = map[*Character]Effect{}
 		g.eventEffects[event.id] = characterEffects
 	}
 	characterEffects[source] = eff
@@ -151,7 +151,7 @@ func (eff TriggerEffect) Register(source *Character) error {
 	return nil
 }
 
-func (eff TriggerEffect) Remove(source *Character) error {
+func (eff Effect) Remove(source *Character) error {
 	g := source.getGame()
 
 	event := eff.Event
@@ -167,7 +167,7 @@ func (eff TriggerEffect) Remove(source *Character) error {
 	return nil
 }
 
-func (eff TriggerEffect) Apply(
+func (eff Effect) Apply(
 	source *Character,
 	idxes []int,
 	sides Sides,

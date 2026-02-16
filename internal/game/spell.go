@@ -2,19 +2,21 @@ package game
 
 type Spell struct {
 	Card
-	Effect
+	DeprecatedEffect
 }
 
 func (s *Spell) Cast(hero *Hero, idxes []int, sides Sides) error {
-	err := s.Effect.Apply(&hero.Character, idxes, sides)
+	err := s.DeprecatedEffect.Apply(&hero.Character, idxes, sides)
 	if err != nil {
 		return err
 	}
 
+	// TODO: move it to `PlayCard`
+	// TODO: I don't like "Abstract" name; Can I extract this field from `Card` to `Spell`?
 	if !s.Abstract {
 		owner := hero.owner
 		Events.CardPlayed.Trigger(owner, nil, nil)
-		sideAwareCardPlayedEvent(owner.Side).Trigger(owner, nil, nil)
+		getSideAwareCardPlayedEvent(owner.Side).Trigger(owner, nil, nil)
 	}
 	return nil
 }

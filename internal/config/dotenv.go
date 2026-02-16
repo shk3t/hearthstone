@@ -16,6 +16,7 @@ var DisplayMethods = struct {
 	Tui string
 }{Tui: "TUI"}
 
+// TODO: DO NOT USE ENV, config everything in main function (later in JSON)
 func LoadEnv() {
 	godotenv.Load(".env")
 	Env.TableSize = parseInt("TABLE_SIZE", 7)

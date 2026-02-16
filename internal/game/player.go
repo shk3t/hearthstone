@@ -45,39 +45,38 @@ func (p *Player) PlayCard(
 	handIdx int,
 	areaIdx int,
 	spellIdxes []int, spellSides []Side,
-) (*NextAction, error) {
+) error {
 	var card Cardlike
-	var next *NextAction
 	var err error
 	heroPowerUse := handIdx == HeroIdx
 
 	if heroPowerUse {
 		if p.Hero.PowerIsUsed {
-			return nil, NewUsedHeroPowerError()
+			return NewUsedHeroPowerError()
 		}
 		card = p.Hero.Power
 	} else {
 		card, err = p.Hand.Get(handIdx)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
 
 	manaCost := ToCard(card).ManaCost
 	if !p.haveEnoughMana(manaCost) {
-		return nil, NewNotEnoughManaError(p.Mana, manaCost)
+		return NewNotEnoughManaError(p.Mana, manaCost)
 	}
 
 	switch card := card.(type) {
 	case Minion:
-		next, err = card.Summon(p, handIdx, areaIdx)
+		err = card.Summon(p, handIdx, areaIdx)
 	case Spell:
 		err = card.Cast(p.Hero, spellIdxes, spellSides)
 	default:
 		panic("Invalid card type")
 	}
-	if next != nil || err != nil {
-		return next, err
+	if err != nil {
+		return err
 	}
 
 	if heroPowerUse {
@@ -86,7 +85,7 @@ func (p *Player) PlayCard(
 	p.Hand.discard(handIdx)
 	_ = p.spendMana(manaCost)
 
-	return nil, nil
+	return nil
 }
 
 func (p *Player) Attack(allyIdx, enemyIdx int) error {

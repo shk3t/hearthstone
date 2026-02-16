@@ -61,6 +61,9 @@ func tuiError(err error) string {
 		}
 		out = "Пустая колода"
 
+	case game.NoTargetSpecifiedError:
+		out = "Цель не указана"
+
 	case game.UnmatchedTargetNumberError:
 		out = fmt.Sprintf(
 			"Несоответствующее число целей.\nУказано: %d, требуется: %d",
@@ -73,6 +76,19 @@ func tuiError(err error) string {
 	case game.UnavailableMinionAttackError:
 		out = "Это существо сможет атаковать только в следующем ходу"
 
+	case game.InfoError:
+		switch card := err.Card.(type) {
+		case game.Minion:
+			return minionInfo(card)
+		case game.Spell:
+			return cardInfo(card.Card, color.MagentaString)
+		default:
+			panic("Invalid card type")
+		}
+
+	case InvalidArgumentsError, ShortHelpError, HelpError:
+		return err.Error()
+
 	default:
 		panic(errpkg.NewUnexpectedError(err))
 	}
@@ -81,30 +97,55 @@ func tuiError(err error) string {
 }
 
 type InvalidArgumentsError struct {
-	correctUsage string
+	action tuiAction
 }
-type EndOfInputError struct {
-}
+type HelpError struct{}
+type ShortHelpError struct{}
 
-func (err InvalidArgumentsError) Set(correctUsage string) InvalidArgumentsError {
-	err.correctUsage = correctUsage
-	return err
+func NewInvalidArgumentsError(action tuiAction) InvalidArgumentsError {
+	return InvalidArgumentsError{action: action}
 }
-
-func NewInvalidArgumentsError() InvalidArgumentsError {
-	return InvalidArgumentsError{}
+func NewShortHelpError() ShortHelpError {
+	return ShortHelpError{}
 }
-func NewEndOfInputError() EndOfInputError {
-	return EndOfInputError{}
+func NewHelpError() HelpError {
+	return HelpError{}
 }
 
 func (err InvalidArgumentsError) Error() string {
 	return fmt.Sprintf(
 		"%s:\n%s",
 		color.RedString("Некорректные аргументы"),
-		err.correctUsage,
+		err.action.info(true, false),
 	)
 }
-func (err EndOfInputError) Error() string {
-	return color.RedString("Конец ввода")
+func (err ShortHelpError) Error() string {
+	builder := strings.Builder{}
+	fmt.Fprint(&builder, color.RedString("Некорректное действие\n"))
+	fmt.Fprint(&builder, color.YellowString("Доступные действия:\n"))
+	for _, action := range actionList {
+		fmt.Fprintln(&builder, action.info(false, true))
+	}
+	return strings.TrimSuffix(builder.String(), "\n")
+}
+func (err HelpError) Error() string {
+	builder := strings.Builder{}
+	fmt.Fprint(&builder,
+		color.YellowString("Доступные действия:\n"),
+	)
+	for _, action := range actionList {
+		fmt.Fprintln(&builder, action.info(false, false))
+	}
+	fmt.Fprintf(&builder,
+		"Чтобы указать героя в качестве цели, используйте %s или %s\n",
+		color.MagentaString("h"),
+		color.MagentaString("0"),
+	)
+	fmt.Fprintf(&builder,
+		"Чтобы указать сторону цели, используйте %s (верх) или %s (низ), например %s",
+		color.MagentaString("t"),
+		color.MagentaString("b"),
+		color.MagentaString("5b"),
+	)
+	return builder.String()
 }

@@ -2,26 +2,45 @@ package tui
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"hearthstone/internal/game"
+	"hearthstone/internal/loop"
 	"hearthstone/pkg/helper"
 	"hearthstone/pkg/ui"
 	"os"
 	"strings"
-
-	"github.com/fatih/color"
 )
 
-func Display(g *game.Game) {
-	ui.UpdateFrame(gameString(*g))
+type gameIO struct {
+	game      game.Game
+	errs      []error
+	scanner   *bufio.Scanner
+	inputChan chan loop.ActionEntry
 }
 
-func HandleInput(g *game.Game) error {
-	if !scanner.Scan() {
-		return NewEndOfInputError()
+func NewGameIO() *gameIO {
+	return &gameIO{
+		scanner:   bufio.NewScanner(os.Stdin),
+		inputChan: make(chan loop.ActionEntry, 64),
 	}
+}
 
-	input := scanner.Text()
+func (io *gameIO) Run(ctx context.Context) {
+	for {
+		if ctx.Err() != nil {
+			return
+		}
+		if !io.scanner.Scan() {
+			return
+		}
+
+		io.handleInput()
+	}
+}
+
+func (io *gameIO) handleInput() {
+	input := io.scanner.Text()
 	input = strings.ToLower(input)
 	allArgs := strings.Fields(input)
 
@@ -30,46 +49,68 @@ func HandleInput(g *game.Game) error {
 		command, args = allArgs[0], allArgs[1:]
 	}
 
-	if state.nextAction != nil {
-		if actions.cancel.matches(command) {
-			state.nextAction.rollback()
-			state.hint, state.nextAction = helper.Capitalize(actions.cancel.description), nil
-		} else {
-			state.hint, state.nextAction = state.nextAction.wrappedDo(allArgs, g)
-		}
-		return nil
-	}
-
 	for _, action := range actionList {
-		if action.matches(command) {
-			state.hint, state.nextAction = action.Do(args, g)
-			if state.nextAction != nil {
-				state.hint = nextActionHint
-			}
-			return nil
+		if !action.matches(command) {
+			continue
 		}
+
+		idxes, sides, errs := parseAllPositions(args)
+		if helper.FirstError(errs) != nil {
+			io.SetErrors(NewInvalidArgumentsError(action))
+			io.redraw()
+			return
+		}
+
+		if action.errFunc != nil {
+			io.SetErrors(action.errFunc())
+			io.redraw()
+			return
+		}
+
+		if action.prepareArgs != nil {
+			idxes, sides = action.prepareArgs(idxes, sides)
+		}
+
+		if idxes == nil || sides == nil {
+			io.SetErrors(NewInvalidArgumentsError(action))
+			io.redraw()
+			return
+		}
+
+		io.inputChan <- loop.ActionEntry{
+			Name:  action.name,
+			Idxes: idxes,
+			Sides: sides,
+		}
+		return
 	}
 
-	state.hint = getShortHelp()
-	return nil
+	io.SetErrors(NewShortHelpError())
 }
 
-func Feedback(errs ...error) {
-	builder := strings.Builder{}
-	for _, err := range errs {
-		fmt.Fprintln(&builder, tuiError(err))
-	}
-	state.hint = strings.TrimSuffix(builder.String(), "\n")
+func (io *gameIO) Input() <-chan loop.ActionEntry {
+	return io.inputChan
 }
 
-var scanner = bufio.NewScanner(os.Stdin)
+func (io *gameIO) SetErrors(errs ...error) {
+	io.errs = errs
+}
 
-func getShortHelp() string {
+func (io *gameIO) Redraw(g game.Game) {
+	io.game = g
+	io.redraw()
+}
+
+func (io *gameIO) redraw() {
 	builder := strings.Builder{}
-	fmt.Fprint(&builder, color.RedString("Некорректное действие\n"))
-	fmt.Fprint(&builder, color.YellowString("Доступные действия:\n"))
-	for _, action := range actionList {
-		fmt.Fprintln(&builder, action.info(false, true))
+
+	for _, err := range io.errs {
+		if err != nil {
+			fmt.Fprintln(&builder, tuiError(err))
+		}
 	}
-	return strings.TrimSuffix(builder.String(), "\n")
+
+	ui.UpdateFrame(
+		gameString(io.game, builder.String()),
+	)
 }
