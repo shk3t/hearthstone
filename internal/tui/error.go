@@ -3,6 +3,7 @@ package tui
 import (
 	"fmt"
 	"hearthstone/internal/game"
+	"hearthstone/internal/loop"
 	errpkg "hearthstone/pkg/errors"
 	"strings"
 
@@ -86,7 +87,10 @@ func tuiError(err error) string {
 			panic("Invalid card type")
 		}
 
-	case InvalidArgumentsError, ShortHelpError, HelpError:
+	case loop.NeedActionError:
+		return NewShortHelpError().Error()
+
+	case InvalidArgumentsError, ShortHelpError, HelpError, InputPromptError:
 		return err.Error()
 
 	default:
@@ -97,13 +101,18 @@ func tuiError(err error) string {
 }
 
 type InvalidArgumentsError struct {
-	action tuiAction
+	action *tuiAction
 }
 type HelpError struct{}
 type ShortHelpError struct{}
+type InputPromptError struct {
+	activeSide game.Side
+}
 
-func NewInvalidArgumentsError(action tuiAction) InvalidArgumentsError {
-	return InvalidArgumentsError{action: action}
+func NewInvalidArgumentsError(action *tuiAction) InvalidArgumentsError {
+	return InvalidArgumentsError{
+		action: action,
+	}
 }
 func NewShortHelpError() ShortHelpError {
 	return ShortHelpError{}
@@ -111,13 +120,20 @@ func NewShortHelpError() ShortHelpError {
 func NewHelpError() HelpError {
 	return HelpError{}
 }
+func NewInputPromptError(activeSide game.Side) InputPromptError {
+	return InputPromptError{
+		activeSide: activeSide,
+	}
+}
 
 func (err InvalidArgumentsError) Error() string {
-	return fmt.Sprintf(
-		"%s:\n%s",
-		color.RedString("Некорректные аргументы"),
-		err.action.info(true, false),
-	)
+	builder := strings.Builder{}
+	fmt.Fprintln(&builder, color.RedString("Некорректные аргументы"))
+	if err.action != nil {
+		fmt.Fprintln(&builder, err.action.info(true, false))
+	}
+	fmt.Fprint(&builder, positionsInfo())
+	return builder.String()
 }
 func (err ShortHelpError) Error() string {
 	builder := strings.Builder{}
@@ -136,16 +152,24 @@ func (err HelpError) Error() string {
 	for _, action := range actionList {
 		fmt.Fprintln(&builder, action.info(false, false))
 	}
+	fmt.Fprint(&builder, positionsInfo())
+	return builder.String()
+}
+func (err InputPromptError) Error() string {
+	return getColorStringFunc(err.activeSide)("Выберите цели")
+}
+
+func positionsInfo() string {
+	builder := strings.Builder{}
 	fmt.Fprintf(&builder,
-		"Чтобы указать героя в качестве цели, используйте %s или %s\n",
-		color.MagentaString("h"),
-		color.MagentaString("0"),
+		"Чтобы указать героя в качестве цели, используйте %s\n",
+		color.BlueString("0"),
 	)
 	fmt.Fprintf(&builder,
 		"Чтобы указать сторону цели, используйте %s (верх) или %s (низ), например %s",
-		color.MagentaString("t"),
-		color.MagentaString("b"),
-		color.MagentaString("5b"),
+		color.BlueString("t"),
+		color.BlueString("b"),
+		color.BlueString("5b"),
 	)
 	return builder.String()
 }

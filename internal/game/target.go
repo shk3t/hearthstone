@@ -6,7 +6,7 @@ import "slices"
 type targetSelector func(
 	source *Character,
 	idxes []int,
-	sides Sides,
+	sides []Side,
 ) (targets []*Character, err error)
 
 var Targets = struct {
@@ -37,13 +37,13 @@ var Targets = struct {
 	// Multiple             characterSelector
 	// All                  characterSelector
 }{
-	Self: func(source *Character, idxes []int, sides Sides) ([]*Character, error) {
+	Self: func(source *Character, idxes []int, sides []Side) ([]*Character, error) {
 		return []*Character{source}, nil
 	},
-	AllAllyMinions: func(source *Character, idxes []int, sides Sides) ([]*Character, error) {
+	AllAllyMinions: func(source *Character, idxes []int, sides []Side) ([]*Character, error) {
 		return source.getAllies(), nil
 	},
-	RestAllyMinions: func(source *Character, idxes []int, sides Sides) ([]*Character, error) {
+	RestAllyMinions: func(source *Character, idxes []int, sides []Side) ([]*Character, error) {
 		allies := source.getAllies()
 		if source != nil {
 			allies = slices.DeleteFunc(
@@ -53,7 +53,7 @@ var Targets = struct {
 		}
 		return allies, nil
 	},
-	Single: func(source *Character, idxes []int, sides Sides) ([]*Character, error) {
+	Single: func(source *Character, idxes []int, sides []Side) ([]*Character, error) {
 		if idxes == nil {
 			return nil, NewNoTargetSpecifiedError()
 		}

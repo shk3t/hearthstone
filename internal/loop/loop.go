@@ -5,29 +5,36 @@ import (
 	"hearthstone/internal/game"
 )
 
-type ActionEntry struct {
-	Name  string
-	Idxes []int
-	Sides game.Sides
+type gameIO interface {
+	Run(ctx context.Context)
+	Redraw(g game.Game)
+	SetErrors(errs ...error)
+	GetInputChan() <-chan InputEntry
+	GetPositionInputFunc(ctx context.Context) game.PositionInputFunc
 }
 
-type GameIO interface {
-	Run(ctx context.Context)
-	Input() <-chan ActionEntry
-	SetErrors(errs ...error)
-	Redraw(g game.Game)
+type InputEntry struct {
+	ActionName string
+	Idxes      []int
+	Sides      []game.Side
 }
 
 func StartGame(
-	io GameIO,
-	config game.GameConfig,
 	topHero, botHero *game.Hero,
 	topDeck, botDeck game.Deck,
+	config game.GameConfig,
+	io gameIO,
 ) *game.Game {
-	g := game.NewGame(config, topHero, botHero, topDeck, botDeck)
-	g.StartGame()
-
 	ctx, cancel := context.WithCancel(context.Background())
+
+	g := game.NewGame(
+		topHero, botHero,
+		topDeck, botDeck,
+		config,
+		io.GetPositionInputFunc(ctx),
+	)
+
+	g.StartGame()
 
 	go func() {
 		io.Run(ctx)
@@ -35,18 +42,23 @@ func StartGame(
 	}()
 
 	go func() {
-		var entry ActionEntry
+		entry := InputEntry{}
+		inputChan := io.GetInputChan()
 
 		for {
 			io.Redraw(*g)
 
 			select {
-			case entry = <-io.Input():
+			case entry = <-inputChan:
+				if entry.ActionName == "" {
+					io.SetErrors(NewNeedActionError())
+					continue
+				}
 			case <-ctx.Done():
 				return
 			}
 
-			gameAction := GetAction(entry.Name)
+			gameAction := GetAction(entry.ActionName)
 			err := gameAction(g, entry.Idxes, entry.Sides)
 			if err != nil {
 				io.SetErrors(err)

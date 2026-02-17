@@ -33,7 +33,7 @@ func (mt minionType) String() string {
 	}
 }
 
-func (m *Minion) Summon(owner *Player, handIdx, areaIdx int) (error) {
+func (m *Minion) Summon(owner *Player, handIdx, areaIdx int) error {
 	game := owner.Game
 	area := owner.GetArea()
 	character := &m.Character
@@ -46,13 +46,17 @@ func (m *Minion) Summon(owner *Player, handIdx, areaIdx int) (error) {
 	}
 
 	if m.Effect != nil {
-		m.Effect.Register(character)
+		m.Effect.gameAttach(character)
 	}
 	if m.Passive != nil {
 		m.Passive.Apply(character, nil, nil)
 	}
 
-	Events.Battlecry.Trigger(owner, nil, nil)
+	err = Events.Battlecry.Trigger(owner, nil, nil)
+	if err != nil {
+		area.remove(areaIdx) // TODO: I don't have to be able to do another action
+		return err
+	}
 
 	for _, effect := range game.getApplicablePassiveEffects(character) {
 		effect.InFunc(character)
@@ -68,6 +72,6 @@ func (m *Minion) Die() {
 	}
 	Events.Deathrattle.Trigger(character.owner, nil, nil)
 	if m.Effect != nil {
-		m.Effect.Remove(character)
+		m.Effect.gameDetach(character)
 	}
 }

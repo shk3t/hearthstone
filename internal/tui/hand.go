@@ -31,12 +31,12 @@ func handString(h game.Hand, side game.Side, isActive bool) string {
 	i := 1
 	for _, card := range h {
 		switch card := card.(type) {
+		case nil:
+			continue
 		case game.Minion:
 			cardStr = minionHandString(card, nameMaxLen, attackHpMaxLen)
 		case game.Spell:
 			cardStr = spellString(card)
-		case nil:
-			continue
 		default:
 			panic("Invalid card type")
 		}

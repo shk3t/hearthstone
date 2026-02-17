@@ -7,10 +7,7 @@ import (
 )
 
 // Subtracts 1 from specified position to get index.
-//
-// "h" means Hero, converts to -1 index.
-// "0" position also can be considered as hero position.
-//
+// "0" means Hero, converts to -1 index.
 // "t"/"b" for precise specifying target side (Top/Bottom).
 func parsePosition(arg string) (idx int, side game.Side, err error) {
 	switch {
@@ -24,7 +21,7 @@ func parsePosition(arg string) (idx int, side game.Side, err error) {
 		side = game.UnsetSide
 	}
 
-	if strings.Contains(arg, "h") || strings.Contains(arg, "w")  {
+	if strings.Contains(arg, "w") {
 		return game.HeroIdx, side, nil
 	}
 
@@ -50,4 +47,8 @@ func parseAllPositions(args []string) (idxes []int, sides []game.Side, errs []er
 	}
 
 	return idxes, sides, errs
+}
+
+func isAction(arg string) bool {
+	return actionCharRegexp.MatchString(arg)
 }

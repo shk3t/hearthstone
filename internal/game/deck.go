@@ -36,10 +36,10 @@ const deckSize = 30
 func (d Deck) takeTop() (Cardlike, error) {
 	card, err := container.Shrice[Cardlike](d).PopBack()
 	switch err.(type) {
-	case errpkg.EmptyError:
-		return nil, NewEmptyDeckError()
 	case nil:
 		return card, nil
+	case errpkg.EmptyError:
+		return nil, NewEmptyDeckError()
 	default:
 		panic(errpkg.NewUnexpectedError(err))
 	}

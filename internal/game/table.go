@@ -23,10 +23,10 @@ type TableArea struct {
 func (a TableArea) GetMinion(idx int) (*Minion, error) {
 	card, err := a.Minions.Get(idx)
 	switch err.(type) {
-	case errpkg.IndexError:
-		return nil, NewInvalidTableAreaPositionError(idx, a.Side)
 	case nil:
 		return card, nil
+	case errpkg.IndexError:
+		return nil, NewInvalidTableAreaPositionError(idx, a.Side)
 	default:
 		panic(errpkg.NewUnexpectedError(err))
 	}
@@ -54,12 +54,12 @@ func (a TableArea) place(idx int, minion *Minion) error {
 	idx = min(idx, a.size-1)
 	err := a.Minions.Insert(idx, minion)
 	switch err.(type) {
+	case nil:
+		return nil
 	case errpkg.IndexError:
 		return NewInvalidTableAreaPositionError(idx, UnsetSide)
 	case errpkg.FullError:
 		return NewFullTableAreaError()
-	case nil:
-		return nil
 	default:
 		panic(errpkg.NewUnexpectedError(err))
 	}

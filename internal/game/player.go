@@ -134,18 +134,17 @@ func (p *Player) DrawCards(number int) []error {
 		card, err := p.deck.takeTop()
 
 		switch err := err.(type) {
+		case nil:
+			err = p.Hand.refill(card)
+			if err, ok := err.(FullHandError); ok {
+				err.BurnedCard = card
+				errs = append(errs, err)
+			}
 		case EmptyDeckError:
 			p.fatigue++
 			p.Hero.DealDamage(p.fatigue)
 			err.Fatigue = p.fatigue
 			errs = append(errs, err)
-		case nil:
-			err = p.Hand.refill(card)
-			switch err := err.(type) {
-			case FullHandError:
-				err.BurnedCard = card
-				errs = append(errs, err)
-			}
 		default:
 			panic(errpkg.NewUnexpectedError(err))
 		}

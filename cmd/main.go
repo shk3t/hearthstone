@@ -23,7 +23,10 @@ func main() {
 	)
 
 	g := loop.StartGame(
-		tui.NewGameIO(),
+		base.Heroes.Mage.Copy(),
+		base.Heroes.Priest.Copy(),
+		startingDeck.Copy(),
+		startingDeck.Copy(),
 		game.GameConfig{
 			TableSize:           7,
 			DisplayMethod:       game.DisplayMethods.TUI,
@@ -31,10 +34,7 @@ func main() {
 			UnlimitedMana:       true,
 			RevealOpponentsHand: false,
 		},
-		base.Heroes.Mage.Copy(),
-		base.Heroes.Priest.Copy(),
-		startingDeck.Copy(),
-		startingDeck.Copy(),
+		tui.NewGameIO(),
 	)
 
 	_ = g

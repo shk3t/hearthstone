@@ -17,13 +17,13 @@ func (h Hand) Get(idx int) (Cardlike, error) {
 	card, err := container.Shrice[Cardlike](h).Get(idx)
 
 	switch err.(type) {
+	case nil:
+		return card, nil
 	case errpkg.IndexError:
 		if container.Shrice[Cardlike](h).Len() == 0 {
 			return nil, NewEmptyHandError()
 		}
 		return nil, NewCardPickError(idx)
-	case nil:
-		return card, nil
 	default:
 		panic(errpkg.NewUnexpectedError(err))
 	}
@@ -40,10 +40,10 @@ func (h Hand) discard(idx int) {
 func (h Hand) refill(card Cardlike) error {
 	err := container.Shrice[Cardlike](h).PushBack(card)
 	switch err.(type) {
-	case errpkg.NotEnoughSpaceError:
-		return NewFullHandError()
 	case nil:
 		return nil
+	case errpkg.NotEnoughSpaceError:
+		return NewFullHandError()
 	default:
 		panic(errpkg.NewUnexpectedError(err))
 	}

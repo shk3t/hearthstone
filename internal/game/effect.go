@@ -9,14 +9,14 @@ type playerEffectFunc func(player *Player)
 
 // Value-type interface
 type DeprecatedEffect interface {
-	Apply(source *Character, idxes []int, sides Sides) error
+	Apply(source *Character, idxes []int, sides []Side) error
 }
 
 type PlayerEffect struct {
 	Func playerEffectFunc
 }
 
-func (e PlayerEffect) Apply(source *Character, idxes []int, sides Sides) error {
+func (e PlayerEffect) Apply(source *Character, idxes []int, sides []Side) error {
 	e.Func(source.owner)
 	return nil
 }
@@ -30,11 +30,11 @@ type TargetEffect struct {
 func (e TargetEffect) Apply(
 	source *Character,
 	idxes []int,
-	sides Sides,
+	sides []Side,
 ) error {
-	sides.SetIfUnset(
-		sugar.If(e.AllyIsDefaultTarget, source.getSide(), source.getSide().Opposite()),
-	)
+	// sides.SetIfUnset(
+	// 	sugar.If(e.AllyIsDefaultTarget, source.getSide(), source.getSide().Opposite()),
+	// )
 
 	targets, err := e.Target(source, idxes, sides)
 	if err != nil {
@@ -57,11 +57,11 @@ type IndividualTargetEffect struct {
 func (e IndividualTargetEffect) Apply(
 	source *Character,
 	idxes []int,
-	sides Sides,
+	sides []Side,
 ) error {
-	sides.SetIfUnset(
-		sugar.If(e.AllyIsDefaultTarget, source.getSide(), source.getSide().Opposite()),
-	)
+	// sides.SetIfUnset(
+	// 	sugar.If(e.AllyIsDefaultTarget, source.getSide(), source.getSide().Opposite()),
+	// )
 
 	targets, err := e.Target(source, idxes, sides)
 	if err != nil {
@@ -90,7 +90,7 @@ type PassiveEffect struct {
 func (e PassiveEffect) Apply(
 	source *Character,
 	idxes []int,
-	sides Sides,
+	sides []Side,
 ) error {
 	targets, err := e.Target(source, idxes, sides)
 	if err != nil {
@@ -109,7 +109,7 @@ func (e PassiveEffect) Apply(
 func (e PassiveEffect) Cancel(
 	source *Character,
 	idxes []int,
-	sides Sides,
+	sides []Side,
 ) error {
 	targets, err := e.Target(source, idxes, sides)
 	if err != nil {
@@ -126,14 +126,15 @@ func (e PassiveEffect) Cancel(
 }
 
 type Effect struct {
-	Event           event
-	Target          targetSelector
-	Func            targetEffectFunc
-	IndividualFuncs []targetEffectFunc
-	PlayerFunc      playerEffectFunc
+	Event               event
+	Target              targetSelector
+	AllyIsDefaultTarget bool
+	Func                targetEffectFunc
+	IndividualFuncs     []targetEffectFunc
+	PlayerFunc          playerEffectFunc
 }
 
-func (eff Effect) Register(source *Character) error {
+func (eff Effect) gameAttach(source *Character) error {
 	g := source.getGame()
 
 	event := eff.Event
@@ -151,7 +152,7 @@ func (eff Effect) Register(source *Character) error {
 	return nil
 }
 
-func (eff Effect) Remove(source *Character) error {
+func (eff Effect) gameDetach(source *Character) error {
 	g := source.getGame()
 
 	event := eff.Event
@@ -170,37 +171,50 @@ func (eff Effect) Remove(source *Character) error {
 func (eff Effect) Apply(
 	source *Character,
 	idxes []int,
-	sides Sides,
+	sides []Side,
 ) error {
-	switch {
-
-	case eff.Target != nil && eff.Func != nil:
+	if eff.Target != nil {
+		eff.fillSides(sides, source.getSide())
 		targets, err := eff.Target(source, idxes, sides)
+
+		if _, ok := err.(NoTargetSpecifiedError); ok {
+			idxes, sides := source.getGame().inputPosition()
+			eff.fillSides(sides, source.getSide())
+			targets, err = eff.Target(source, idxes, sides)
+			// TODO: rollback if invalid args
+		}
 		if err != nil {
 			return err
 		}
-		for _, target := range targets {
-			eff.Func(target)
+
+		if eff.Func != nil {
+			for _, target := range targets {
+				eff.Func(target)
+			}
+		} else if eff.IndividualFuncs != nil {
+			if len(eff.IndividualFuncs) != len(targets) {
+				panic(NewUnmatchedTargetNumberError(len(eff.IndividualFuncs), len(targets)))
+			}
+			for i, target := range targets {
+				eff.IndividualFuncs[i](target)
+			}
 		}
 
-	case eff.Target != nil && eff.IndividualFuncs != nil:
-		targets, err := eff.Target(source, idxes, sides)
-		if err != nil {
-			return err
-		}
-		if len(eff.IndividualFuncs) != len(targets) {
-			panic(NewUnmatchedTargetNumberError(len(eff.IndividualFuncs), len(targets)))
-		}
-		for i, target := range targets {
-			eff.IndividualFuncs[i](target)
-		}
-
-	case eff.PlayerFunc != nil:
+	} else if eff.PlayerFunc != nil {
 		eff.PlayerFunc(source.owner)
 
-	default:
+	} else {
 		panic("Invalid effect")
 	}
 
 	return nil
+}
+
+func (eff Effect) fillSides(sides []Side, sourceSide Side) {
+	defaultSide := sugar.If(eff.AllyIsDefaultTarget, sourceSide, sourceSide.Opposite())
+	for i := range sides {
+		if sides[i] == UnsetSide {
+			sides[i] = defaultSide
+		}
+	}
 }

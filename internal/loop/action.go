@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type GameAction func(g *game.Game, idxes []int, sides game.Sides) error
+type GameAction func(g *game.Game, idxes []int, sides []game.Side) error
 
 var Actions = struct {
 	Info   GameAction
@@ -15,23 +15,23 @@ var Actions = struct {
 	End    GameAction
 	Cancel GameAction
 }{
-	Info: func(g *game.Game, idxes []int, sides game.Sides) error {
+	Info: func(g *game.Game, idxes []int, sides []game.Side) error {
 		idx, side := idxes[0], sides[0]
 		return g.GetInfo(idx, side)
 	},
-	Play: func(g *game.Game, idxes []int, sides game.Sides) error {
+	Play: func(g *game.Game, idxes []int, sides []game.Side) error {
 		handIdx, areaIdx := idxes[0], idxes[1]
 		spellIdxes, spellSides := idxes[1:], sides[1:]
 		return g.GetActivePlayer().PlayCard(handIdx, areaIdx, spellIdxes, spellSides)
 	},
-	Attack: func(g *game.Game, idxes []int, sides game.Sides) error {
+	Attack: func(g *game.Game, idxes []int, sides []game.Side) error {
 		allyIdx, enemyIdx := idxes[0], idxes[1]
 		return g.GetActivePlayer().Attack(allyIdx, enemyIdx)
 	},
-	Power: func(g *game.Game, idxes []int, sides game.Sides) error {
+	Power: func(g *game.Game, idxes []int, sides []game.Side) error {
 		return g.GetActivePlayer().CastHeroPower(idxes, sides)
 	},
-	End: func(g *game.Game, idxes []int, sides game.Sides) error {
+	End: func(g *game.Game, idxes []int, sides []game.Side) error {
 		g.TurnFinished = true
 		return nil
 	},
@@ -50,7 +50,7 @@ func GetAction(name string) GameAction {
 	case "end":
 		return Actions.End
 	default:
-		return func(g *game.Game, idxes []int, sides game.Sides) error {
+		return func(g *game.Game, idxes []int, sides []game.Side) error {
 			return nil
 		}
 	}

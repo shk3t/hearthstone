@@ -13,16 +13,28 @@ type Game struct {
 	passiveEffects map[*Character]PassiveEffect
 	eventEffects   map[int]map[*Character]Effect
 	Config         GameConfig
+	inputPosition  func() (idxes []int, sides []Side)
 }
 
-func NewGame(config GameConfig, topHero, botHero *Hero, topDeck, botDeck Deck) *Game {
-	game := &Game{
-		Config:         config,
+type PositionInputFunc func(g *Game) (idxes []int, sides []Side)
+
+func NewGame(
+	topHero, botHero *Hero,
+	topDeck, botDeck Deck,
+	config GameConfig,
+	positionInputFunc PositionInputFunc,
+) *Game {
+	var game *Game
+	game = &Game{
 		Table:          *newTable(config.TableSize),
 		Turn:           UnsetSide,
 		TurnFinished:   false,
 		passiveEffects: map[*Character]PassiveEffect{},
 		eventEffects:   map[int]map[*Character]Effect{},
+		Config:         config,
+		inputPosition: func() (idxes []int, sides []Side) {
+			return positionInputFunc(game)
+		},
 	}
 
 	topHero.SetHealthToMax()
@@ -103,31 +115,6 @@ func (g *Game) GetWinner() Side {
 	return UnsetSide
 }
 
-func (g *Game) GetInfo(idx int, side Side) error {
-	player := g.GetActivePlayer()
-
-	if idx == HeroIdx {
-		if side == player.Side.Opposite() {
-			return NewInfoError(player.GetOpponent().Hero.Power)
-		}
-		return NewInfoError(player.Hero.Power)
-	}
-
-	if side == UnsetSide {
-		card, err := player.Hand.Get(idx)
-		if err != nil {
-			return err
-		}
-		return NewInfoError(card)
-	}
-
-	minion, err := g.Table[side].GetMinion(idx)
-	if err != nil {
-		return err
-	}
-	return NewInfoError(*minion)
-}
-
 func (g *Game) getCharacter(idx int, side Side) (*Character, error) {
 	if idx == HeroIdx {
 		return &g.Players[side].Hero.Character, nil
@@ -151,4 +138,29 @@ func (g *Game) getApplicablePassiveEffects(character *Character) []PassiveEffect
 		}
 	}
 	return applicableEffects
+}
+
+func (g *Game) GetInfo(idx int, side Side) error {
+	player := g.GetActivePlayer()
+
+	if idx == HeroIdx {
+		if side == player.Side.Opposite() {
+			return NewInfoError(player.GetOpponent().Hero.Power)
+		}
+		return NewInfoError(player.Hero.Power)
+	}
+
+	if side == UnsetSide {
+		card, err := player.Hand.Get(idx)
+		if err != nil {
+			return err
+		}
+		return NewInfoError(card)
+	}
+
+	minion, err := g.Table[side].GetMinion(idx)
+	if err != nil {
+		return err
+	}
+	return NewInfoError(*minion)
 }

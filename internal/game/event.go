@@ -1,9 +1,5 @@
 package game
 
-import (
-	errpkg "hearthstone/pkg/errors"
-)
-
 type event struct {
 	id              int
 	getPrimaryEvent func(owner *Player) event
@@ -41,28 +37,15 @@ var Events = struct {
 	Deathrattle: event{id: 4},
 }
 
-func (evt event) Trigger(triggerer *Player, idxes []int, sides Sides) {
+func (evt event) Trigger(triggerer *Player, idxes []int, sides []Side) error {
 	characterEffects := triggerer.Game.eventEffects[evt.id]
-
 	for character, effect := range characterEffects {
 		err := effect.Apply(character, idxes, sides)
-
-		switch err.(type) {
-		case nil:
-		case NoTargetSpecifiedError:
-			idxes, sides := InputNewIdxes()
-			err := effect.Apply(character, idxes, sides)
-			if err != nil {
-				panic(errpkg.NewUnexpectedError(err))
-			}
-		default:
-			panic(errpkg.NewUnexpectedError(err))
+		if err != nil {
+			return err
 		}
 	}
-}
-
-func InputNewIdxes() (idxes []int, sides Sides) {
-	return nil, nil // TODO
+	return nil
 }
 
 func getSideAwareCardPlayedEvent(side Side) event {
