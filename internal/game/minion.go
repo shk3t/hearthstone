@@ -45,14 +45,14 @@ func (m *Minion) Summon(owner *Player, handIdx, areaIdx int) (error) {
 		m.Status.SetSleep(true)
 	}
 
-	Events.Battlecry.Trigger(owner, nil, nil)
-
-	if m.Passive != nil {
-		m.Passive.Apply(character, nil, nil)
-	}
 	if m.Effect != nil {
 		m.Effect.Register(character)
 	}
+	if m.Passive != nil {
+		m.Passive.Apply(character, nil, nil)
+	}
+
+	Events.Battlecry.Trigger(owner, nil, nil)
 
 	for _, effect := range game.getApplicablePassiveEffects(character) {
 		effect.InFunc(character)

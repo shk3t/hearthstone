@@ -19,6 +19,7 @@ func main() {
 		legacy.Neutral.ElvenArcher,
 		legacy.Neutral.LootHoarder,
 		legacy.Neutral.ColdlightOracle,
+		legacy.Neutral.ColdlightOracle,
 	)
 
 	g := loop.StartGame(

@@ -48,6 +48,7 @@ func (evt event) Trigger(triggerer *Player, idxes []int, sides Sides) {
 		err := effect.Apply(character, idxes, sides)
 
 		switch err.(type) {
+		case nil:
 		case NoTargetSpecifiedError:
 			idxes, sides := InputNewIdxes()
 			err := effect.Apply(character, idxes, sides)

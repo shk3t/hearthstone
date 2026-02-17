@@ -172,13 +172,34 @@ func (eff Effect) Apply(
 	idxes []int,
 	sides Sides,
 ) error {
-	targets, err := eff.Target(source, idxes, sides)
-	if err != nil {
-		return err
-	}
+	switch {
 
-	for _, target := range targets {
-		eff.Func(target)
+	case eff.Target != nil && eff.Func != nil:
+		targets, err := eff.Target(source, idxes, sides)
+		if err != nil {
+			return err
+		}
+		for _, target := range targets {
+			eff.Func(target)
+		}
+
+	case eff.Target != nil && eff.IndividualFuncs != nil:
+		targets, err := eff.Target(source, idxes, sides)
+		if err != nil {
+			return err
+		}
+		if len(eff.IndividualFuncs) != len(targets) {
+			panic(NewUnmatchedTargetNumberError(len(eff.IndividualFuncs), len(targets)))
+		}
+		for i, target := range targets {
+			eff.IndividualFuncs[i](target)
+		}
+
+	case eff.PlayerFunc != nil:
+		eff.PlayerFunc(source.owner)
+
+	default:
+		panic("Invalid effect")
 	}
 
 	return nil

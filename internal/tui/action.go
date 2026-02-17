@@ -37,7 +37,6 @@ var actions = struct {
 			return NewHelpError()
 		},
 	},
-	// TODO: show info about opponent's hero power
 	info: tuiAction{
 		name:        "info",
 		shortcut:    "i",

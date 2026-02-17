@@ -128,7 +128,7 @@ func (p *Player) Attack(allyIdx, enemyIdx int) error {
 }
 
 func (p *Player) DrawCards(number int) []error {
-	errs := make([]error, 0, 4)
+	errs := []error{}
 
 	for range number {
 		card, err := p.deck.takeTop()
