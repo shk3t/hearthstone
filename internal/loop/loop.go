@@ -50,10 +50,6 @@ func StartGame(
 
 			select {
 			case entry = <-inputChan:
-				if entry.ActionName == "" {
-					io.SetErrors(NewNeedActionError())
-					continue
-				}
 			case <-ctx.Done():
 				return
 			}

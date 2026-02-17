@@ -48,7 +48,3 @@ func parseAllPositions(args []string) (idxes []int, sides []game.Side, errs []er
 
 	return idxes, sides, errs
 }
-
-func isAction(arg string) bool {
-	return actionCharRegexp.MatchString(arg)
-}

@@ -10,13 +10,15 @@ import (
 	"hearthstone/pkg/ui"
 	"os"
 	"strings"
+	"sync/atomic"
 )
 
 type gameIO struct {
-	game      game.Game
-	errorChan chan error
-	scanner   *bufio.Scanner
-	inputChan chan loop.InputEntry
+	game                  game.Game
+	errorChan             chan error
+	scanner               *bufio.Scanner
+	inputChan             chan loop.InputEntry
+	positionInputMode atomic.Bool
 }
 
 func NewGameIO() *gameIO {
@@ -36,11 +38,33 @@ func (io *gameIO) Run(ctx context.Context) {
 			return
 		}
 
-		io.handleInput()
+		if io.positionInputMode.Load() {
+			io.handlePositionInput()
+		} else {
+			io.handleActionInput()
+		}
 	}
 }
 
-func (io *gameIO) handleInput() {
+func (io *gameIO) handlePositionInput() {
+	input := io.scanner.Text()
+	input = strings.ToLower(input)
+	args := strings.Fields(input)
+
+	idxes, sides, errs := parseAllPositions(args)
+	if helper.FirstError(errs) != nil {
+		io.SetErrors(NewInvalidArgumentsError(nil))
+		io.redraw()
+		return
+	}
+
+	io.inputChan <- loop.InputEntry{
+		Idxes: idxes,
+		Sides: sides,
+	}
+}
+
+func (io *gameIO) handleActionInput() {
 	input := io.scanner.Text()
 	input = strings.ToLower(input)
 	allArgs := strings.Fields(input)
@@ -48,21 +72,6 @@ func (io *gameIO) handleInput() {
 	command, args := "", []string{}
 	if len(allArgs) > 0 {
 		command, args = allArgs[0], allArgs[1:]
-	}
-
-	if !isAction(command) {
-		args = allArgs
-		idxes, sides, errs := parseAllPositions(args)
-		if helper.FirstError(errs) != nil {
-			io.SetErrors(NewInvalidArgumentsError(nil))
-			io.redraw()
-			return
-		}
-		io.inputChan <- loop.InputEntry{
-			Idxes: idxes,
-			Sides: sides,
-		}
-		return
 	}
 
 	for _, action := range actionList {
@@ -142,10 +151,12 @@ func (io *gameIO) GetInputChan() <-chan loop.InputEntry {
 
 func (io *gameIO) GetPositionInputFunc(ctx context.Context) game.PositionInputFunc {
 	return func(g *game.Game, n int) (idxes []int, sides []game.Side) {
+		io.positionInputMode.Store(true)
 		io.SetErrors(NewInputPromptError(n, g.GetActivePlayer().Side))
 		io.Redraw(*g)
 		select {
 		case entry := <-io.inputChan:
+			io.positionInputMode.Store(false)
 			return entry.Idxes, entry.Sides
 		case <-ctx.Done():
 			return nil, nil

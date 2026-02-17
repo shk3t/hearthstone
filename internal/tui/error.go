@@ -3,7 +3,6 @@ package tui
 import (
 	"fmt"
 	"hearthstone/internal/game"
-	"hearthstone/internal/loop"
 	errpkg "hearthstone/pkg/errors"
 	"strings"
 
@@ -86,9 +85,6 @@ func tuiError(err error) string {
 		default:
 			panic("Invalid card type")
 		}
-
-	case loop.NeedActionError:
-		return NewShortHelpError().Error()
 
 	case InvalidArgumentsError, ShortHelpError, HelpError, InputPromptError:
 		return err.Error()
