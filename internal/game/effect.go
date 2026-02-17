@@ -177,11 +177,10 @@ func (eff Effect) Apply(
 		eff.fillSides(sides, source.getSide())
 		targets, err := eff.Target(source, idxes, sides)
 
-		if _, ok := err.(NoTargetSpecifiedError); ok {
-			idxes, sides := source.getGame().inputPosition()
+		if ntsErr, ok := err.(NoTargetSpecifiedError); ok {
+			idxes, sides := source.getGame().inputPosition(ntsErr.Required)
 			eff.fillSides(sides, source.getSide())
 			targets, err = eff.Target(source, idxes, sides)
-			// TODO: rollback if invalid args
 		}
 		if err != nil {
 			return err

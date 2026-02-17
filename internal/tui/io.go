@@ -59,8 +59,8 @@ func (io *gameIO) handleInput() {
 			return
 		}
 		io.inputChan <- loop.InputEntry{
-			Idxes:      idxes,
-			Sides:      sides,
+			Idxes: idxes,
+			Sides: sides,
 		}
 		return
 	}
@@ -141,8 +141,8 @@ func (io *gameIO) GetInputChan() <-chan loop.InputEntry {
 }
 
 func (io *gameIO) GetPositionInputFunc(ctx context.Context) game.PositionInputFunc {
-	return func(g *game.Game) (idxes []int, sides []game.Side) {
-		io.SetErrors(NewInputPromptError(g.GetActivePlayer().Side))
+	return func(g *game.Game, n int) (idxes []int, sides []game.Side) {
+		io.SetErrors(NewInputPromptError(n, g.GetActivePlayer().Side))
 		io.Redraw(*g)
 		select {
 		case entry := <-io.inputChan:

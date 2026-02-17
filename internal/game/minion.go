@@ -48,14 +48,13 @@ func (m *Minion) Summon(owner *Player, handIdx, areaIdx int) error {
 	if m.Effect != nil {
 		m.Effect.gameAttach(character)
 	}
-	if m.Passive != nil {
-		m.Passive.Apply(character, nil, nil)
-	}
-
 	err = Events.Battlecry.Trigger(owner, nil, nil)
 	if err != nil {
-		area.remove(areaIdx) // TODO: I don't have to be able to do another action
+		area.remove(areaIdx)
 		return err
+	}
+	if m.Passive != nil {
+		m.Passive.Apply(character, nil, nil)
 	}
 
 	for _, effect := range game.getApplicablePassiveEffects(character) {

@@ -43,6 +43,7 @@ type EmptyDeckError struct {
 }
 type NoTargetSpecifiedError struct {
 	BaseError
+	Required int
 }
 type UnmatchedTargetNumberError struct {
 	BaseError
@@ -84,8 +85,8 @@ func NewFullTableAreaError() FullTableAreaError {
 func NewEmptyDeckError() EmptyDeckError {
 	return EmptyDeckError{}
 }
-func NewNoTargetSpecifiedError() NoTargetSpecifiedError {
-	return NoTargetSpecifiedError{}
+func NewNoTargetSpecifiedError(required int) NoTargetSpecifiedError {
+	return NoTargetSpecifiedError{Required: required}
 }
 func NewUnmatchedTargetNumberError(specified, required int) UnmatchedTargetNumberError {
 	return UnmatchedTargetNumberError{

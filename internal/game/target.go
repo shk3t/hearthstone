@@ -55,7 +55,7 @@ var Targets = struct {
 	},
 	Single: func(source *Character, idxes []int, sides []Side) ([]*Character, error) {
 		if idxes == nil {
-			return nil, NewNoTargetSpecifiedError()
+			return nil, NewNoTargetSpecifiedError(1)
 		}
 		if len(idxes) == 0 {
 			return nil, NewUnmatchedTargetNumberError(0, 1)

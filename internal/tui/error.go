@@ -106,6 +106,7 @@ type InvalidArgumentsError struct {
 type HelpError struct{}
 type ShortHelpError struct{}
 type InputPromptError struct {
+	requiredTargets int
 	activeSide game.Side
 }
 
@@ -120,9 +121,10 @@ func NewShortHelpError() ShortHelpError {
 func NewHelpError() HelpError {
 	return HelpError{}
 }
-func NewInputPromptError(activeSide game.Side) InputPromptError {
+func NewInputPromptError(requiredTargets int, activeSide game.Side) InputPromptError {
 	return InputPromptError{
-		activeSide: activeSide,
+		requiredTargets: requiredTargets,
+		activeSide:      activeSide,
 	}
 }
 
@@ -156,7 +158,9 @@ func (err HelpError) Error() string {
 	return builder.String()
 }
 func (err InputPromptError) Error() string {
-	return getColorStringFunc(err.activeSide)("Выберите цели")
+	return getColorStringFunc(err.activeSide)(
+		"Выберите цели (%d)", err.requiredTargets,
+	)
 }
 
 func positionsInfo() string {

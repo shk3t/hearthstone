@@ -13,10 +13,10 @@ type Game struct {
 	passiveEffects map[*Character]PassiveEffect
 	eventEffects   map[int]map[*Character]Effect
 	Config         GameConfig
-	inputPosition  func() (idxes []int, sides []Side)
+	inputPosition  func(n int) (idxes []int, sides []Side)
 }
 
-type PositionInputFunc func(g *Game) (idxes []int, sides []Side)
+type PositionInputFunc func(g *Game, n int) (idxes []int, sides []Side)
 
 func NewGame(
 	topHero, botHero *Hero,
@@ -32,8 +32,8 @@ func NewGame(
 		passiveEffects: map[*Character]PassiveEffect{},
 		eventEffects:   map[int]map[*Character]Effect{},
 		Config:         config,
-		inputPosition: func() (idxes []int, sides []Side) {
-			return positionInputFunc(game)
+		inputPosition: func(n int) (idxes []int, sides []Side) {
+			return positionInputFunc(game, n)
 		},
 	}
 
