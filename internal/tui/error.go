@@ -103,7 +103,7 @@ type HelpError struct{}
 type ShortHelpError struct{}
 type InputPromptError struct {
 	requiredTargets int
-	activeSide game.Side
+	activeSide      game.Side
 }
 
 func NewInvalidArgumentsError(action *tuiAction) InvalidArgumentsError {
@@ -162,7 +162,8 @@ func (err InputPromptError) Error() string {
 func positionsInfo() string {
 	builder := strings.Builder{}
 	fmt.Fprintf(&builder,
-		"Чтобы указать героя в качестве цели, используйте %s\n",
+		"Чтобы указать героя в качестве цели, используйте %s или %s\n",
+		color.BlueString("h"),
 		color.BlueString("0"),
 	)
 	fmt.Fprintf(&builder,
