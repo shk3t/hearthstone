@@ -66,7 +66,7 @@ func (p *Player) PlayCard(
 	case Minion:
 		err = card.Summon(p, handIdx, areaIdx)
 	case Spell:
-		err = card.Cast(p.Hero, spellIdxes, spellSides)
+		err = card.Cast(p, spellIdxes, spellSides)
 	default:
 		panic("Invalid card type")
 	}
@@ -77,14 +77,11 @@ func (p *Player) PlayCard(
 	p.Hand.discard(handIdx)
 	p.spendMana(manaCost)
 
-	p.Game.TriggerAllEffects(Events.CardPlayed)
-	p.Game.TriggerAllEffects(getSideAwareCardPlayedEvent(p.Side))
-
 	return nil
 }
 
 func (p *Player) CastHeroPower(idxes []int, sides []Side) error {
-	if p.Hero.PowerIsUsed {
+	if p.Hero.Power.IsUsed {
 		return NewUsedHeroPowerError()
 	}
 
@@ -95,12 +92,12 @@ func (p *Player) CastHeroPower(idxes []int, sides []Side) error {
 		return NewNotEnoughManaError(p.Mana, manaCost)
 	}
 
-	err := power.Cast(p.Hero, idxes, sides)
+	err := power.Effect.Apply(&p.Hero.Character, idxes, sides)
 	if err != nil {
 		return err
 	}
 
-	p.Hero.PowerIsUsed = true
+	p.Hero.Power.IsUsed = true
 	p.spendMana(manaCost)
 
 	return nil

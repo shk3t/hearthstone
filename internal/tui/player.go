@@ -19,12 +19,12 @@ func playerString(p game.Player) string {
 		healthString(*p.Hero),
 		manaString(p),
 		sugar.If(
-			p.IsActive() && !p.Hero.PowerIsUsed,
+			p.IsActive() && !p.Hero.Power.IsUsed,
 			fmt.Sprintf(
 				"%s%s %s",
 				ui.BoldString(colorStringFunc("w")),
 				color.HiBlackString("."),
-				spellString(p.Hero.Power),
+				powerString(p.Hero.Power),
 			),
 			"",
 		),

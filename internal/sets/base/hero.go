@@ -17,7 +17,7 @@ var Heroes = struct {
 			MaxHealth: 30,
 		},
 		Class: game.MageClass,
-		Power: game.Spell{
+		Power: game.Power{
 			Card: game.Card{
 				ManaCost:    2,
 				Name:        "Вспышка огня",
@@ -31,7 +31,6 @@ var Heroes = struct {
 					target.DealDamage(1)
 				},
 			},
-			HeroPower: true,
 		},
 	},
 	Priest: game.Hero{
@@ -40,7 +39,7 @@ var Heroes = struct {
 			MaxHealth: 30,
 		},
 		Class: game.PriestClass,
-		Power: game.Spell{
+		Power: game.Power{
 			Card: game.Card{
 				ManaCost:    2,
 				Name:        "Малое исцеление",
@@ -55,7 +54,6 @@ var Heroes = struct {
 				},
 				AllyIsDefaultTarget: true,
 			},
-			HeroPower: true,
 		},
 	},
 }

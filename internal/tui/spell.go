@@ -14,3 +14,7 @@ func spellString(s game.Spell) string {
 		color.MagentaString("%s", s.Name),
 	)
 }
+
+func powerString(p game.Power) string {
+	return spellString(game.Spell{Card: p.Card, Effect: p.Effect})
+}

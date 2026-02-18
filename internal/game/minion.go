@@ -47,15 +47,18 @@ func (m *Minion) Summon(owner *Player, handIdx, areaIdx int) error {
 
 	m.Status.SetSleep(true)
 	game.TriggerAllEffectsOnlyFor(Events.PassiveIn, character)
-	for _, effect := range m.Effects {
-		game.AttachEffect(effect, character)
-	}
 	err = game.TriggerSelfEffect(Events.Battlecry, character)
 	if err != nil {
 		area.remove(areaIdx)
 		return err
 	}
 	game.TriggerSelfEffect(Events.PassiveIn, character)
+	game.TriggerAllEffects(Events.CardPlayed)
+	game.TriggerAllEffects(getSideAwareCardPlayedEvent(owner.Side))
+
+	for _, effect := range m.Effects {
+		game.AttachEffect(effect, character)
+	}
 
 	return nil
 }

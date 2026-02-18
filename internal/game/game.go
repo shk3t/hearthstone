@@ -6,10 +6,10 @@ import (
 )
 
 type Game struct {
-	Players      [SidesCount]Player
-	Table        Table
-	Turn         Side
-	TurnFinished bool
+	Players       [SidesCount]Player
+	Table         Table
+	Turn          Side
+	TurnFinished  bool
 	eventEffects  map[int]map[*Character]Effect
 	Config        GameConfig
 	inputPosition func(n int) (idxes []int, sides []Side)
@@ -78,7 +78,7 @@ func (g *Game) StartNextTurn() []error {
 	activePlayer := g.GetActivePlayer()
 	activePlayer.increaseMana()
 	activePlayer.restoreMana()
-	activePlayer.Hero.PowerIsUsed = false
+	activePlayer.Hero.Power.IsUsed = false
 	errs := activePlayer.DrawCards(1)
 
 	activeArea := g.GetActiveArea()
