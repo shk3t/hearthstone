@@ -62,13 +62,13 @@ func StartGame(
 
 			g.Cleanup()
 
-			if g.GetWinner() != game.UnsetSide {
-				cancel()
-			}
-
 			if g.TurnFinished {
 				errs := g.StartNextTurn()
 				io.SetErrors(errs...)
+			}
+
+			if g.GetWinner() != game.UnsetSide {
+				cancel()
 			}
 		}
 	}()

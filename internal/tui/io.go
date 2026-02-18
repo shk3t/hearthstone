@@ -31,10 +31,10 @@ func NewGameIO() *gameIO {
 
 func (io *gameIO) Run(ctx context.Context) {
 	for {
-		if ctx.Err() != nil {
+		if !io.scanner.Scan() {
 			return
 		}
-		if !io.scanner.Scan() {
+		if ctx.Err() != nil {
 			return
 		}
 
