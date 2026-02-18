@@ -14,10 +14,10 @@ import (
 )
 
 type gameIO struct {
-	game                  game.Game
-	errorChan             chan error
-	scanner               *bufio.Scanner
-	inputChan             chan loop.InputEntry
+	game              game.Game
+	errorChan         chan error
+	scanner           *bufio.Scanner
+	inputChan         chan loop.InputEntry
 	positionInputMode atomic.Bool
 }
 

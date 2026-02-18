@@ -28,9 +28,6 @@ var Actions = struct {
 		allyIdx, enemyIdx := idxes[0], idxes[1]
 		return g.GetActivePlayer().Attack(allyIdx, enemyIdx)
 	},
-	Power: func(g *game.Game, idxes []int, sides []game.Side) error {
-		return g.GetActivePlayer().CastHeroPower(idxes, sides)
-	},
 	End: func(g *game.Game, idxes []int, sides []game.Side) error {
 		g.TurnFinished = true
 		return nil
@@ -45,8 +42,6 @@ func GetAction(name string) GameAction {
 		return Actions.Play
 	case "attack":
 		return Actions.Attack
-	case "power":
-		return Actions.Power
 	case "end":
 		return Actions.End
 	default:

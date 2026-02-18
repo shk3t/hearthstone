@@ -10,7 +10,6 @@ import (
 
 type tuiAction struct {
 	name        string
-	shortcut    string
 	args        []string
 	description string
 	errFunc     func() error
@@ -30,7 +29,6 @@ var actions = struct {
 }{
 	help: tuiAction{
 		name:        "help",
-		shortcut:    "h",
 		args:        nil,
 		description: "вывести полную помощь по командам",
 		errFunc: func() error {
@@ -39,7 +37,6 @@ var actions = struct {
 	},
 	info: tuiAction{
 		name:        "info",
-		shortcut:    "i",
 		args:        []string{"<номер_карты>/<позиция_на_столе><b/t>"},
 		description: "подробное описание карты на руке/столе",
 		prepareArgs: func(idxes []int, sides []game.Side) ([]int, []game.Side) {
@@ -52,8 +49,7 @@ var actions = struct {
 		},
 	},
 	play: tuiAction{
-		name:     "play",
-		shortcut: "p",
+		name: "play",
 		args: []string{
 			"<номер_карты>",
 			"<позиция_на_столе>/<позиции_целей_заклинания>",
@@ -74,7 +70,6 @@ var actions = struct {
 	},
 	attack: tuiAction{
 		name:        "attack",
-		shortcut:    "a",
 		args:        []string{"<позиция_союзного_персонажа>", "<позиция_персонажа_противника>"},
 		description: "атаковать персонажа",
 		prepareArgs: func(idxes []int, sides []game.Side) ([]int, []game.Side) {
@@ -89,40 +84,21 @@ var actions = struct {
 			}
 		},
 	},
-	power: tuiAction{
-		name:        "power",
-		shortcut:    "w",
-		args:        []string{"<позиции_целей_силы_героя>"},
-		description: "использовать способность героя",
-		prepareArgs: func(idxes []int, sides []game.Side) ([]int, []game.Side) {
-			switch len(idxes) {
-			case 0:
-				idxes = append(idxes, 0)
-				sides = append(sides, game.UnsetSide)
-				return idxes, sides
-			case 1:
-				return idxes, sides
-			default:
-				return nil, nil
-			}
-		},
-	},
 	end: tuiAction{
 		name:        "end",
-		shortcut:    "e",
 		args:        nil,
 		description: "закончить ход",
 	},
 }
 
 func (a *tuiAction) matches(command string) bool {
-	return strings.HasPrefix(command, a.shortcut) || command == a.name
+	return strings.HasPrefix(a.name, command)
 }
 
 func (a *tuiAction) info(trimSpaces bool, hideArgs bool) string {
 	if hideArgs {
 		return fmt.Sprintf(
-			"%53s %s %s",
+			"%44s %s %s",
 			a.getFormattedName(),
 			color.HiBlackString("-"),
 			a.description,
@@ -130,7 +106,7 @@ func (a *tuiAction) info(trimSpaces bool, hideArgs bool) string {
 	}
 
 	output := fmt.Sprintf(
-		"%53s %-59s %s %s",
+		"%44s %-59s %s %s",
 		a.getFormattedName(),
 		strings.Join(a.args, " "),
 		color.HiBlackString("-"),
@@ -160,18 +136,13 @@ func (a *tuiAction) info(trimSpaces bool, hideArgs bool) string {
 }
 
 func (a *tuiAction) getFormattedName() string {
-	nameParts := strings.SplitN(a.name, a.shortcut, 2)
-	if len(nameParts) != 2 {
-		return color.MagentaString(a.name)
-	}
-
+	runes := []rune(a.name)
 	return fmt.Sprintf(
-		"%s%s%s%s%s",
-		color.MagentaString(nameParts[0]),
+		"%s%s%s%s",
 		color.HiBlackString("["),
-		color.MagentaString(a.shortcut),
+		color.MagentaString(string(runes[0])),
 		color.HiBlackString("]"),
-		color.MagentaString(nameParts[1]),
+		color.MagentaString(string(runes[1:])),
 	)
 }
 
@@ -181,7 +152,6 @@ func init() {
 		actions.info,
 		actions.play,
 		actions.attack,
-		actions.power,
 		actions.end,
 	}
 }
