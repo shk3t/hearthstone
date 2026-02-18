@@ -22,7 +22,7 @@ func parsePosition(arg string) (idx int, side game.Side, err error) {
 		side = game.UnsetSide
 	}
 
-	if strings.Contains(arg, "h") || strings.Contains(arg, "w") {
+	if strings.Contains(arg, "h") {
 		return game.HeroIdx, side, nil
 	}
 

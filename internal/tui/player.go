@@ -22,7 +22,7 @@ func playerString(p game.Player) string {
 			p.IsActive() && !p.Hero.Power.IsUsed,
 			fmt.Sprintf(
 				"%s%s %s",
-				ui.BoldString(colorStringFunc("w")),
+				ui.BoldString(colorStringFunc("h")),
 				color.HiBlackString("."),
 				powerString(p.Hero.Power),
 			),
