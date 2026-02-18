@@ -25,7 +25,7 @@ var Heroes = struct {
 				Class:       game.MageClass,
 				Rarity:      game.BaseRarity,
 			},
-			DeprecatedEffect: game.TargetEffect{
+			Effect: game.Effect{
 				Target: game.Targets.Single,
 				Func: func(target *game.Character) {
 					target.DealDamage(1)
@@ -48,7 +48,7 @@ var Heroes = struct {
 				Class:       game.PriestClass,
 				Rarity:      game.BaseRarity,
 			},
-			DeprecatedEffect: game.TargetEffect{
+			Effect: game.Effect{
 				Target: game.Targets.Single,
 				Func: func(target *game.Character) {
 					target.RestoreHealth(2)
