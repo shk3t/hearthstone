@@ -6,14 +6,13 @@ import (
 )
 
 type Game struct {
-	Players        [SidesCount]Player
-	Table          Table
-	Turn           Side
-	TurnFinished   bool
-	passiveEffects map[*Character]PassiveEffect
-	eventEffects   map[int]map[*Character]Effect
-	Config         GameConfig
-	inputPosition  func(n int) (idxes []int, sides []Side)
+	Players      [SidesCount]Player
+	Table        Table
+	Turn         Side
+	TurnFinished bool
+	eventEffects  map[int]map[*Character]Effect
+	Config        GameConfig
+	inputPosition func(n int) (idxes []int, sides []Side)
 }
 
 type PositionInputFunc func(g *Game, n int) (idxes []int, sides []Side)
@@ -26,12 +25,11 @@ func NewGame(
 ) *Game {
 	var game *Game
 	game = &Game{
-		Table:          *newTable(config.TableSize),
-		Turn:           UnsetSide,
-		TurnFinished:   false,
-		passiveEffects: map[*Character]PassiveEffect{},
-		eventEffects:   map[int]map[*Character]Effect{},
-		Config:         config,
+		Table:        *newTable(config.TableSize),
+		Turn:         UnsetSide,
+		TurnFinished: false,
+		eventEffects: map[int]map[*Character]Effect{},
+		Config:       config,
 		inputPosition: func(n int) (idxes []int, sides []Side) {
 			return positionInputFunc(game, n)
 		},
@@ -127,17 +125,57 @@ func (g *Game) getCharacter(idx int, side Side) (*Character, error) {
 	}
 }
 
-func (g *Game) getApplicablePassiveEffects(character *Character) []PassiveEffect {
-	applicableEffects := []PassiveEffect{}
-	for source, effect := range g.passiveEffects {
-		targets, _ := effect.Target(source, nil, nil)
-		for _, target := range targets {
-			if target == character {
-				applicableEffects = append(applicableEffects, effect)
-			}
+func (g *Game) AttachEffect(effect Effect, source *Character) error {
+	event := effect.Event
+	if event.getPrimaryEvent != nil {
+		event = event.getPrimaryEvent(source.owner)
+	}
+
+	characterEffects, ok := g.eventEffects[event.id]
+	if !ok {
+		characterEffects = map[*Character]Effect{}
+		g.eventEffects[event.id] = characterEffects
+	}
+	characterEffects[source] = effect
+
+	return nil
+}
+
+func (g *Game) DetachEffect(effect Effect, source *Character) error {
+	event := effect.Event
+	if event.getPrimaryEvent != nil {
+		event = event.getPrimaryEvent(source.owner)
+	}
+
+	characterEffects, ok := g.eventEffects[event.id]
+	if ok {
+		delete(characterEffects, source)
+	}
+
+	return nil
+}
+
+func (g *Game) TriggerSelfEffect(event event, source *Character) error {
+	for _, effect := range source.Effects {
+		if effect.Event.id == event.id {
+			return effect.Apply(source, nil, nil)
 		}
 	}
-	return applicableEffects
+	return nil
+}
+
+func (g *Game) TriggerAllEffects(event event) {
+	characterEffects := g.eventEffects[event.id]
+	for character, effect := range characterEffects {
+		effect.Apply(character, nil, nil)
+	}
+}
+
+func (g *Game) TriggerAllEffectsOnlyFor(event event, target *Character) {
+	characterEffects := g.eventEffects[event.id]
+	for source, effect := range characterEffects {
+		effect.ApplyOn(source, target)
+	}
 }
 
 func (g *Game) GetInfo(idx int, side Side) error {

@@ -77,8 +77,8 @@ func (p *Player) PlayCard(
 	p.Hand.discard(handIdx)
 	p.spendMana(manaCost)
 
-	Events.CardPlayed.Trigger(p, nil, nil)
-	getSideAwareCardPlayedEvent(p.Side).Trigger(p, nil, nil)
+	p.Game.TriggerAllEffects(Events.CardPlayed)
+	p.Game.TriggerAllEffects(getSideAwareCardPlayedEvent(p.Side))
 
 	return nil
 }

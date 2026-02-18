@@ -27,13 +27,13 @@ var Neutral = struct {
 		Character: game.Character{
 			Attack:    1,
 			MaxHealth: 1,
-			Effect: &game.Effect{
+			Effects: []game.Effect{{
 				Event:  game.Events.Battlecry,
 				Target: game.Targets.Single,
 				Func: func(target *game.Character) {
 					target.DealDamage(1)
 				},
-			},
+			}},
 		},
 		Type: game.NoMinionType,
 	},
@@ -48,12 +48,12 @@ var Neutral = struct {
 		Character: game.Character{
 			Attack:    2,
 			MaxHealth: 1,
-			Effect: &game.Effect{
+			Effects: []game.Effect{{
 				Event: game.Events.Deathrattle,
 				PlayerFunc: func(player *game.Player) {
 					player.DrawCards(1)
 				},
-			},
+			}},
 		},
 		Type: game.NoMinionType,
 	},
@@ -82,13 +82,13 @@ var Neutral = struct {
 		Character: game.Character{
 			Attack:    2,
 			MaxHealth: 2,
-			Effect: &game.Effect{
+			Effects: []game.Effect{{
 				Event: game.Events.Battlecry,
 				PlayerFunc: func(player *game.Player) {
 					player.DrawCards(2)
 					player.GetOpponent().DrawCards(2)
 				},
-			},
+			}},
 		},
 		Type: game.MurlocMinionType,
 	},
@@ -103,7 +103,7 @@ var Neutral = struct {
 		Character: game.Character{
 			Attack:    2,
 			MaxHealth: 2,
-			Effect: &game.Effect{
+			Effects: []game.Effect{{
 				Target: game.Targets.Self,
 				Func: func(target *game.Character) {
 					target.Attack++
@@ -111,7 +111,7 @@ var Neutral = struct {
 					target.Health++
 				},
 				Event: game.Events.PlayersCardPlayed,
-			},
+			}},
 		},
 		Type: game.NoMinionType,
 	},
@@ -126,13 +126,20 @@ var Neutral = struct {
 		Character: game.Character{
 			Attack:    2,
 			MaxHealth: 3,
-			Passive: &game.PassiveEffect{
-				Target: game.Targets.RestAllyMinions,
-				InFunc: func(target *game.Character) {
-					target.Attack++
+			Effects: []game.Effect{
+				{
+					Target: game.Targets.RestAllyMinions,
+					Event:  game.Events.PassiveIn,
+					Func: func(target *game.Character) {
+						target.Attack++
+					},
 				},
-				OutFunc: func(target *game.Character) {
-					target.Attack--
+				{
+					Target: game.Targets.RestAllyMinions,
+					Event:  game.Events.PassiveOut,
+					Func: func(target *game.Character) {
+						target.Attack--
+					},
 				},
 			},
 		},

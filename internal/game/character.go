@@ -1,13 +1,12 @@
 package game
 
 type Character struct {
-	Attack      int
-	Health      int
-	MaxHealth   int
-	Status      CharacterStatus
-	Passive     *PassiveEffect
-	Effect      *Effect
-	owner       *Player
+	Attack    int
+	Health    int
+	MaxHealth int
+	Status    CharacterStatus
+	Effects    []Effect
+	owner     *Player
 }
 
 func (c *Character) SetHealthToMax() {
@@ -25,14 +24,6 @@ func (c *Character) ExecuteAttack(target *Character) {
 
 func (c *Character) DealDamage(value int) {
 	c.Health -= value
-}
-
-func (c *Character) getGame() *Game {
-	return c.owner.Game
-}
-
-func (c *Character) getSide() Side {
-	return c.owner.Side
 }
 
 func (c *Character) getAllies() []*Character {

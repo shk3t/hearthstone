@@ -19,6 +19,8 @@ var Events = struct {
 	OpponentsCardPlayed event
 	Battlecry           event
 	Deathrattle         event
+	PassiveIn           event
+	PassiveOut          event
 }{
 	CardPlayed: event{id: 0},
 	PlayersCardPlayed: event{
@@ -35,17 +37,8 @@ var Events = struct {
 	},
 	Battlecry:   event{id: 3},
 	Deathrattle: event{id: 4},
-}
-
-func (evt event) Trigger(triggerer *Player, idxes []int, sides []Side) error {
-	characterEffects := triggerer.Game.eventEffects[evt.id]
-	for character, effect := range characterEffects {
-		err := effect.Apply(character, idxes, sides)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	PassiveIn:   event{id: 5},
+	PassiveOut:  event{id: 6},
 }
 
 func getSideAwareCardPlayedEvent(side Side) event {

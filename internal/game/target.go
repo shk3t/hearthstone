@@ -61,7 +61,7 @@ var Targets = struct {
 			return nil, NewUnmatchedTargetNumberError(0, 1)
 		}
 
-		target, err := source.getGame().getCharacter(idxes[0], sides[0])
+		target, err := source.owner.Game.getCharacter(idxes[0], sides[0])
 		return []*Character{target}, err
 	},
 }

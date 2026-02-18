@@ -34,14 +34,10 @@ var characterStatusInfoEntries = [...]*characterStatusInfoEntry{
 }
 
 var characterStatusHeader = color.HiBlackString("Статусы:") + "\n"
-var characterStatusEffectPictogram = color.YellowString("󰜷 ")
+// var characterStatusEffectPictogram = color.YellowString("󰜷 ")
 
 func characterStatusString(c game.Character) string {
 	builder := strings.Builder{}
-
-	if c.Passive != nil {
-		fmt.Fprint(&builder, characterStatusEffectPictogram)
-	}
 
 	for _, status := range characterStatusInfoEntries {
 		if status.isActive(&c.Status) {

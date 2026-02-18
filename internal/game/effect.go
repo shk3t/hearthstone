@@ -7,50 +7,6 @@ import (
 type targetEffectFunc func(target *Character)
 type playerEffectFunc func(player *Player)
 
-type PassiveEffect struct {
-	Target  targetSelector
-	InFunc  targetEffectFunc
-	OutFunc targetEffectFunc
-}
-
-func (e PassiveEffect) Apply(
-	source *Character,
-	idxes []int,
-	sides []Side,
-) error {
-	targets, err := e.Target(source, idxes, sides)
-	if err != nil {
-		return err
-	}
-
-	source.getGame().passiveEffects[source] = e
-
-	for _, target := range targets {
-		e.InFunc(target)
-	}
-
-	return nil
-}
-
-func (e PassiveEffect) Cancel(
-	source *Character,
-	idxes []int,
-	sides []Side,
-) error {
-	targets, err := e.Target(source, idxes, sides)
-	if err != nil {
-		return err
-	}
-
-	delete(source.getGame().passiveEffects, source)
-
-	for _, target := range targets {
-		e.OutFunc(target)
-	}
-
-	return nil
-}
-
 type Effect struct {
 	Event               event
 	Target              targetSelector
@@ -60,52 +16,14 @@ type Effect struct {
 	PlayerFunc          playerEffectFunc
 }
 
-func (eff Effect) gameAttach(source *Character) error {
-	g := source.getGame()
-
-	event := eff.Event
-	if event.getPrimaryEvent != nil {
-		event = event.getPrimaryEvent(source.owner)
-	}
-
-	characterEffects, ok := g.eventEffects[event.id]
-	if !ok {
-		characterEffects = map[*Character]Effect{}
-		g.eventEffects[event.id] = characterEffects
-	}
-	characterEffects[source] = eff
-
-	return nil
-}
-
-func (eff Effect) gameDetach(source *Character) error {
-	g := source.getGame()
-
-	event := eff.Event
-	if event.getPrimaryEvent != nil {
-		event = event.getPrimaryEvent(source.owner)
-	}
-
-	characterEffects, ok := g.eventEffects[event.id]
-	if ok {
-		delete(characterEffects, source)
-	}
-
-	return nil
-}
-
-func (eff Effect) Apply(
-	source *Character,
-	idxes []int,
-	sides []Side,
-) error {
+func (eff Effect) Apply(source *Character, idxes []int, sides []Side) error {
 	if eff.Target != nil {
-		eff.fillSides(sides, source.getSide())
+		eff.fillSides(sides, source.owner.Side)
 		targets, err := eff.Target(source, idxes, sides)
 
 		if ntsErr, ok := err.(NoTargetSpecifiedError); ok {
-			idxes, sides := source.getGame().inputPosition(ntsErr.Required)
-			eff.fillSides(sides, source.getSide())
+			idxes, sides := source.owner.Game.inputPosition(ntsErr.Required)
+			eff.fillSides(sides, source.owner.Side)
 			targets, err = eff.Target(source, idxes, sides)
 		}
 		if err != nil {
@@ -132,6 +50,25 @@ func (eff Effect) Apply(
 		panic("Invalid effect")
 	}
 
+	return nil
+}
+
+func (eff Effect) ApplyOn(source *Character, target *Character) error {
+	if eff.Target == nil {
+		return NewUnmatchedTargetNumberError(1, 0)
+	}
+
+	targets, err := eff.Target(source, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	for _, tgt := range targets {
+		if target == tgt {
+			eff.Func(target)
+			return nil
+		}
+	}
 	return nil
 }
 
