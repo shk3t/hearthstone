@@ -2,6 +2,7 @@ package game
 
 import (
 	"hearthstone/pkg/sugar"
+	"slices"
 )
 
 type targetEffectFunc func(target *Character)
@@ -63,11 +64,8 @@ func (eff Effect) ApplyOn(source *Character, target *Character) error {
 		return err
 	}
 
-	for _, tgt := range targets {
-		if target == tgt {
-			eff.Func(target)
-			return nil
-		}
+	if slices.Contains(targets, target) {
+		eff.Func(target)
 	}
 	return nil
 }
@@ -78,5 +76,26 @@ func (eff Effect) fillSides(sides []Side, sourceSide Side) {
 		if sides[i] == UnsetSide {
 			sides[i] = defaultSide
 		}
+	}
+}
+
+type PassiveEffectArgs struct {
+	Target  targetSelector
+	InFunc  targetEffectFunc
+	OutFunc targetEffectFunc
+}
+
+func NewPassiveEffect(args PassiveEffectArgs) []Effect {
+	return []Effect{
+		{
+			Target: args.Target,
+			Event:  Events.PassiveIn,
+			Func:   args.InFunc,
+		},
+		{
+			Target: args.Target,
+			Event:  Events.PassiveOut,
+			Func:   args.OutFunc,
+		},
 	}
 }

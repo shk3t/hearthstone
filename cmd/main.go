@@ -14,8 +14,8 @@ func main() {
 	defer loop.DeinitAll()
 
 	startingDeck := game.NewDeck(
-		// legacy.Mage.Frostbolt,
-		// legacy.Mage.Fireball,
+		legacy.Mage.Frostbolt,
+		legacy.Mage.Fireball,
 		// legacy.Neutral.QuestingAdventurer,
 		legacy.Neutral.RaidLeader,
 		legacy.Neutral.RaidLeader,

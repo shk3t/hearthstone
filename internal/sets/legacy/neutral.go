@@ -126,22 +126,15 @@ var Neutral = struct {
 		Character: game.Character{
 			Attack:    2,
 			MaxHealth: 3,
-			Effects: []game.Effect{
-				{
-					Target: game.Targets.RestAllyMinions,
-					Event:  game.Events.PassiveIn,
-					Func: func(target *game.Character) {
-						target.Attack++
-					},
+			Effects: game.NewPassiveEffect(game.PassiveEffectArgs{
+				Target:  game.Targets.RestAllyMinions,
+				InFunc:  func(target *game.Character) {
+					target.Attack++
 				},
-				{
-					Target: game.Targets.RestAllyMinions,
-					Event:  game.Events.PassiveOut,
-					Func: func(target *game.Character) {
-						target.Attack--
-					},
+				OutFunc: func(target *game.Character) {
+					target.Attack--
 				},
-			},
+			}),
 		},
 		Type: game.NoMinionType,
 	},
