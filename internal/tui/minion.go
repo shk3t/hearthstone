@@ -54,12 +54,10 @@ func minionTableString(m game.Minion, fieldWidths ...int) string {
 		"%s%s%s",
 		color.YellowString("%d", m.Attack),
 		color.HiBlackString("/"),
-		color.RedString(
-			sugar.If(
-				m.Health < m.MaxHealth,
-				ui.UnderlineString("%d", m.Health),
-				fmt.Sprintf("%d", m.Health),
-			),
+		sugar.If(
+			m.Health < m.MaxHealth,
+			ui.UnderlineString(color.RedString("%d", m.Health)),
+			color.RedString("%d", m.Health),
 		),
 	)
 
