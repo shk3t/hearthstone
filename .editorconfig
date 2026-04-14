@@ -1,12 +1,13 @@
 root = true
 
-[*.go]
-end_of_line = lf
+[*]
 charset = utf-8
+end_of_line = lf
+trim_trailing_whitespace = true
+
+[*.go]
 indent_style = tab
 indent_size = 4
-trim_trailing_whitespace = true
-insert_final_newline = false
 
 [*.lua]
 indent_size = 2
